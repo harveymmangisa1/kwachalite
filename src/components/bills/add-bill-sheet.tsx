@@ -33,12 +33,23 @@ import {
 import { PlusCircle } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Switch } from '@/components/ui/switch';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   amount: z.coerce.number().positive('Amount must be positive'),
   dueDate: z.string().min(1, 'Date is required'),
   status: z.enum(['paid', 'unpaid']),
+  isRecurring: z.boolean().default(false),
+  recurringFrequency: z.enum(['weekly', 'monthly', 'yearly']).optional(),
+}).refine(data => {
+    if (data.isRecurring && !data.recurringFrequency) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Recurring frequency is required for recurring bills.",
+    path: ["recurringFrequency"],
 });
 
 export function AddBillSheet() {
@@ -51,8 +62,11 @@ export function AddBillSheet() {
       amount: 0,
       dueDate: new Date().toISOString().split('T')[0],
       status: 'unpaid',
+      isRecurring: false,
     },
   });
+
+  const isRecurring = form.watch('isRecurring');
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -146,6 +160,50 @@ export function AddBillSheet() {
                 </FormItem>
               )}
             />
+             <FormField
+              control={form.control}
+              name="isRecurring"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                        <FormLabel>Recurring Bill</FormLabel>
+                    </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            {isRecurring && (
+                <FormField
+                control={form.control}
+                name="recurringFrequency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Frequency</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a frequency" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="yearly">Yearly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <SheetFooter>
                 <SheetClose asChild>
                     <Button type="submit">Save Bill</Button>

@@ -6,6 +6,13 @@ import { formatCurrency, cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AddBillSheet } from '@/components/bills/add-bill-sheet';
+import { Repeat } from 'lucide-react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export default function BillsPage() {
     return (
@@ -34,7 +41,21 @@ export default function BillsPage() {
                         <TableBody>
                             {bills.map((bill) => (
                                 <TableRow key={bill.id}>
-                                    <TableCell className="font-medium">{bill.name}</TableCell>
+                                    <TableCell className="font-medium flex items-center gap-2">
+                                        {bill.name}
+                                        {bill.isRecurring && (
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <Repeat className="h-4 w-4 text-muted-foreground" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>Recurring {bill.recurringFrequency}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        )}
+                                    </TableCell>
                                     <TableCell>{new Date(bill.dueDate).toLocaleDateString()}</TableCell>
                                     <TableCell>
                                         <Badge variant={bill.status === 'paid' ? 'secondary' : 'destructive'}>

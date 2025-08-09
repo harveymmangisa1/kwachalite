@@ -77,10 +77,10 @@ export const transactions: Transaction[] = [
 ];
 
 export const bills: Bill[] = [
-    { id: '1', name: 'Netflix Subscription', amount: 15000, dueDate: '2024-08-15', status: 'unpaid' },
-    { id: '2', name: 'Water Bill', amount: 20000, dueDate: '2024-08-20', status: 'unpaid' },
-    { id: '3', name: 'Electricity', amount: 35000, dueDate: '2024-08-25', status: 'paid' },
-    { id: '4', name: 'Internet Bill', amount: 45000, dueDate: '2024-09-01', status: 'unpaid' },
+    { id: '1', name: 'Netflix Subscription', amount: 15000, dueDate: '2024-08-15', status: 'unpaid', isRecurring: true, recurringFrequency: 'monthly' },
+    { id: '2', name: 'Water Bill', amount: 20000, dueDate: '2024-08-20', status: 'unpaid', isRecurring: true, recurringFrequency: 'monthly' },
+    { id: '3', name: 'Electricity', amount: 35000, dueDate: '2024-08-25', status: 'paid', isRecurring: false },
+    { id: '4', name: 'Internet Bill', amount: 45000, dueDate: '2024-09-01', status: 'unpaid', isRecurring: true, recurringFrequency: 'monthly' },
 ];
 
 export const savingsGoals: SavingsGoal[] = [

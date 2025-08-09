@@ -10,7 +10,7 @@ export interface Transaction {
 }
 
 export interface Category {
-  id: string;
+  id:string;
   name: string;
   icon: LucideIcon;
   color: string;
@@ -22,6 +22,8 @@ export interface Bill {
     amount: number;
     dueDate: string;
     status: 'paid' | 'unpaid';
+    isRecurring: boolean;
+    recurringFrequency?: 'weekly' | 'monthly' | 'yearly';
 }
 
 export interface SavingsGoal {
