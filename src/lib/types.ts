@@ -15,3 +15,19 @@ export interface Category {
   icon: LucideIcon;
   color: string;
 }
+
+export interface Bill {
+    id: string;
+    name: string;
+    amount: number;
+    dueDate: string;
+    status: 'paid' | 'unpaid';
+}
+
+export interface SavingsGoal {
+    id: string;
+    name: string;
+    targetAmount: number;
+    currentAmount: number;
+    deadline: string;
+}

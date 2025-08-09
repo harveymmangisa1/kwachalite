@@ -7,6 +7,8 @@ import {
   BarChart2,
   Settings,
   Wallet,
+  ReceiptText,
+  PiggyBank
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -20,6 +22,8 @@ import { LayoutDashboard } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions' },
+  { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills' },
+  { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings' },
   { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ];
@@ -30,24 +34,14 @@ export function Sidebar() {
   return (
     <aside className="hidden w-14 flex-col border-r bg-card sm:flex">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-        <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
+        <Link
               href="/dashboard"
-              className={cn(
-                'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8',
-                pathname === '/dashboard'
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <LayoutDashboard className="h-5 w-5" />
-              <span className="sr-only">Dashboard</span>
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent side="right">Dashboard</TooltipContent>
-        </Tooltip>
+              className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+        >
+            <Wallet className="h-5 w-5 transition-all group-hover:scale-110" />
+            <span className="sr-only">KwachaLite</span>
+        </Link>
+        <TooltipProvider>
           {navItems.map((item) => (
             <Tooltip key={item.href}>
               <TooltipTrigger asChild>
@@ -83,7 +77,7 @@ export function MobileNav() {
     return (
         <nav className="grid gap-6 text-lg font-medium">
             <Link
-                href="#"
+                href="/dashboard"
                 className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
             >
                 <Wallet className="h-5 w-5 transition-all group-hover:scale-110" />

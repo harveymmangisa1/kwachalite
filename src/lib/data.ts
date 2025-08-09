@@ -10,7 +10,7 @@ import {
   Gift,
   Landmark,
 } from 'lucide-react';
-import type { Transaction, Category } from './types';
+import type { Transaction, Category, Bill, SavingsGoal } from './types';
 
 export const categories: Category[] = [
   { id: 'groceries', name: 'Groceries', icon: ShoppingBasket, color: 'hsl(var(--chart-1))' },
@@ -74,4 +74,17 @@ export const transactions: Transaction[] = [
     type: 'expense',
     category: 'Entertainment',
   },
+];
+
+export const bills: Bill[] = [
+    { id: '1', name: 'Netflix Subscription', amount: 15000, dueDate: '2024-08-15', status: 'unpaid' },
+    { id: '2', name: 'Water Bill', amount: 20000, dueDate: '2024-08-20', status: 'unpaid' },
+    { id: '3', name: 'Electricity', amount: 35000, dueDate: '2024-08-25', status: 'paid' },
+    { id: '4', name: 'Internet Bill', amount: 45000, dueDate: '2024-09-01', status: 'unpaid' },
+];
+
+export const savingsGoals: SavingsGoal[] = [
+    { id: '1', name: 'New Laptop', targetAmount: 800000, currentAmount: 250000, deadline: '2024-12-31' },
+    { id: '2', name: 'Vacation Fund', targetAmount: 1200000, currentAmount: 600000, deadline: '2025-06-30' },
+    { id: '3', name: 'Emergency Fund', targetAmount: 500000, currentAmount: 500000, deadline: '2024-10-01' },
 ];
