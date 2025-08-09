@@ -60,7 +60,7 @@ export function Sidebar() {
             <span className="sr-only">KwachaLite</span>
         </Link>
         <TooltipProvider>
-          {[...filteredMainNav, ...filteredSecondaryNav].map((item) => (
+          {filteredMainNav.map((item) => (
             <Tooltip key={item.href}>
               <TooltipTrigger asChild>
                 <Link
@@ -82,7 +82,28 @@ export function Sidebar() {
         </TooltipProvider>
       </nav>
        <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-            <UserNav />
+          <TooltipProvider>
+            {filteredSecondaryNav.map((item) => (
+              <Tooltip key={item.href}>
+                <TooltipTrigger asChild>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8',
+                      pathname === item.href
+                        ? 'bg-accent text-accent-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="sr-only">{item.label}</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">{item.label}</TooltipContent>
+              </Tooltip>
+            ))}
+          </TooltipProvider>
+          <UserNav />
         </nav>
     </aside>
   );
@@ -92,11 +113,13 @@ export function MobileNav() {
     const pathname = usePathname();
     const activeWorkspace = useActiveWorkspace();
     const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
+    const allNavItems = [...filteredMainNav, ...secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace))];
+
 
     return (
         <div className="sm:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t z-50">
-            <nav className={`grid h-full grid-cols-${filteredMainNav.length} items-center justify-items-center text-sm font-medium`}>
-                {filteredMainNav.map(item => (
+            <nav className={`grid h-full ${'grid-cols-' + allNavItems.length} items-center justify-items-center text-sm font-medium`}>
+                {allNavItems.map(item => (
                     <Link
                         key={item.href}
                         href={item.href}
