@@ -14,12 +14,12 @@ import { Label } from '@/components/ui/label';
 
 export default function SettingsPage() {
   return (
-    <>
+    <div className="flex-1 space-y-4">
       <PageHeader
         title="Settings"
         description="Manage your account and application settings."
       />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 px-4 sm:px-6">
         <Card>
           <CardHeader>
             <CardTitle>Profile</CardTitle>
@@ -45,6 +45,6 @@ export default function SettingsPage() {
         </Card>
         <CategoryManager />
       </div>
-    </>
+    </div>
   );
 }

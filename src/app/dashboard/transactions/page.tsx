@@ -6,21 +6,23 @@ import { transactions } from '@/lib/data';
 
 export default function TransactionsPage() {
     return (
-        <>
+        <div className="flex-1 space-y-4">
             <PageHeader title="Transactions" description="A complete history of your financial activity.">
                 <AddTransactionSheet />
             </PageHeader>
-            <Card>
-                <CardHeader>
-                    <CardTitle>All Transactions</CardTitle>
-                    <CardDescription>
-                        Here is a list of all your recorded transactions.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <TransactionsDataTable data={transactions} />
-                </CardContent>
-            </Card>
-        </>
+            <div className="px-4 sm:px-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>All Transactions</CardTitle>
+                        <CardDescription>
+                            Here is a list of all your recorded transactions.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <TransactionsDataTable data={transactions} />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
     )
 }

@@ -14,11 +14,11 @@ import { ShareGoalButton } from '@/components/savings/share-goal-button';
 export default function SavingsPage() {
 
     return (
-        <>
+        <div className="flex-1 space-y-4">
             <PageHeader title="Savings" description="Track and manage your savings goals.">
                 <AddGoalSheet />
             </PageHeader>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 sm:px-6">
                 {savingsGoals.map(goal => {
                     const progress = (goal.currentAmount / goal.targetAmount) * 100;
                     return (
@@ -65,6 +65,6 @@ export default function SavingsPage() {
                     )
                 })}
             </div>
-        </>
+        </div>
     )
 }
