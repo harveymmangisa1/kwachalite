@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -19,7 +20,7 @@ const SuggestTransactionCategoryInputSchema = z.object({
     ),
   userCategories: z
     .array(z.string())
-    .describe('The user-defined categories for transactions.'),
+    .describe('The user-defined expense categories for transactions.'),
 });
 export type SuggestTransactionCategoryInput = z.infer<typeof SuggestTransactionCategoryInputSchema>;
 
@@ -44,7 +45,7 @@ const suggestCategoryTool = ai.defineTool({
     receiptText: z.string().describe('The text extracted from the receipt.'),
     userCategories: z
       .array(z.string())
-      .describe('The user-defined categories for transactions.'),
+      .describe('The user-defined expense categories for transactions.'),
   }),
   outputSchema: z.string(),
   async resolve(input) {
@@ -73,7 +74,7 @@ const prompt = ai.definePrompt({
   tools: [suggestCategoryTool],
   prompt: `You are an AI assistant helping users categorize their expenses based on receipt images.
 
-  The user has provided a receipt image, and a list of their categories: {{{userCategories}}}.
+  The user has provided a receipt image, and a list of their expense categories: {{{userCategories}}}.
 
   Extract the text from the receipt image: {{media url=receiptDataUri}}.
 

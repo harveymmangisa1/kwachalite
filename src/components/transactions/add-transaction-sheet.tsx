@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -62,6 +63,17 @@ export function AddTransactionSheet() {
     },
   });
 
+  const transactionType = form.watch('type');
+
+  React.useEffect(() => {
+    form.setValue('category', '');
+  }, [transactionType, form]);
+
+  const filteredCategories = React.useMemo(() => {
+    return categories.filter((c) => c.type === transactionType);
+  }, [transactionType]);
+
+
   async function handleReceiptUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -72,7 +84,7 @@ export function AddTransactionSheet() {
       reader.readAsDataURL(file);
       reader.onload = async () => {
         const receiptDataUri = reader.result as string;
-        const userCategories = categories.map((c) => c.name);
+        const userCategories = categories.filter(c => c.type === 'expense').map((c) => c.name);
 
         const result = await suggestTransactionCategory({
           receiptDataUri,
@@ -152,8 +164,8 @@ export function AddTransactionSheet() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="income">Income</SelectItem>
                       <SelectItem value="expense">Expense</SelectItem>
+                      <SelectItem value="income">Income</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -202,7 +214,7 @@ export function AddTransactionSheet() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((cat) => (
+                      {filteredCategories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.name}>
                           {cat.name}
                         </SelectItem>
@@ -226,37 +238,39 @@ export function AddTransactionSheet() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="receipt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Receipt</FormLabel>
-                   <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isSuggesting}
-                  >
-                    {isSuggesting ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : null}
-                    Upload and Analyze with AI
-                  </Button>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      className="hidden"
-                      ref={fileInputRef}
-                      onChange={handleReceiptUpload}
-                      accept="image/*"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {transactionType === 'expense' && (
+              <FormField
+                control={form.control}
+                name="receipt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Receipt</FormLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isSuggesting}
+                    >
+                      {isSuggesting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      Upload and Analyze with AI
+                    </Button>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleReceiptUpload}
+                        accept="image/*"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <SheetFooter>
                 <SheetClose asChild>
                     <Button type="submit">Save transaction</Button>

@@ -9,20 +9,28 @@ import {
   Briefcase,
   Gift,
   Landmark,
+  PiggyBank,
+  TrendingUp,
 } from 'lucide-react';
 import type { Transaction, Category, Bill, SavingsGoal } from './types';
 
 export const categories: Category[] = [
-  { id: 'groceries', name: 'Groceries', icon: ShoppingBasket, color: 'hsl(var(--chart-1))' },
-  { id: 'transport', name: 'Transport', icon: Car, color: 'hsl(var(--chart-2))' },
-  { id: 'housing', name: 'Housing', icon: Home, color: 'hsl(var(--chart-3))' },
-  { id: 'food', name: 'Food & Dining', icon: Utensils, color: 'hsl(var(--chart-4))' },
-  { id: 'health', name: 'Health', icon: Heart, color: 'hsl(var(--chart-5))' },
-  { id: 'entertainment', name: 'Entertainment', icon: Film, color: 'hsl(var(--chart-1))' },
-  { id: 'education', name: 'Education', icon: GraduationCap, color: 'hsl(var(--chart-2))' },
-  { id: 'work', name: 'Work', icon: Briefcase, color: 'hsl(var(--chart-3))' },
-  { id: 'gifts', name: 'Gifts', icon: Gift, color: 'hsl(var(--chart-4))' },
-  { id: 'salary', name: 'Salary', icon: Landmark, color: 'hsl(var(--chart-5))' },
+  // Expense Categories
+  { id: 'groceries', name: 'Groceries', icon: ShoppingBasket, color: 'hsl(var(--chart-1))', type: 'expense' },
+  { id: 'transport', name: 'Transport', icon: Car, color: 'hsl(var(--chart-2))', type: 'expense' },
+  { id: 'housing', name: 'Housing', icon: Home, color: 'hsl(var(--chart-3))', type: 'expense' },
+  { id: 'food', name: 'Food & Dining', icon: Utensils, color: 'hsl(var(--chart-4))', type: 'expense' },
+  { id: 'health', name: 'Health', icon: Heart, color: 'hsl(var(--chart-5))', type: 'expense' },
+  { id: 'entertainment', name: 'Entertainment', icon: Film, color: 'hsl(var(--chart-1))', type: 'expense' },
+  { id: 'education', name: 'Education', icon: GraduationCap, color: 'hsl(var(--chart-2))', type: 'expense' },
+  { id: 'work', name: 'Work', icon: Briefcase, color: 'hsl(var(--chart-3))', type: 'expense' },
+  { id: 'gifts', name: 'Gifts', icon: Gift, color: 'hsl(var(--chart-4))', type: 'expense' },
+  
+  // Income Categories
+  { id: 'salary', name: 'Salary', icon: Landmark, color: 'hsl(var(--chart-2))', type: 'income' },
+  { id: 'freelance', name: 'Freelance', icon: Briefcase, color: 'hsl(var(--chart-2))', type: 'income' },
+  { id: 'investment', name: 'Investment', icon: TrendingUp, color: 'hsl(var(--chart-2))', type: 'income' },
+  { id: 'side_hustle', name: 'Side Hustle', icon: PiggyBank, color: 'hsl(var(--chart-2))', type: 'income' },
 ];
 
 export const transactions: Transaction[] = [

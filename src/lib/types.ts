@@ -15,6 +15,7 @@ export interface Category {
   name: string;
   icon: LucideIcon;
   color: string;
+  type: 'income' | 'expense';
 }
 
 export interface Bill {
