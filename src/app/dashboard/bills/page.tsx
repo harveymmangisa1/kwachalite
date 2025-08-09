@@ -5,11 +5,14 @@ import { bills } from '@/lib/data';
 import { formatCurrency, cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { AddBillSheet } from '@/components/bills/add-bill-sheet';
 
 export default function BillsPage() {
     return (
         <>
-            <PageHeader title="Bills" description="Manage your upcoming and paid bills." />
+            <PageHeader title="Bills" description="Manage your upcoming and paid bills.">
+                <AddBillSheet />
+            </PageHeader>
             <Card>
                 <CardHeader>
                     <CardTitle>Upcoming Bills</CardTitle>
