@@ -5,23 +5,20 @@ import { usePathname } from 'next/navigation';
 import {
   ArrowRightLeft,
   BarChart2,
-  LayoutDashboard,
   Settings,
   Wallet,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import {
   TooltipProvider,
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
-import Logo from './logo';
+import { LayoutDashboard } from 'lucide-react';
 
 const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions' },
   { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
@@ -33,14 +30,24 @@ export function Sidebar() {
   return (
     <aside className="hidden w-14 flex-col border-r bg-card sm:flex">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-        <Link
-          href="/dashboard"
-          className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-        >
-          <Wallet className="h-4 w-4 transition-all group-hover:scale-110" />
-          <span className="sr-only">KwachaLite</span>
-        </Link>
         <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href="/dashboard"
+              className={cn(
+                'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8',
+                pathname === '/dashboard'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <LayoutDashboard className="h-5 w-5" />
+              <span className="sr-only">Dashboard</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Dashboard</TooltipContent>
+        </Tooltip>
           {navItems.map((item) => (
             <Tooltip key={item.href}>
               <TooltipTrigger asChild>
@@ -66,6 +73,11 @@ export function Sidebar() {
   );
 }
 
+const mobileNavItems = [
+    { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    ...navItems
+]
+
 export function MobileNav() {
     const pathname = usePathname()
     return (
@@ -77,7 +89,7 @@ export function MobileNav() {
                 <Wallet className="h-5 w-5 transition-all group-hover:scale-110" />
                 <span className="sr-only">KwachaLite</span>
             </Link>
-            {navItems.map(item => (
+            {mobileNavItems.map(item => (
                 <Link
                     key={item.href}
                     href={item.href}
