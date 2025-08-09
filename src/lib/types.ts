@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react';
 
 export interface Transaction {
@@ -23,7 +24,7 @@ export interface Bill {
     dueDate: string;
     status: 'paid' | 'unpaid';
     isRecurring: boolean;
-    recurringFrequency?: 'weekly' | 'monthly' | 'yearly';
+    recurringFrequency?: 'daily' | 'weekly' | 'bi-weekly' | 'monthly' | 'quarterly' | 'yearly';
 }
 
 export interface SavingsGoal {

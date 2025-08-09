@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -41,7 +42,7 @@ const formSchema = z.object({
   dueDate: z.string().min(1, 'Date is required'),
   status: z.enum(['paid', 'unpaid']),
   isRecurring: z.boolean().default(false),
-  recurringFrequency: z.enum(['weekly', 'monthly', 'yearly']).optional(),
+  recurringFrequency: z.enum(['daily', 'weekly', 'bi-weekly', 'monthly', 'quarterly', 'yearly']).optional(),
 }).refine(data => {
     if (data.isRecurring && !data.recurringFrequency) {
         return false;
@@ -194,8 +195,11 @@ export function AddBillSheet() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
                         <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
                         <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="quarterly">Quarterly</SelectItem>
                         <SelectItem value="yearly">Yearly</SelectItem>
                       </SelectContent>
                     </Select>
