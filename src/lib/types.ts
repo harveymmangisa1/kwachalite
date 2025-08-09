@@ -30,4 +30,6 @@ export interface SavingsGoal {
     targetAmount: number;
     currentAmount: number;
     deadline: string;
+    type: 'individual' | 'group';
+    members?: string[];
 }

@@ -84,7 +84,7 @@ export const bills: Bill[] = [
 ];
 
 export const savingsGoals: SavingsGoal[] = [
-    { id: '1', name: 'New Laptop', targetAmount: 800000, currentAmount: 250000, deadline: '2024-12-31' },
-    { id: '2', name: 'Vacation Fund', targetAmount: 1200000, currentAmount: 600000, deadline: '2025-06-30' },
-    { id: '3', name: 'Emergency Fund', targetAmount: 500000, currentAmount: 500000, deadline: '2024-10-01' },
+    { id: '1', name: 'New Laptop', targetAmount: 800000, currentAmount: 250000, deadline: '2024-12-31', type: 'individual' },
+    { id: '2', name: 'Group Vacation', targetAmount: 1200000, currentAmount: 600000, deadline: '2025-06-30', type: 'group', members: ['John', 'Jane', 'Pete'] },
+    { id: '3', name: 'Emergency Fund', targetAmount: 500000, currentAmount: 500000, deadline: '2024-10-01', type: 'individual' },
 ];
