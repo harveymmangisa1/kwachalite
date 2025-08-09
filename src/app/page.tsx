@@ -25,6 +25,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Demo credentials: demo@example.com / password */}
           <form className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
