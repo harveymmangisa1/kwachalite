@@ -43,3 +43,34 @@ export interface SavingsGoal {
     members?: string[];
     workspace: Workspace;
 }
+
+export interface Client {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    address?: string;
+}
+
+export interface Product {
+    id: string;
+    name: string;
+    description?: string;
+    price: number;
+}
+
+export interface QuoteItem {
+    productId: string;
+    quantity: number;
+    price: number;
+}
+
+export interface Quote {
+    id: string;
+    quoteNumber: string;
+    clientId: string;
+    date: string;
+    expiryDate: string;
+    items: QuoteItem[];
+    status: 'draft' | 'sent' | 'accepted' | 'rejected';
+}

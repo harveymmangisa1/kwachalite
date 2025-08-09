@@ -14,9 +14,11 @@ import {
   CreditCard,
   Truck,
   Users,
-  Computer
+  Computer,
+  FileText,
+  Package
 } from 'lucide-react';
-import type { Transaction, Category, Bill, SavingsGoal } from './types';
+import type { Transaction, Category, Bill, SavingsGoal, Client, Product, Quote } from './types';
 
 export const categories: Category[] = [
   // Personal Expense Categories
@@ -137,3 +139,53 @@ export const savingsGoals: SavingsGoal[] = [
     { id: '3', name: 'Emergency Fund', targetAmount: 500000, currentAmount: 500000, deadline: '2024-10-01', type: 'individual', workspace: 'personal' },
     { id: '4', name: 'Business Expansion', targetAmount: 2000000, currentAmount: 450000, deadline: '2025-12-31', type: 'individual', workspace: 'business' },
 ];
+
+export const clients: Client[] = [
+    { id: '1', name: 'Innovate Inc.', email: 'contact@innovate.com', phone: '123-456-7890', address: '123 Tech Park, Silicon Valley' },
+    { id: '2', name: 'Creative Solutions', email: 'hello@creative.com', phone: '098-765-4321', address: '456 Design Ave, Arts District' },
+    { id: '3', name: 'Data Driven LLC', email: 'info@datadriven.com', phone: '555-555-5555', address: '789 Analytics Blvd, Downtown' },
+];
+
+export const products: Product[] = [
+    { id: '1', name: 'Web Design Package', description: 'Complete website design and development.', price: 2500000 },
+    { id: '2', name: 'Logo Design', description: 'Custom logo and brand identity.', price: 500000 },
+    { id: '3', name: 'Social Media Management (Monthly)', description: 'Monthly management of social media channels.', price: 300000 },
+    { id: '4', name: 'Consulting Hour', description: 'One hour of business consulting.', price: 75000 },
+];
+
+export const quotes: Quote[] = [
+    {
+        id: '1',
+        quoteNumber: 'Q-2024-001',
+        clientId: '1',
+        date: '2024-07-28',
+        expiryDate: '2024-08-28',
+        items: [
+            { productId: '1', quantity: 1, price: 2500000 },
+            { productId: '2', quantity: 1, price: 500000 },
+        ],
+        status: 'sent',
+    },
+    {
+        id: '2',
+        quoteNumber: 'Q-2024-002',
+        clientId: '2',
+        date: '2024-07-29',
+        expiryDate: '2024-08-29',
+        items: [
+            { productId: '3', quantity: 3, price: 300000 },
+        ],
+        status: 'accepted',
+    },
+    {
+        id: '3',
+        quoteNumber: 'Q-2024-003',
+        clientId: '3',
+        date: '2024-07-30',
+        expiryDate: '2024-08-30',
+        items: [
+            { productId: '4', quantity: 10, price: 75000 },
+        ],
+        status: 'draft',
+    }
+]

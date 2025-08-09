@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -10,8 +11,9 @@ import {
   ReceiptText,
   PiggyBank,
   LayoutDashboard,
-  Search,
-  User,
+  Users,
+  Package,
+  FileText,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -22,21 +24,30 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { UserNav } from './user-nav';
+import React from 'react';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
 const mainNavItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions' },
-  { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills' },
-  { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', workspace: ['personal', 'business'] },
+  { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal', 'business'] },
+  { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
+  { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings', workspace: ['personal', 'business'] },
+  { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business'] },
+  { href: '/dashboard/products', icon: Package, label: 'Products', workspace: ['business'] },
+  { href: '/dashboard/quotes', icon: FileText, label: 'Quotations', workspace: ['business'] },
 ];
 
 const secondaryNavItems = [
-    { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics' },
-    { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
+    { href: '/dashboard/analytics', icon: BarChart2, label: 'Analytics', workspace: ['personal', 'business'] },
+    { href: '/dashboard/settings', icon: Settings, label: 'Settings', workspace: ['personal', 'business'] },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const activeWorkspace = useActiveWorkspace();
+
+  const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
+  const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
   return (
     <aside className="hidden w-14 flex-col border-r bg-card sm:flex fixed h-full z-40">
@@ -49,7 +60,7 @@ export function Sidebar() {
             <span className="sr-only">KwachaLite</span>
         </Link>
         <TooltipProvider>
-          {[...mainNavItems, ...secondaryNavItems].map((item) => (
+          {[...filteredMainNav, ...filteredSecondaryNav].map((item) => (
             <Tooltip key={item.href}>
               <TooltipTrigger asChild>
                 <Link
@@ -78,11 +89,14 @@ export function Sidebar() {
 }
 
 export function MobileNav() {
-    const pathname = usePathname()
+    const pathname = usePathname();
+    const activeWorkspace = useActiveWorkspace();
+    const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
+
     return (
         <div className="sm:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t z-50">
-            <nav className="grid h-full grid-cols-4 items-center justify-items-center text-sm font-medium">
-                {mainNavItems.map(item => (
+            <nav className={`grid h-full grid-cols-${filteredMainNav.length} items-center justify-items-center text-sm font-medium`}>
+                {filteredMainNav.map(item => (
                     <Link
                         key={item.href}
                         href={item.href}

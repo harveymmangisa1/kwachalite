@@ -19,9 +19,10 @@ import {
 import Link from 'next/link';
 import { Building, Check, ChevronsUpDown, User } from 'lucide-react';
 import React from 'react';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
 export function UserNav() {
-  const [activeWorkspace, setActiveWorkspace] = React.useState('personal');
+  const { activeWorkspace, setActiveWorkspace } = useActiveWorkspace();
 
   return (
     <DropdownMenu>
