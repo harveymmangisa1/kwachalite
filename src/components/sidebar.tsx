@@ -8,7 +8,8 @@ import {
   Settings,
   Wallet,
   ReceiptText,
-  PiggyBank
+  PiggyBank,
+  LayoutDashboard
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -18,9 +19,9 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
-import { LayoutDashboard } from 'lucide-react';
 
 const navItems = [
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions' },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills' },
   { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings' },
@@ -49,7 +50,7 @@ export function Sidebar() {
                   href={item.href}
                   className={cn(
                     'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8',
-                    pathname.startsWith(item.href)
+                    pathname === item.href
                       ? 'bg-accent text-accent-foreground'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
@@ -67,11 +68,6 @@ export function Sidebar() {
   );
 }
 
-const mobileNavItems = [
-    { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    ...navItems
-]
-
 export function MobileNav() {
     const pathname = usePathname()
     return (
@@ -83,13 +79,13 @@ export function MobileNav() {
                 <Wallet className="h-5 w-5 transition-all group-hover:scale-110" />
                 <span className="sr-only">KwachaLite</span>
             </Link>
-            {mobileNavItems.map(item => (
+            {navItems.map(item => (
                 <Link
                     key={item.href}
                     href={item.href}
                     className={cn(
                         'flex items-center gap-4 px-2.5',
-                        pathname.startsWith(item.href) ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                        pathname === item.href ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                     )}
                 >
                     <item.icon className="h-5 w-5" />

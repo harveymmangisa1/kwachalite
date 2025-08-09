@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Pie, PieChart, ResponsiveContainer, Cell, Legend } from 'recharts';
+import { Pie, PieChart, ResponsiveContainer, Cell, Legend, Tooltip } from 'recharts';
 
 import {
   Card,
@@ -10,7 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { transactions, categories } from '@/lib/data';
+import { transactions } from '@/lib/data';
+import { formatCurrency } from '@/lib/utils';
 
 const COLORS = [
   'hsl(var(--chart-1))',
@@ -47,19 +48,22 @@ export function CategoryPieChart() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
+        <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+                <Tooltip 
+                    formatter={(value) => formatCurrency(value as number)}
+                    cursor={{fill: 'hsl(var(--muted))'}}
+                />
               <Pie
                 data={expenseData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={80}
+                outerRadius={120}
                 fill="#8884d8"
                 dataKey="value"
                 nameKey="name"
-                label={(entry) => entry.name}
               >
                 {expenseData.map((entry, index) => (
                   <Cell

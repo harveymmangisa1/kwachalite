@@ -1,6 +1,7 @@
 import { IncomeExpenseChart } from "@/components/analytics/income-expense-chart";
 import { PageHeader } from "@/components/page-header";
 import { OverviewCards } from "@/components/dashboard/overview-cards";
+import { CategoryPieChart } from "@/components/dashboard/category-pie-chart";
 
 export default function AnalyticsPage() {
     return (
@@ -11,7 +12,10 @@ export default function AnalyticsPage() {
             />
             <div className="space-y-6">
                 <OverviewCards />
-                <IncomeExpenseChart />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <IncomeExpenseChart />
+                    <CategoryPieChart />
+                </div>
             </div>
         </>
     )
