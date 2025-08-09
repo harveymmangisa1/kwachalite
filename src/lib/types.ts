@@ -1,6 +1,8 @@
 
 import type { LucideIcon } from 'lucide-react';
 
+export type Workspace = 'personal' | 'business';
+
 export interface Transaction {
   id: string;
   date: string;
@@ -8,6 +10,7 @@ export interface Transaction {
   amount: number;
   type: 'income' | 'expense';
   category: string;
+  workspace: Workspace;
 }
 
 export interface Category {
@@ -16,6 +19,7 @@ export interface Category {
   icon: LucideIcon;
   color: string;
   type: 'income' | 'expense';
+  workspace: Workspace;
 }
 
 export interface Bill {
@@ -26,6 +30,7 @@ export interface Bill {
     status: 'paid' | 'unpaid';
     isRecurring: boolean;
     recurringFrequency?: 'daily' | 'weekly' | 'bi-weekly' | 'monthly' | 'quarterly' | 'yearly';
+    workspace: Workspace;
 }
 
 export interface SavingsGoal {
@@ -36,4 +41,5 @@ export interface SavingsGoal {
     deadline: string;
     type: 'individual' | 'group';
     members?: string[];
+    workspace: Workspace;
 }

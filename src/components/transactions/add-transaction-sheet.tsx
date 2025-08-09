@@ -52,6 +52,9 @@ export function AddTransactionSheet() {
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  // This would come from a context in a real app
+  const activeWorkspace = 'personal';
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,8 +73,8 @@ export function AddTransactionSheet() {
   }, [transactionType, form]);
 
   const filteredCategories = React.useMemo(() => {
-    return categories.filter((c) => c.type === transactionType);
-  }, [transactionType]);
+    return categories.filter((c) => c.type === transactionType && c.workspace === activeWorkspace);
+  }, [transactionType, activeWorkspace]);
 
 
   async function handleReceiptUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -121,7 +124,7 @@ export function AddTransactionSheet() {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    console.log({...values, workspace: activeWorkspace });
     toast({
       title: 'Transaction Added',
       description: 'Your transaction has been successfully saved.',
@@ -138,9 +141,9 @@ export function AddTransactionSheet() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Add a New Transaction</SheetTitle>
+          <SheetTitle>Add New Transaction</SheetTitle>
           <SheetDescription>
-            Enter the details of your transaction below.
+            Enter the details of your transaction below. This will be added to your <span className="font-semibold">{activeWorkspace}</span> workspace.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
