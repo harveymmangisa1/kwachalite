@@ -9,9 +9,8 @@ import { formatCurrency } from '@/lib/utils';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import React from 'react';
 import { Target } from 'lucide-react';
-import type { Category, Transaction } from '@/lib/types';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import type { Category } from '@/lib/types';
+import { BudgetManager } from '@/components/budgets/budget-manager';
 
 interface BudgetCategory extends Category {
     spent: number;
@@ -52,50 +51,46 @@ export default function BudgetsPage() {
                 title="Budgets"
                 description="Manage and track your spending against your monthly budgets."
             />
-            <div className="px-4 sm:px-6">
-                {budgetData.length > 0 ? (
-                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {budgetData.map((item) => (
-                            <Card key={item.id}>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">{item.name}</CardTitle>
-                                    <item.icon className="h-4 w-4 text-muted-foreground" />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <div className="flex justify-between mb-1">
-                                                <span className="text-sm font-medium text-muted-foreground">Spent</span>
-                                                <span className="text-sm font-medium">
+            <div className="grid gap-6 lg:grid-cols-2 px-4 sm:px-6">
+                <div className="space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Monthly Progress</CardTitle>
+                             <CardDescription>Your spending progress for this month.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                             {budgetData.length > 0 ? (
+                                <div className="space-y-6">
+                                    {budgetData.map((item) => (
+                                        <div key={item.id}>
+                                            <div className="flex justify-between mb-1 items-center">
+                                                <span className="text-sm font-medium">{item.name}</span>
+                                                <span className="text-sm text-muted-foreground">
                                                     {formatCurrency(item.spent)} / {formatCurrency(item.budget!)}
                                                 </span>
                                             </div>
                                             <Progress value={item.progress} />
-                                             <p className="text-xs text-muted-foreground mt-1 text-right">
+                                            <p className="text-xs text-muted-foreground mt-1 text-right">
                                                 {formatCurrency(Math.max(0, item.budget! - item.spent))} {item.spent > item.budget! ? 'over' : 'remaining'}
                                             </p>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                ) : (
-                    <Card className="text-center py-12">
-                        <CardContent>
-                            <Target className="mx-auto h-12 w-12 text-muted-foreground" />
-                            <h3 className="mt-4 text-lg font-semibold">No Budgets Set</h3>
-                            <p className="mt-2 text-sm text-muted-foreground">
-                                You haven't set any budgets for your expense categories yet.
-                            </p>
-                            <div className="mt-6">
-                                <Button asChild>
-                                    <Link href="/dashboard/settings">Set Budgets</Link>
-                                </Button>
-                            </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <Target className="mx-auto h-12 w-12 text-muted-foreground" />
+                                    <h3 className="mt-4 text-lg font-semibold">No Budgets Set</h3>
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                        Use the manager to set budgets for your expense categories.
+                                    </p>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
-                )}
+                </div>
+                 <div>
+                    <BudgetManager />
+                </div>
             </div>
         </div>
     )

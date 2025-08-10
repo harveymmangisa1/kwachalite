@@ -2,7 +2,6 @@
 'use client';
 
 import { PageHeader } from '@/components/page-header';
-import { CategoryManager } from '@/components/settings/category-manager';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -20,7 +19,7 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { BusinessProfileSettings } from '@/components/settings/business-profile-settings';
 
 export default function SettingsPage() {
-  const activeWorkspace = useActiveWorkspace();
+  const { activeWorkspace } = useActiveWorkspace();
   
   return (
     <div className="flex-1 space-y-4">
@@ -28,9 +27,9 @@ export default function SettingsPage() {
         title="Settings"
         description="Manage your account and application settings."
       />
-      <div className="grid gap-6 lg:grid-cols-2 px-4 sm:px-6">
+      <div className="px-4 sm:px-6">
         {activeWorkspace === 'personal' ? (
-          <Card>
+          <Card className="max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle>Profile</CardTitle>
               <CardDescription>
@@ -75,7 +74,6 @@ export default function SettingsPage() {
         ) : (
           <BusinessProfileSettings />
         )}
-        <CategoryManager />
       </div>
     </div>
   );

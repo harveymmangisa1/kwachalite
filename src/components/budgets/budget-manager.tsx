@@ -16,10 +16,10 @@ import React from 'react';
 import type { Category } from '@/lib/types';
 import { Label } from '../ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Pen, Trash2, Check, X } from 'lucide-react';
+import { Pen, Trash2, Check, X, Briefcase } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
-export function CategoryManager() {
+export function BudgetManager() {
   const { activeWorkspace } = useActiveWorkspace();
   const { toast } = useToast();
   
@@ -141,7 +141,7 @@ export function CategoryManager() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Manage Categories</CardTitle>
+        <CardTitle>Budget Manager</CardTitle>
         <CardDescription>
           Add, edit, or delete categories and set monthly budgets for your expenses.
         </CardDescription>
