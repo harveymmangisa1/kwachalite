@@ -29,8 +29,12 @@ import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '../ui/scroll-area';
 import { formatCurrency } from '@/lib/utils';
+import { savingsGoals } from '@/lib/data';
+import type { SavingsGoal } from '@/lib/types';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
 const goalItemSchema = z.object({
+  id: z.string().default(() => `item-${new Date().toISOString()}`),
   name: z.string().min(1, "Item name is required"),
   price: z.coerce.number().min(0, "Price can't be negative"),
   purchased: z.boolean().default(false),
@@ -45,6 +49,7 @@ const formSchema = z.object({
 
 export function AddGoalSheet() {
   const { toast } = useToast();
+  const { activeWorkspace } = useActiveWorkspace();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,7 +77,15 @@ export function AddGoalSheet() {
 
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const newGoal: SavingsGoal = {
+        id: new Date().toISOString(),
+        currentAmount: 0,
+        type: 'individual',
+        workspace: activeWorkspace,
+        ...values
+    };
+    savingsGoals.unshift(newGoal);
+
     toast({
       title: 'Financial Goal Added',
       description: 'Your new goal has been created.',
@@ -176,7 +189,7 @@ export function AddGoalSheet() {
                             variant="outline"
                             size="sm"
                             className="mt-4"
-                            onClick={() => append({ name: '', price: 0, purchased: false })}
+                            onClick={() => append({ id: `item-${new Date().toISOString()}`, name: '', price: 0, purchased: false })}
                         >
                             <PlusCircle className="h-4 w-4 mr-2" />
                             Add Item

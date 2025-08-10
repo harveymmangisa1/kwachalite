@@ -17,7 +17,7 @@ import {
   DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
-import { Building, Check, ChevronsUpDown, User } from 'lucide-react';
+import { Building, Check, ChevronsUpDown, User, HelpCircle, Info } from 'lucide-react';
 import React from 'react';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
@@ -70,6 +70,18 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
              <Link href="/dashboard/settings">Settings</Link>
+          </DropdownMenuItem>
+           <DropdownMenuItem asChild>
+             <Link href="/dashboard/about">
+                <Info className="mr-2 h-4 w-4" />
+                About
+             </Link>
+          </DropdownMenuItem>
+           <DropdownMenuItem asChild>
+             <Link href="/dashboard/help">
+                <HelpCircle className="mr-2 h-4 w-4" />
+                Help
+             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

@@ -27,6 +27,8 @@ import {
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '../ui/textarea';
+import { clients } from '@/lib/data';
+import type { Client } from '@/lib/types';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -49,7 +51,12 @@ export function AddClientSheet() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const newClient: Client = {
+        id: new Date().toISOString(),
+        ...values
+    };
+    clients.unshift(newClient);
+
     toast({
       title: 'Client Added',
       description: 'The new client has been successfully saved.',

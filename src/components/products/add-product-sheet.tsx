@@ -27,6 +27,8 @@ import {
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '../ui/textarea';
+import { products } from '@/lib/data';
+import type { Product } from '@/lib/types';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -49,7 +51,12 @@ export function AddProductSheet() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const newProduct: Product = {
+        id: new Date().toISOString(),
+        ...values
+    };
+    products.unshift(newProduct);
+    
     toast({
       title: 'Product Added',
       description: 'The new product/service has been successfully saved.',

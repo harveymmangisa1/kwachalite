@@ -28,6 +28,8 @@ import { PlusCircle } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import { loans } from '@/lib/data';
+import type { Loan } from '@/lib/types';
 
 const formSchema = z.object({
   lender: z.string().min(1, 'Lender name is required'),
@@ -53,7 +55,15 @@ export function AddLoanSheet() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({ ...values, workspace: activeWorkspace });
+    const newLoan: Loan = {
+      id: new Date().toISOString(),
+      workspace: activeWorkspace,
+      remainingAmount: values.principal,
+      status: 'active',
+      ...values,
+    };
+    loans.unshift(newLoan);
+    
     toast({
       title: 'Loan Added',
       description: 'Your new loan has been successfully saved.',

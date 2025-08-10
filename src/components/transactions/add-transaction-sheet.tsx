@@ -38,6 +38,7 @@ import { suggestTransactionCategory } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { formatCurrency } from '@/lib/utils';
+import type { Transaction } from '@/lib/types';
 
 const formSchema = z.object({
   type: z.enum(['income', 'expense']),
@@ -155,7 +156,13 @@ export function AddTransactionSheet() {
       }
     }
     
-    console.log({...values, workspace: activeWorkspace });
+    const newTransaction: Transaction = {
+        id: new Date().toISOString(),
+        workspace: activeWorkspace,
+        ...values
+    }
+    transactions.unshift(newTransaction);
+
     toast({
       title: 'Transaction Added',
       description: 'Your transaction has been successfully saved.',

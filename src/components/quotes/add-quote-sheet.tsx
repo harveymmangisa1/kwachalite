@@ -33,8 +33,9 @@ import {
 } from '@/components/ui/select';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { clients, products } from '@/lib/data';
+import { clients, products, quotes } from '@/lib/data';
 import { ScrollArea } from '../ui/scroll-area';
+import type { Quote } from '@/lib/types';
 
 const quoteItemSchema = z.object({
   productId: z.string().min(1, 'Product is required'),
@@ -68,7 +69,14 @@ export function AddQuoteSheet() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const newQuote: Quote = {
+        id: new Date().toISOString(),
+        quoteNumber: `Q-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
+        status: 'draft',
+        ...values
+    };
+    quotes.unshift(newQuote);
+    
     toast({
       title: 'Quotation Created',
       description: 'The new quotation has been successfully saved as a draft.',

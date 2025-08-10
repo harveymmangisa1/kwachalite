@@ -35,6 +35,9 @@ import { PlusCircle } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
+import { bills } from '@/lib/data';
+import type { Bill } from '@/lib/types';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -55,6 +58,7 @@ const formSchema = z.object({
 
 export function AddBillSheet() {
   const { toast } = useToast();
+  const { activeWorkspace } = useActiveWorkspace();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,7 +74,13 @@ export function AddBillSheet() {
   const isRecurring = form.watch('isRecurring');
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const newBill: Bill = {
+        id: new Date().toISOString(),
+        workspace: activeWorkspace,
+        ...values
+    };
+    bills.unshift(newBill);
+
     toast({
       title: 'Bill Added',
       description: 'Your bill has been successfully saved.',
@@ -192,7 +202,7 @@ export function AddBillSheet() {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a frequency" />
-                        </SelectTrigger>
+                        </Trigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="daily">Daily</SelectItem>
