@@ -200,7 +200,7 @@ export function AddBillSheet() {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a frequency" />
-                        </Trigger>
+                        </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="daily">Daily</SelectItem>

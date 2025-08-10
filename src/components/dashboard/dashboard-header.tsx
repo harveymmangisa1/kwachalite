@@ -9,9 +9,11 @@ import { AddClientSheet } from '@/components/clients/add-client-sheet';
 import { AddQuoteSheet } from '@/components/quotes/add-quote-sheet';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import React from 'react';
+import { useAuth } from '@/hooks/use-auth';
 
 export function DashboardHeader() {
     const { activeWorkspace } = useActiveWorkspace();
+    const { userName } = useAuth();
     const [greeting, setGreeting] = React.useState('');
 
     React.useEffect(() => {
@@ -44,7 +46,7 @@ export function DashboardHeader() {
             <div className="flex items-center justify-between">
                 <div className="grid gap-1">
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-                        {greeting}, John!
+                        {greeting}, {userName?.split(' ')[0]}!
                     </h1>
                     <p className="text-muted-foreground">
                         {activeWorkspace === 'personal' 

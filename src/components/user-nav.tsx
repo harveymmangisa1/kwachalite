@@ -20,26 +20,32 @@ import Link from 'next/link';
 import { Building, Check, ChevronsUpDown, User, HelpCircle, Info } from 'lucide-react';
 import React from 'react';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import { useAuth } from '@/hooks/use-auth';
 
 export function UserNav() {
   const { activeWorkspace, setActiveWorkspace } = useActiveWorkspace();
+  const { userName, logout } = useAuth();
+  
+  const userInitials = userName
+    ? userName.split(' ').map(n => n[0]).join('').toUpperCase()
+    : 'U';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src="https://placehold.co/40x40" alt="@johndoe" data-ai-hint="person avatar" />
-            <AvatarFallback>JD</AvatarFallback>
+            <AvatarImage src={`https://placehold.co/40x40.png?text=${userInitials}`} alt={userName || 'User'} data-ai-hint="person avatar" />
+            <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
+            <p className="text-sm font-medium leading-none">{userName || 'User'}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              john.doe@example.com
+              {userName ? `${userName.split(' ')[0].toLowerCase()}@example.com` : ''}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -86,7 +92,7 @@ export function UserNav() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-           <Link href="/">Log out</Link>
+           <Link href="/" onClick={() => logout()}>Log out</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -17,10 +17,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { BusinessProfileSettings } from '@/components/settings/business-profile-settings';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function SettingsPage() {
   const { activeWorkspace } = useActiveWorkspace();
+  const { userName } = useAuth();
+
+  const userInitials = userName
+    ? userName.split(' ').map(n => n[0]).join('').toUpperCase()
+    : 'U';
   
+  const userEmail = userName ? `${userName.split(' ')[0].toLowerCase()}@example.com` : '';
+
   return (
     <div className="flex-1 space-y-4">
       <PageHeader
@@ -40,8 +48,8 @@ export default function SettingsPage() {
               <form className="space-y-6">
                   <div className="flex items-center gap-4">
                       <Avatar className="h-20 w-20">
-                          <AvatarImage src="https://placehold.co/100x100.png" alt="@johndoe" data-ai-hint="person avatar" />
-                          <AvatarFallback>JD</AvatarFallback>
+                          <AvatarImage src={`https://placehold.co/100x100.png?text=${userInitials}`} alt={userName || 'User'} data-ai-hint="person avatar" />
+                          <AvatarFallback>{userInitials}</AvatarFallback>
                       </Avatar>
                       <div className="grid gap-2">
                           <Label htmlFor="picture">Profile Picture</Label>
@@ -51,15 +59,15 @@ export default function SettingsPage() {
                   </div>
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" defaultValue="John Doe" />
+                  <Input id="name" defaultValue={userName || ''} />
                 </div>
                  <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
-                  <Input id="username" defaultValue="johndoe" />
+                  <Input id="username" defaultValue={userName?.split(' ')[0].toLowerCase() || ''} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="john.doe@example.com" />
+                  <Input id="email" type="email" defaultValue={userEmail} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
