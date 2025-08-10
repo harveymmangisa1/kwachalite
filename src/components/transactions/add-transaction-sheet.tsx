@@ -31,12 +31,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { categories } from '@/lib/data';
+import { categories, transactions } from '@/lib/data';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import React from 'react';
 import { suggestTransactionCategory } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Textarea } from '../ui/textarea';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import { formatCurrency } from '@/lib/utils';
 
 const formSchema = z.object({
   type: z.enum(['income', 'expense']),
@@ -51,9 +52,7 @@ export function AddTransactionSheet() {
   const [isSuggesting, setIsSuggesting] = React.useState(false);
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  // This would come from a context in a real app
-  const activeWorkspace = 'personal';
+  const { activeWorkspace } = useActiveWorkspace();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -124,11 +123,44 @@ export function AddTransactionSheet() {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    // Budget checking logic
+    if (values.type === 'expense') {
+      const category = categories.find(c => c.name === values.category && c.workspace === activeWorkspace);
+      if (category && category.budget) {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+        const currentSpending = transactions
+          .filter(t => 
+            t.category === category.name && 
+            t.workspace === activeWorkspace &&
+            new Date(t.date) >= startOfMonth &&
+            new Date(t.date) <= endOfMonth
+          )
+          .reduce((sum, t) => sum + t.amount, 0);
+
+        const newTotalSpending = currentSpending + values.amount;
+        const budgetThreshold = category.budget * 0.85;
+
+        if (newTotalSpending > category.budget) {
+            // This could be a different toast type
+        } else if (newTotalSpending > budgetThreshold) {
+          toast({
+            title: 'Budget Warning',
+            description: `You are about to exceed your budget for ${category.name}. You've spent ${formatCurrency(newTotalSpending)} of ${formatCurrency(category.budget)}.`,
+            variant: 'destructive'
+          });
+        }
+      }
+    }
+    
     console.log({...values, workspace: activeWorkspace });
     toast({
       title: 'Transaction Added',
       description: 'Your transaction has been successfully saved.',
     });
+    form.reset();
   }
 
   return (

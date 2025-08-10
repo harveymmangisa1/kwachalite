@@ -20,6 +20,7 @@ export interface Category {
   color: string;
   type: 'income' | 'expense';
   workspace: Workspace;
+  budget?: number;
 }
 
 export interface Bill {

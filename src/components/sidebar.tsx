@@ -16,6 +16,7 @@ import {
   Package,
   FileText,
   Briefcase,
+  Target
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -32,12 +33,13 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 const mainNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', workspace: ['personal', 'business'] },
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal', 'business'] },
+  { href: '/dashboard/budgets', icon: Target, label: 'Budgets', workspace: ['personal', 'business'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
   { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings', workspace: ['personal'] },
   { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']},
   { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business'], isSubItem: true },
   { href: '/dashboard/products', icon: Package, label: 'Products', workspace: ['business'], isSubItem: true },
-  { href: '/dashboard/quotes', icon: FileText, label: 'Quotations', workspace: ['business'], isSubItem: true },
+  { href: ' /dashboard/quotes', icon: FileText, label: 'Quotations', workspace: ['business'], isSubItem: true },
 ];
 
 const secondaryNavItems = [
@@ -47,7 +49,7 @@ const secondaryNavItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const activeWorkspace = useActiveWorkspace();
+  const { activeWorkspace } = useActiveWorkspace();
 
   const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace) && !item.isSubItem);
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
@@ -116,10 +118,17 @@ export function MobileNav() {
     const pathname = usePathname();
     const { activeWorkspace } = useActiveWorkspace();
     
-    const navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace) && !item.isSubItem);
+    let navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace) && !item.isSubItem);
+
+    if (activeWorkspace === 'business') {
+        const businessHubIndex = navItemsToShow.findIndex(item => item.href.includes('business'));
+        if (businessHubIndex !== -1) {
+            navItemsToShow.splice(businessHubIndex, 1);
+        }
+    }
 
     if (activeWorkspace === 'personal') {
-       navItemsToShow.push(...secondaryNavItems.filter(item => item.workspace.includes('personal')));
+       navItemsToShow.push(...secondaryNavItems.filter(item => item.workspace.includes('personal') && !item.href.includes('analytics')));
     } else {
        // For business, we only add Settings to keep it clean. Analytics is accessible from the Dashboard.
        const settingsItem = secondaryNavItems.find(item => item.href.includes('settings'));
@@ -127,6 +136,10 @@ export function MobileNav() {
         navItemsToShow.push(settingsItem);
        }
     }
+    
+    // Ensure we don't have too many items
+    navItemsToShow = navItemsToShow.slice(0, 5);
+
 
     const gridColsClass = `grid-cols-${navItemsToShow.length}`;
 
