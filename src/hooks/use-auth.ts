@@ -1,25 +1,33 @@
 
 'use client';
 
+import { useEffect } from 'react';
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { auth } from '@/lib/firebase';
+import { User, onAuthStateChanged } from 'firebase/auth';
 
 interface AuthState {
-  userName: string | null;
-  setUserName: (name: string) => void;
-  logout: () => void;
+  user: User | null;
+  loading: boolean;
 }
 
-export const useAuth = create<AuthState>()(
-  persist(
-    (set) => ({
-      userName: null,
-      setUserName: (name) => set({ userName: name }),
-      logout: () => set({ userName: null }),
-    }),
-    {
-      name: 'auth-storage',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
+const useAuthStore = create<AuthState>(() => ({
+  user: null,
+  loading: true,
+}));
+
+export const useAuth = () => {
+  const { user, loading } = useAuthStore();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      useAuthStore.setState({ user, loading: false });
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  return { user, loading };
+};

@@ -14,7 +14,56 @@ import Logo from '@/components/logo';
 
 export default function SignupPage() {
   return (
+    <div className="flex min-h-screen w-full items-center justify-center bg-background 'use client';
+
+import { useRouter } from 'next/navigation';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import Logo from '@/components/logo';
+
+export default function SignupPage() {
+  const router = useRouter();
+
+  const handleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error signing in with Google', error);
+    }
+  };
+
+  return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background px-4">
+      <Card className="mx-auto w-full max-w-sm">
+        <CardHeader>
+          <div className="mx-auto mb-4">
+            <Logo />
+          </div>
+          <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+          <CardDescription className="text-center">
+            Sign in with your Google account to continue
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={handleSignIn} className="w-full">
+            Sign in with Google
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+">
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
           <div className="mx-auto mb-4">
