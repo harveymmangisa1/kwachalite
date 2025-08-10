@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -14,6 +15,7 @@ import {
   Users,
   Package,
   FileText,
+  Briefcase,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -31,10 +33,11 @@ const mainNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', workspace: ['personal', 'business'] },
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal', 'business'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
-  { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings', workspace: ['personal', 'business'] },
-  { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business'] },
-  { href: '/dashboard/products', icon: Package, label: 'Products', workspace: ['business'] },
-  { href: '/dashboard/quotes', icon: FileText, label: 'Quotations', workspace: ['business'] },
+  { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings', workspace: ['personal'] },
+  { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']},
+  { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business'], isSubItem: true },
+  { href: '/dashboard/products', icon: Package, label: 'Products', workspace: ['business'], isSubItem: true },
+  { href: '/dashboard/quotes', icon: FileText, label: 'Quotations', workspace: ['business'], isSubItem: true },
 ];
 
 const secondaryNavItems = [
@@ -46,7 +49,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const activeWorkspace = useActiveWorkspace();
 
-  const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
+  const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace) && !item.isSubItem);
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
   return (
@@ -67,7 +70,7 @@ export function Sidebar() {
                   href={item.href}
                   className={cn(
                     'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8',
-                    pathname === item.href
+                    pathname.startsWith(item.href)
                       ? 'bg-accent text-accent-foreground'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
@@ -90,7 +93,7 @@ export function Sidebar() {
                     href={item.href}
                     className={cn(
                       'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8',
-                      pathname === item.href
+                      pathname.startsWith(item.href)
                         ? 'bg-accent text-accent-foreground'
                         : 'text-muted-foreground hover:text-foreground'
                     )}
@@ -112,21 +115,31 @@ export function Sidebar() {
 export function MobileNav() {
     const pathname = usePathname();
     const { activeWorkspace } = useActiveWorkspace();
-    const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
-    const allNavItems = [...filteredMainNav, ...secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace))];
+    
+    const navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace) && !item.isSubItem);
 
-    const gridColsClass = `grid-cols-${allNavItems.length}`;
+    if (activeWorkspace === 'personal') {
+       navItemsToShow.push(...secondaryNavItems.filter(item => item.workspace.includes('personal')));
+    } else {
+       // For business, we only add Settings to keep it clean. Analytics is accessible from the Dashboard.
+       const settingsItem = secondaryNavItems.find(item => item.href.includes('settings'));
+       if (settingsItem) {
+        navItemsToShow.push(settingsItem);
+       }
+    }
+
+    const gridColsClass = `grid-cols-${navItemsToShow.length}`;
 
     return (
         <div className="sm:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t z-50">
             <nav className={cn('grid h-full items-center justify-items-center text-sm font-medium', gridColsClass)}>
-                {allNavItems.map(item => (
+                {navItemsToShow.map(item => (
                     <Link
                         key={item.href}
                         href={item.href}
                         className={cn(
                             'flex flex-col items-center gap-1 w-full pt-2 pb-1',
-                            pathname === item.href ? 'text-primary' : 'text-muted-foreground'
+                            pathname.startsWith(item.href) ? 'text-primary' : 'text-muted-foreground'
                         )}
                     >
                         <item.icon className="h-5 w-5" />
