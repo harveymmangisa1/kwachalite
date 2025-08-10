@@ -94,7 +94,7 @@ export function AddQuoteSheet() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex-1 flex flex-col gap-4"
+            className="flex-1 flex flex-col gap-4 overflow-y-hidden"
           >
             <ScrollArea className="flex-1 -mx-6 px-6">
                 <div className="grid gap-4 py-4">
