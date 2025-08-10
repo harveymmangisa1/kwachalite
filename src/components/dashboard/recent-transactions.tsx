@@ -7,13 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { transactions } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { formatCurrency, cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
 export function RecentTransactions() {
+  const { transactions } = useAppStore();
   const recentTransactions = transactions.slice(0, 5);
 
   return (

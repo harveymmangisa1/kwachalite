@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { categories as initialCategories } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import React from 'react';
 import type { Category } from '@/lib/types';
@@ -21,9 +21,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 export function BudgetManager() {
   const { activeWorkspace } = useActiveWorkspace();
+  const { categories, updateCategory, deleteCategory, addCategory } = useAppStore();
   const { toast } = useToast();
   
-  const [categories, setCategories] = React.useState<Category[]>(initialCategories);
   const [editingCategoryId, setEditingCategoryId] = React.useState<string | null>(null);
   const [editedCategory, setEditedCategory] = React.useState<Partial<Category>>({});
   
@@ -42,22 +42,13 @@ export function BudgetManager() {
         color: 'hsl(var(--primary))',
         budgetFrequency: 'monthly',
       };
-      setCategories(prev => [...prev, newCategory]);
+      addCategory(newCategory);
       setNewCategoryName('');
       toast({
         title: 'Category Added',
         description: `The category "${newCategoryName}" has been added.`,
       });
     }
-  };
-
-  const handleSaveChanges = () => {
-    console.log('Saving categories:', categories);
-    // In a real app, this would be an API call
-    toast({
-      title: 'Changes Saved',
-      description: 'Your category settings have been updated.',
-    });
   };
   
   const handleEdit = (category: Category) => {
@@ -71,18 +62,17 @@ export function BudgetManager() {
   }
 
   const handleUpdateCategory = (categoryId: string) => {
-    setCategories(prev => prev.map(cat => 
-        cat.id === categoryId 
-        ? { ...cat, name: editedCategory.name!, budget: editedCategory.budget, budgetFrequency: editedCategory.budgetFrequency } 
-        : cat
-    ));
+    const originalCategory = categories.find(c => c.id === categoryId);
+    if (originalCategory) {
+      updateCategory({ ...originalCategory, ...editedCategory });
+    }
     setEditingCategoryId(null);
     setEditedCategory({});
     toast({ title: 'Category Updated' });
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+    deleteCategory(categoryId);
     toast({ title: 'Category Deleted', variant: 'destructive' });
   };
 
@@ -157,7 +147,7 @@ export function BudgetManager() {
       <CardHeader>
         <CardTitle>Budget Manager</CardTitle>
         <CardDescription>
-          Add, edit, or delete categories and set monthly budgets for your expenses.
+          Add, edit, or delete categories and set weekly/monthly budgets for your expenses.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -193,7 +183,6 @@ export function BudgetManager() {
                 <Button onClick={handleAddCategory}>Add</Button>
             </div>
         </div>
-        <Button onClick={handleSaveChanges}>Save All Changes</Button>
       </CardFooter>
     </Card>
   );

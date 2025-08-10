@@ -2,7 +2,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { quotes, clients, products } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -17,6 +17,7 @@ import Logo from '@/components/logo';
 export default function QuotePage() {
     const params = useParams();
     const quoteId = params.id as string;
+    const { quotes, clients, products } = useAppStore();
     const quote = quotes.find(q => q.id === quoteId);
     const client = quote ? clients.find(c => c.id === quote.clientId) : null;
     const quoteRef = React.useRef<HTMLDivElement>(null);

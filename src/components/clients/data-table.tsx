@@ -20,8 +20,11 @@ import { MoreHorizontal, View, Edit, Trash2 } from 'lucide-react';
 import type { Client } from '@/lib/types';
 import Link from 'next/link';
 import { EditClientSheet } from './edit-client-sheet';
+import { useAppStore } from '@/lib/data';
 
 export function ClientsDataTable({ data }: { data: Client[] }) {
+  const { clients } = useAppStore();
+  
   return (
     <Table>
       <TableHeader>

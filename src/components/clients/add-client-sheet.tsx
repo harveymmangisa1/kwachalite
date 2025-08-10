@@ -27,8 +27,9 @@ import {
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '../ui/textarea';
-import { clients } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import type { Client } from '@/lib/types';
+import React from 'react';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -39,6 +40,8 @@ const formSchema = z.object({
 
 export function AddClientSheet() {
   const { toast } = useToast();
+  const { addClient } = useAppStore();
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,17 +58,18 @@ export function AddClientSheet() {
         id: new Date().toISOString(),
         ...values
     };
-    clients.unshift(newClient);
+    addClient(newClient);
 
     toast({
       title: 'Client Added',
       description: 'The new client has been successfully saved.',
     });
     form.reset();
+    setOpen(false);
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />
@@ -138,8 +142,9 @@ export function AddClientSheet() {
             />
             <SheetFooter>
                 <SheetClose asChild>
-                    <Button type="submit">Save Client</Button>
+                    <Button type="button" variant="ghost">Cancel</Button>
                 </SheetClose>
+                <Button type="submit">Save Client</Button>
             </SheetFooter>
           </form>
         </Form>

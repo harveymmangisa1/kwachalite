@@ -1,10 +1,15 @@
+
+'use client';
+
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AddTransactionSheet } from '@/components/transactions/add-transaction-sheet';
 import { TransactionsDataTable } from '@/components/transactions/data-table';
-import { transactions } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 
 export default function TransactionsPage() {
+    const { transactions } = useAppStore();
+
     return (
         <div className="flex-1 space-y-4">
             <PageHeader title="Transactions" description="A complete history of your financial activity.">

@@ -1,11 +1,14 @@
 
+'use client';
+
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { products } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { AddProductSheet } from '@/components/products/add-product-sheet';
 import { ProductsDataTable } from '@/components/products/data-table';
 
 export default function ProductsPage() {
+    const { products } = useAppStore();
     return (
         <div className="flex-1 space-y-4">
             <PageHeader title="Products & Services" description="Manage your products and services.">

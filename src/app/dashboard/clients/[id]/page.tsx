@@ -4,13 +4,14 @@
 import { useParams } from 'next/navigation';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { clients, quotes } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { QuotesDataTable } from '@/components/quotes/data-table';
 import { Mail, Phone } from 'lucide-react';
 
 export default function ClientDetailPage() {
     const params = useParams();
     const clientId = params.id as string;
+    const { clients, quotes } = useAppStore();
     const client = clients.find(c => c.id === clientId);
     const clientQuotes = quotes.filter(q => q.clientId === clientId);
 

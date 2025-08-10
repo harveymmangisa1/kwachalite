@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -10,8 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { transactions } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
 const COLORS = [
   'hsl(var(--chart-1))',
@@ -22,10 +24,13 @@ const COLORS = [
 ];
 
 export function CategoryPieChart() {
+  const { transactions } = useAppStore();
+  const { activeWorkspace } = useActiveWorkspace();
+
   const expenseData = React.useMemo(() => {
     const categoryTotals: { [key: string]: number } = {};
     transactions
-      .filter((t) => t.type === 'expense')
+      .filter((t) => t.type === 'expense' && t.workspace === activeWorkspace)
       .forEach((t) => {
         if (!categoryTotals[t.category]) {
           categoryTotals[t.category] = 0;
@@ -37,7 +42,7 @@ export function CategoryPieChart() {
       name: categoryName,
       value: categoryTotals[categoryName],
     }));
-  }, []);
+  }, [transactions, activeWorkspace]);
 
   return (
     <Card>

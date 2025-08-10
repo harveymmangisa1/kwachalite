@@ -1,11 +1,14 @@
 
+'use client';
+
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { clients } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { AddClientSheet } from '@/components/clients/add-client-sheet';
 import { ClientsDataTable } from '@/components/clients/data-table';
 
 export default function ClientsPage() {
+    const { clients } = useAppStore();
     return (
         <div className="flex-1 space-y-4">
             <PageHeader title="Clients" description="Manage your business clients.">

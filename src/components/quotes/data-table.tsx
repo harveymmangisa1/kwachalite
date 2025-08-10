@@ -18,14 +18,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { clients } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 import type { Quote } from '@/lib/types';
 import { MoreHorizontal, View } from 'lucide-react';
 import Link from 'next/link';
 
 export function QuotesDataTable({ data }: { data: Quote[] }) {
+    const { clients } = useAppStore();
+    
     const getClientName = (clientId: string) => {
         return clients.find(c => c.id === clientId)?.name || 'Unknown Client';
     }

@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { categories, transactions } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import React from 'react';
 import { suggestTransactionCategory } from '@/app/actions';
@@ -51,9 +51,11 @@ const formSchema = z.object({
 
 export function AddTransactionSheet() {
   const [isSuggesting, setIsSuggesting] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { activeWorkspace } = useActiveWorkspace();
+  const { categories, transactions, addTransaction } = useAppStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,7 +76,7 @@ export function AddTransactionSheet() {
 
   const filteredCategories = React.useMemo(() => {
     return categories.filter((c) => c.type === transactionType && c.workspace === activeWorkspace);
-  }, [transactionType, activeWorkspace]);
+  }, [transactionType, activeWorkspace, categories]);
 
 
   async function handleReceiptUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -161,17 +163,18 @@ export function AddTransactionSheet() {
         workspace: activeWorkspace,
         ...values
     }
-    transactions.unshift(newTransaction);
+    addTransaction(newTransaction);
 
     toast({
       title: 'Transaction Added',
       description: 'Your transaction has been successfully saved.',
     });
     form.reset();
+    setOpen(false);
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />
@@ -314,9 +317,10 @@ export function AddTransactionSheet() {
               />
             )}
             <SheetFooter>
-                <SheetClose asChild>
-                    <Button type="submit">Save transaction</Button>
-                </SheetClose>
+              <SheetClose asChild>
+                <Button type="button" variant="ghost">Cancel</Button>
+              </SheetClose>
+              <Button type="submit">Save transaction</Button>
             </SheetFooter>
           </form>
         </Form>

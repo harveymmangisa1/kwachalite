@@ -28,7 +28,7 @@ import { PlusCircle } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
-import { loans } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import type { Loan } from '@/lib/types';
 
 const formSchema = z.object({
@@ -42,6 +42,8 @@ const formSchema = z.object({
 export function AddLoanSheet() {
   const { toast } = useToast();
   const { activeWorkspace } = useActiveWorkspace();
+  const { addLoan } = useAppStore();
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,17 +64,18 @@ export function AddLoanSheet() {
       status: 'active',
       ...values,
     };
-    loans.unshift(newLoan);
+    addLoan(newLoan);
     
     toast({
       title: 'Loan Added',
       description: 'Your new loan has been successfully saved.',
     });
     form.reset();
+    setOpen(false);
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />

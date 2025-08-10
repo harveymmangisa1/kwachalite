@@ -1,8 +1,10 @@
 
+'use client';
+
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { bills } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { formatCurrency, cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,7 @@ import {
 } from '@/components/ui/tooltip';
 
 export default function BillsPage() {
+    const { bills } = useAppStore();
     return (
         <div className="flex-1 space-y-4">
             <PageHeader title="Bills" description="Manage your upcoming and paid bills.">

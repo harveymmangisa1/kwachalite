@@ -1,3 +1,7 @@
+
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import type { Transaction, Bill, SavingsGoal, Client, Product, Quote, Loan, Category } from './types';
 import {
   ShoppingBasket,
   Car,
@@ -15,12 +19,10 @@ import {
   Truck,
   Users,
   Computer,
-  FileText,
-  Package
 } from 'lucide-react';
-import type { Transaction, Category, Bill, SavingsGoal, Client, Product, Quote, Loan } from './types';
 
-export const categories: Category[] = [
+// Define the initial categories, which are static and don't need to be in the store.
+export const initialCategories: Category[] = [
   // Personal Expense Categories
   { id: 'groceries', name: 'Groceries', icon: ShoppingBasket, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'personal', budget: 75000, budgetFrequency: 'monthly' },
   { id: 'transport', name: 'Transport', icon: Car, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'personal', budget: 30000, budgetFrequency: 'monthly' },
@@ -50,16 +52,63 @@ export const categories: Category[] = [
   { id: 'product_sales', name: 'Product Sales', icon: ShoppingBasket, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
 ];
 
-export let transactions: Transaction[] = [];
 
-export let bills: Bill[] = [];
+interface AppState {
+  transactions: Transaction[];
+  bills: Bill[];
+  savingsGoals: SavingsGoal[];
+  clients: Client[];
+  products: Product[];
+  quotes: Quote[];
+  loans: Loan[];
+  categories: Category[];
+  addTransaction: (transaction: Transaction) => void;
+  addBill: (bill: Bill) => void;
+  addSavingsGoal: (goal: SavingsGoal) => void;
+  updateSavingsGoal: (goalId: string, amount: number) => void;
+  addClient: (client: Client) => void;
+  addProduct: (product: Product) => void;
+  addQuote: (quote: Quote) => void;
+  addLoan: (loan: Loan) => void;
+  updateCategory: (category: Category) => void;
+  deleteCategory: (categoryId: string) => void;
+  addCategory: (category: Category) => void;
+}
 
-export let savingsGoals: SavingsGoal[] = [];
-
-export let clients: Client[] = [];
-
-export let products: Product[] = [];
-
-export let quotes: Quote[] = [];
-
-export let loans: Loan[] = [];
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      transactions: [],
+      bills: [],
+      savingsGoals: [],
+      clients: [],
+      products: [],
+      quotes: [],
+      loans: [],
+      categories: initialCategories,
+      addTransaction: (transaction) => set((state) => ({ transactions: [transaction, ...state.transactions] })),
+      addBill: (bill) => set((state) => ({ bills: [bill, ...state.bills] })),
+      addSavingsGoal: (goal) => set((state) => ({ savingsGoals: [goal, ...state.savingsGoals] })),
+      updateSavingsGoal: (goalId, amount) => set((state) => ({
+        savingsGoals: state.savingsGoals.map(g => 
+          g.id === goalId ? { ...g, currentAmount: g.currentAmount + amount } : g
+        )
+      })),
+      addClient: (client) => set((state) => ({ clients: [client, ...state.clients] })),
+      addProduct: (product) => set((state) => ({ products: [product, ...state.products] })),
+      addQuote: (quote) => set((state) => ({ quotes: [quote, ...state.quotes] })),
+      addLoan: (loan) => set((state) => ({ loans: [loan, ...state.loans] })),
+      addCategory: (category) => set(state => ({ categories: [...state.categories, category] })),
+      updateCategory: (category) => set(state => ({
+        categories: state.categories.map(c => c.id === category.id ? category : c)
+      })),
+      deleteCategory: (categoryId: string) => set(state => ({
+        categories: state.categories.filter(c => c.id !== categoryId)
+      })),
+    }),
+    {
+      name: 'kwachalite-storage', // name of the item in storage
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);

@@ -35,7 +35,7 @@ import { PlusCircle } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
-import { bills } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import type { Bill } from '@/lib/types';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
@@ -59,6 +59,8 @@ const formSchema = z.object({
 export function AddBillSheet() {
   const { toast } = useToast();
   const { activeWorkspace } = useActiveWorkspace();
+  const { addBill } = useAppStore();
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,17 +79,18 @@ export function AddBillSheet() {
         workspace: activeWorkspace,
         ...values
     };
-    bills.unshift(newBill);
+    addBill(newBill);
 
     toast({
       title: 'Bill Added',
       description: 'Your bill has been successfully saved.',
     });
     form.reset();
+    setOpen(false);
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />
@@ -218,8 +221,9 @@ export function AddBillSheet() {
             )}
             <SheetFooter>
                 <SheetClose asChild>
-                    <Button type="submit">Save Bill</Button>
+                  <Button type="button" variant="ghost">Cancel</Button>
                 </SheetClose>
+                <Button type="submit">Save Bill</Button>
             </SheetFooter>
           </form>
         </Form>

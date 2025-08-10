@@ -29,7 +29,7 @@ import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '../ui/scroll-area';
 import { formatCurrency } from '@/lib/utils';
-import { savingsGoals } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import type { SavingsGoal } from '@/lib/types';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
@@ -50,6 +50,8 @@ const formSchema = z.object({
 export function AddGoalSheet() {
   const { toast } = useToast();
   const { activeWorkspace } = useActiveWorkspace();
+  const { addSavingsGoal } = useAppStore();
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,17 +86,18 @@ export function AddGoalSheet() {
         workspace: activeWorkspace,
         ...values
     };
-    savingsGoals.unshift(newGoal);
+    addSavingsGoal(newGoal);
 
     toast({
       title: 'Financial Goal Added',
       description: 'Your new goal has been created.',
     });
     form.reset();
+    setOpen(false);
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />

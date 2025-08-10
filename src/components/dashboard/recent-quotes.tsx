@@ -16,13 +16,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { quotes, clients } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import type { Quote } from '@/lib/types';
 
 export function RecentQuotes() {
+  const { quotes, clients } = useAppStore();
   const recentQuotes = quotes.slice(0, 5);
 
    const getClientName = (clientId: string) => {

@@ -33,9 +33,10 @@ import {
 } from '@/components/ui/select';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { clients, products, quotes } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { ScrollArea } from '../ui/scroll-area';
 import type { Quote } from '@/lib/types';
+import React from 'react';
 
 const quoteItemSchema = z.object({
   productId: z.string().min(1, 'Product is required'),
@@ -52,6 +53,8 @@ const formSchema = z.object({
 
 export function AddQuoteSheet() {
   const { toast } = useToast();
+  const { clients, products, addQuote } = useAppStore();
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,17 +78,18 @@ export function AddQuoteSheet() {
         status: 'draft',
         ...values
     };
-    quotes.unshift(newQuote);
+    addQuote(newQuote);
     
     toast({
       title: 'Quotation Created',
       description: 'The new quotation has been successfully saved as a draft.',
     });
     form.reset();
+    setOpen(false);
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />
@@ -239,9 +243,7 @@ export function AddQuoteSheet() {
                 <SheetClose asChild>
                     <Button type="button" variant="ghost">Cancel</Button>
                 </SheetClose>
-                <SheetClose asChild>
-                    <Button type="submit">Save Quotation</Button>
-                </SheetClose>
+                <Button type="submit">Save Quotation</Button>
             </SheetFooter>
           </form>
         </Form>

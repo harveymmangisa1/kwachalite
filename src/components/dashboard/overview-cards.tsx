@@ -3,15 +3,24 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
-import { transactions } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import React from 'react';
 
 export function OverviewCards() {
-  const totalIncome = transactions
+  const { transactions } = useAppStore();
+  const { activeWorkspace } = useActiveWorkspace();
+  
+  const filteredTransactions = React.useMemo(() => 
+    transactions.filter(t => t.workspace === activeWorkspace)
+  , [transactions, activeWorkspace]);
+
+  const totalIncome = filteredTransactions
     .filter((t) => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
 
-  const totalExpenses = transactions
+  const totalExpenses = filteredTransactions
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
 

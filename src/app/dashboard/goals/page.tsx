@@ -3,26 +3,26 @@
 
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { savingsGoals as goals } from '@/lib/data';
+import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { AddGoalSheet } from '@/components/goals/add-goal-sheet';
 import { UpdateGoalSheet } from '@/components/goals/update-goal-sheet';
-import { PiggyBank, ShoppingCart } from 'lucide-react';
+import { PiggyBank } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 
 export default function GoalsPage() {
+    const { savingsGoals } = useAppStore();
 
     return (
         <div className="flex-1 space-y-4">
             <PageHeader title="Financial Goals" description="Set and track your specific financial goals.">
                 <AddGoalSheet />
             </PageHeader>
-            {goals.length > 0 ? (
+            {savingsGoals.length > 0 ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 sm:px-6">
-                    {goals.map(goal => {
+                    {savingsGoals.map(goal => {
                         const progress = (goal.currentAmount / goal.targetAmount) * 100;
                         const purchasedItems = goal.items?.filter(i => i.purchased).length || 0;
                         const totalItems = goal.items?.length || 0;

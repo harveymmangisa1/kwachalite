@@ -29,6 +29,7 @@ import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { SavingsGoal } from '@/lib/types';
 import { formatCurrency } from '@/lib/utils';
+import { useAppStore } from '@/lib/data';
 
 const formSchema = z.object({
   amount: z.coerce.number().positive('Amount must be positive'),
@@ -37,6 +38,7 @@ const formSchema = z.object({
 export function UpdateGoalSheet({ goal }: { goal: SavingsGoal }) {
   const { toast } = useToast();
   const [open, setOpen] = React.useState(false);
+  const { updateSavingsGoal } = useAppStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,7 +48,7 @@ export function UpdateGoalSheet({ goal }: { goal: SavingsGoal }) {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({ goalId: goal.id, newContribution: values.amount });
+    updateSavingsGoal(goal.id, values.amount);
     toast({
       title: 'Progress Updated',
       description: `You've added to your "${goal.name}" goal.`,

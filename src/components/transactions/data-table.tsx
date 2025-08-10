@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Table,
@@ -8,7 +9,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { categories, transactions } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import type { Transaction } from '@/lib/types';
@@ -44,7 +44,7 @@ export function TransactionsDataTable({ data }: { data: Transaction[] }) {
               <TableCell
                 className={cn(
                   'text-right font-medium',
-                  transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                  transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
                 )}
               >
                 {transaction.type === 'income' ? '+' : '-'}
