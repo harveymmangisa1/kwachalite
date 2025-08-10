@@ -13,7 +13,8 @@ import {
   LayoutDashboard,
   Briefcase,
   Target,
-  Landmark
+  Landmark,
+  HandCoins
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const mainNavItems = [
   { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets', workspace: ['personal'] },
   { href: '/dashboard/goals', icon: Target, label: 'Goals', workspace: ['personal'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
+  { href: '/dashboard/loans', icon: Landmark, label: 'Loans', workspace: ['personal', 'business'] },
   { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']},
 ];
 

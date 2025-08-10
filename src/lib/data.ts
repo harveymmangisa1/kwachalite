@@ -18,7 +18,7 @@ import {
   FileText,
   Package
 } from 'lucide-react';
-import type { Transaction, Category, Bill, SavingsGoal, Client, Product, Quote } from './types';
+import type { Transaction, Category, Bill, SavingsGoal, Client, Product, Quote, Loan } from './types';
 
 export const categories: Category[] = [
   // Personal Expense Categories
@@ -218,4 +218,10 @@ export const quotes: Quote[] = [
         ],
         status: 'draft',
     }
-]
+];
+
+export const loans: Loan[] = [
+    { id: '1', lender: 'Vision Bank', principal: 5000000, remainingAmount: 4500000, interestRate: 15, term: 36, startDate: '2024-01-15', status: 'active', workspace: 'personal' },
+    { id: '2', lender: 'GrowthCap Fund', principal: 10000000, remainingAmount: 8000000, interestRate: 12, term: 60, startDate: '2023-06-01', status: 'active', workspace: 'business' },
+    { id: '3', lender: 'MyFamily Loans', principal: 500000, remainingAmount: 0, interestRate: 0, term: 12, startDate: '2023-01-01', status: 'paid', workspace: 'personal' },
+];

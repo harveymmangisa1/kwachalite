@@ -84,3 +84,15 @@ export interface Quote {
     items: QuoteItem[];
     status: 'draft' | 'sent' | 'accepted' | 'rejected';
 }
+
+export interface Loan {
+    id: string;
+    lender: string;
+    principal: number;
+    remainingAmount: number;
+    interestRate: number; // Annual interest rate in percentage
+    term: number; // Loan term in months
+    startDate: string;
+    status: 'active' | 'paid';
+    workspace: Workspace;
+}
