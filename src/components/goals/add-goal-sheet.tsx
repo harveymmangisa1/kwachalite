@@ -40,8 +40,8 @@ const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   targetAmount: z.coerce.number().positive('Target amount must be positive'),
   deadline: z.string().min(1, 'Deadline is required'),
-  type: z.enum(['individual', 'group']),
-  members: z.string().optional(),
+  category: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export function AddGoalSheet() {
@@ -53,18 +53,16 @@ export function AddGoalSheet() {
       name: '',
       targetAmount: 0,
       deadline: new Date().toISOString().split('T')[0],
-      type: 'individual',
-      members: '',
+      category: '',
+      notes: '',
     },
   });
-
-  const goalType = form.watch('type');
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     toast({
-      title: 'Savings Goal Added',
-      description: 'Your new savings goal has been created.',
+      title: 'Financial Goal Added',
+      description: 'Your new goal has been created.',
     });
     form.reset();
   }
@@ -79,9 +77,9 @@ export function AddGoalSheet() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Create a New Savings Goal</SheetTitle>
+          <SheetTitle>Create a New Financial Goal</SheetTitle>
           <SheetDescription>
-            What are you saving up for? Set your goal below.
+            What are you planning for? Set your goal below.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -96,7 +94,7 @@ export function AddGoalSheet() {
                 <FormItem>
                   <FormLabel>Goal Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Dream Vacation" {...field} />
+                    <Input placeholder="e.g. Saturday Market Run" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,7 +107,7 @@ export function AddGoalSheet() {
                 <FormItem>
                   <FormLabel>Target Amount</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="MK 1,000,000" {...field} />
+                    <Input type="number" placeholder="MK 25,000" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,7 +118,7 @@ export function AddGoalSheet() {
               name="deadline"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deadline</FormLabel>
+                  <FormLabel>Date / Deadline</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
@@ -128,45 +126,44 @@ export function AddGoalSheet() {
                 </FormItem>
               )}
             />
-            <FormField
+             <FormField
               control={form.control}
-              name="type"
+              name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Goal Type</FormLabel>
+                  <FormLabel>Expense Category (Optional)</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a goal type" />
+                        <SelectValue placeholder="Link to a category" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="individual">Individual</SelectItem>
-                      <SelectItem value="group">Group</SelectItem>
+                      <SelectItem value="food">Food & Dining</SelectItem>
+                       <SelectItem value="groceries">Groceries</SelectItem>
+                      <SelectItem value="transport">Transport</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {goalType === 'group' && (
-                <FormField
-                control={form.control}
-                name="members"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Invite Members</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Enter teammate emails, separated by commas" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+             <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes / Item List</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="e.g. Tomatoes, Onions, Milk" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <SheetFooter>
                 <SheetClose asChild>
                     <Button type="submit">Create Goal</Button>

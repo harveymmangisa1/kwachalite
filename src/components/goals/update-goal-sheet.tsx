@@ -33,7 +33,7 @@ const formSchema = z.object({
   amount: z.coerce.number().positive('Amount must be positive'),
 });
 
-export function UpdateSavingsGoal({ goal }: { goal: SavingsGoal }) {
+export function UpdateGoalSheet({ goal }: { goal: SavingsGoal }) {
   const { toast } = useToast();
   const [open, setOpen] = React.useState(false);
 
@@ -48,7 +48,7 @@ export function UpdateSavingsGoal({ goal }: { goal: SavingsGoal }) {
     console.log({ goalId: goal.id, newContribution: values.amount });
     toast({
       title: 'Progress Updated',
-      description: `You've added ${values.amount} to your "${goal.name}" goal.`,
+      description: `You've added to your "${goal.name}" goal.`,
     });
     form.reset();
     setOpen(false);
@@ -59,14 +59,14 @@ export function UpdateSavingsGoal({ goal }: { goal: SavingsGoal }) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
             <Edit className="h-4 w-4 mr-2" />
-            Update
+            Update Progress
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Update "{goal.name}"</DialogTitle>
           <DialogDescription>
-            Add to your savings for this goal. Your current progress is {goal.currentAmount}.
+            Add a transaction amount to this goal. Your current progress is {goal.currentAmount}.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -81,7 +81,7 @@ export function UpdateSavingsGoal({ goal }: { goal: SavingsGoal }) {
                 <FormItem>
                   <FormLabel>Amount to Add</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="MK 50,000" {...field} />
+                    <Input type="number" placeholder="MK 5,000" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

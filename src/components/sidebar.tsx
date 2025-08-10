@@ -10,11 +10,7 @@ import {
   Settings,
   Wallet,
   ReceiptText,
-  PiggyBank,
   LayoutDashboard,
-  Users,
-  Package,
-  FileText,
   Briefcase,
   Target,
   Landmark
@@ -37,7 +33,6 @@ const mainNavItems = [
   { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets', workspace: ['personal'] },
   { href: '/dashboard/goals', icon: Target, label: 'Goals', workspace: ['personal'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
-  { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings', workspace: ['personal'] },
   { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']},
 ];
 
