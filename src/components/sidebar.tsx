@@ -111,14 +111,15 @@ export function Sidebar() {
 
 export function MobileNav() {
     const pathname = usePathname();
-    const activeWorkspace = useActiveWorkspace();
+    const { activeWorkspace } = useActiveWorkspace();
     const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
     const allNavItems = [...filteredMainNav, ...secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace))];
 
+    const gridColsClass = `grid-cols-${allNavItems.length}`;
 
     return (
         <div className="sm:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t z-50">
-            <nav className={`grid h-full ${'grid-cols-' + allNavItems.length} items-center justify-items-center text-sm font-medium`}>
+            <nav className={cn('grid h-full items-center justify-items-center text-sm font-medium', gridColsClass)}>
                 {allNavItems.map(item => (
                     <Link
                         key={item.href}

@@ -8,6 +8,11 @@ const config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
+  safelist: [
+    {
+      pattern: /grid-cols-./,
+    },
+  ],
   prefix: '',
   theme: {
     container: {
