@@ -21,6 +21,7 @@ export interface Category {
   type: 'income' | 'expense';
   workspace: Workspace;
   budget?: number;
+  budgetFrequency?: 'weekly' | 'monthly';
 }
 
 export interface Bill {

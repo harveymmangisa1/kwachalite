@@ -7,16 +7,13 @@ import { formatCurrency, cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Landmark } from 'lucide-react';
-import { PlusCircle } from 'lucide-react';
+import { AddLoanSheet } from '@/components/loans/add-loan-sheet';
 
 export default function LoansPage() {
     return (
         <div className="flex-1 space-y-4">
             <PageHeader title="Loans" description="Manage your loans and repayments.">
-                <Button size="sm" className="gap-1">
-                    <PlusCircle className="h-4 w-4" />
-                    Add Loan
-                </Button>
+                <AddLoanSheet />
             </PageHeader>
             <div className="px-4 sm:px-6">
                 <Card>
@@ -66,10 +63,7 @@ export default function LoansPage() {
                                     You haven't added any loans yet.
                                 </p>
                                 <div className="mt-6">
-                                     <Button size="sm" className="gap-1">
-                                        <PlusCircle className="h-4 w-4" />
-                                        Add Loan
-                                    </Button>
+                                     <AddLoanSheet />
                                 </div>
                             </div>
                         )}

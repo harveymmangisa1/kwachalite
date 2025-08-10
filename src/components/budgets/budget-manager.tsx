@@ -40,6 +40,7 @@ export function BudgetManager() {
         workspace: activeWorkspace,
         icon: Briefcase, // A default icon
         color: 'hsl(var(--primary))',
+        budgetFrequency: 'monthly',
       };
       setCategories(prev => [...prev, newCategory]);
       setNewCategoryName('');
@@ -61,7 +62,7 @@ export function BudgetManager() {
   
   const handleEdit = (category: Category) => {
     setEditingCategoryId(category.id);
-    setEditedCategory({ name: category.name, budget: category.budget });
+    setEditedCategory({ name: category.name, budget: category.budget, budgetFrequency: category.budgetFrequency || 'monthly' });
   };
   
   const handleCancelEdit = () => {
@@ -72,7 +73,7 @@ export function BudgetManager() {
   const handleUpdateCategory = (categoryId: string) => {
     setCategories(prev => prev.map(cat => 
         cat.id === categoryId 
-        ? { ...cat, name: editedCategory.name!, budget: editedCategory.budget } 
+        ? { ...cat, name: editedCategory.name!, budget: editedCategory.budget, budgetFrequency: editedCategory.budgetFrequency } 
         : cat
     ));
     setEditingCategoryId(null);
@@ -101,13 +102,26 @@ export function BudgetManager() {
             className="text-sm h-8 flex-1"
           />
           {category.type === 'expense' && (
+            <>
             <Input 
               type="number" 
               placeholder="Set budget..." 
-              className="text-sm h-8 w-32"
+              className="text-sm h-8 w-28"
               value={editedCategory.budget || ''}
               onChange={(e) => setEditedCategory(prev => ({...prev, budget: parseFloat(e.target.value) || undefined}))}
             />
+            <Select 
+              value={editedCategory.budgetFrequency} 
+              onValueChange={(v) => setEditedCategory(prev => ({...prev, budgetFrequency: v as 'weekly' | 'monthly'}))}>
+              <SelectTrigger className="w-[110px] h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+              </SelectContent>
+            </Select>
+            </>
           )}
           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleUpdateCategory(category.id)}><Check className="h-4 w-4" /></Button>
           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCancelEdit}><X className="h-4 w-4" /></Button>
@@ -123,8 +137,8 @@ export function BudgetManager() {
          </div>
          <div className="flex items-center gap-2">
             {category.type === 'expense' && category.budget && (
-                <span className="text-sm text-muted-foreground w-32 text-right pr-2">
-                    Budget: {new Intl.NumberFormat().format(category.budget)}
+                <span className="text-sm text-muted-foreground w-48 text-right pr-2">
+                    Budget: {new Intl.NumberFormat().format(category.budget)} / {category.budgetFrequency === 'weekly' ? 'wk' : 'mo'}
                 </span>
             )}
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(category)}>
