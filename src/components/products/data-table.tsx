@@ -18,7 +18,8 @@ export function ProductsDataTable({ data }: { data: Product[] }) {
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Description</TableHead>
-          <TableHead className="text-right">Price</TableHead>
+          <TableHead className="text-right">Cost Price</TableHead>
+          <TableHead className="text-right">Selling Price</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -30,6 +31,9 @@ export function ProductsDataTable({ data }: { data: Product[] }) {
               </TableCell>
               <TableCell>
                 {product.description}
+              </TableCell>
+              <TableCell className="text-right">
+                {formatCurrency(product.costPrice)}
               </TableCell>
               <TableCell className="text-right">
                 {formatCurrency(product.price)}

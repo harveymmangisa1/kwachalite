@@ -147,10 +147,10 @@ export const clients: Client[] = [
 ];
 
 export const products: Product[] = [
-    { id: '1', name: 'Web Design Package', description: 'Complete website design and development.', price: 2500000 },
-    { id: '2', name: 'Logo Design', description: 'Custom logo and brand identity.', price: 500000 },
-    { id: '3', name: 'Social Media Management (Monthly)', description: 'Monthly management of social media channels.', price: 300000 },
-    { id: '4', name: 'Consulting Hour', description: 'One hour of business consulting.', price: 75000 },
+    { id: '1', name: 'Web Design Package', description: 'Complete website design and development.', price: 2500000, costPrice: 1800000 },
+    { id: '2', name: 'Logo Design', description: 'Custom logo and brand identity.', price: 500000, costPrice: 200000 },
+    { id: '3', name: 'Social Media Management (Monthly)', description: 'Monthly management of social media channels.', price: 300000, costPrice: 150000 },
+    { id: '4', name: 'Consulting Hour', description: 'One hour of business consulting.', price: 75000, costPrice: 10000 },
 ];
 
 export const quotes: Quote[] = [

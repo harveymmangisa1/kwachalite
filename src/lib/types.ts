@@ -57,6 +57,7 @@ export interface Product {
     name: string;
     description?: string;
     price: number;
+    costPrice: number;
 }
 
 export interface QuoteItem {

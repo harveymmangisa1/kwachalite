@@ -31,6 +31,7 @@ import { Textarea } from '../ui/textarea';
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   price: z.coerce.number().positive('Price must be a positive number'),
+  costPrice: z.coerce.number().min(0, 'Cost price must be a non-negative number'),
   description: z.string().optional(),
 });
 
@@ -42,6 +43,7 @@ export function AddProductSheet() {
     defaultValues: {
       name: '',
       price: 0,
+      costPrice: 0,
       description: '',
     },
   });
@@ -88,19 +90,34 @@ export function AddProductSheet() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="MK 250,000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+             <div className="grid grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="costPrice"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Cost Price</FormLabel>
+                    <FormControl>
+                        <Input type="number" placeholder="MK 150,000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Selling Price</FormLabel>
+                    <FormControl>
+                        <Input type="number" placeholder="MK 250,000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
             <FormField
               control={form.control}
               name="description"
