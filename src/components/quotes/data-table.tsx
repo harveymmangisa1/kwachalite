@@ -9,10 +9,21 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { clients, products } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { clients } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import type { Quote } from '@/lib/types';
+import { MoreHorizontal, View } from 'lucide-react';
+import Link from 'next/link';
 
 export function QuotesDataTable({ data }: { data: Quote[] }) {
     const getClientName = (clientId: string) => {
@@ -32,6 +43,7 @@ export function QuotesDataTable({ data }: { data: Quote[] }) {
           <TableHead>Date</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Amount</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -60,6 +72,25 @@ export function QuotesDataTable({ data }: { data: Quote[] }) {
                 className="text-right font-medium"
               >
                 {formatCurrency(getTotalAmount(quote.items))}
+              </TableCell>
+              <TableCell className="text-right">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                           <Link href={`/dashboard/quotes/${quote.id}`}>
+                             <View className="mr-2 h-4 w-4" />
+                             View Quote
+                           </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           );
