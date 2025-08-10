@@ -71,8 +71,6 @@ export function AddBillSheet() {
     },
   });
 
-  const isRecurring = form.watch('isRecurring');
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     const newBill: Bill = {
         id: new Date().toISOString(),
@@ -188,7 +186,7 @@ export function AddBillSheet() {
                 </FormItem>
               )}
             />
-            {isRecurring && (
+            {form.watch('isRecurring') && (
                 <FormField
                 control={form.control}
                 name="recurringFrequency"
