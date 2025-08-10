@@ -28,6 +28,7 @@ import { Edit } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { SavingsGoal } from '@/lib/types';
+import { formatCurrency } from '@/lib/utils';
 
 const formSchema = z.object({
   amount: z.coerce.number().positive('Amount must be positive'),
@@ -66,7 +67,7 @@ export function UpdateGoalSheet({ goal }: { goal: SavingsGoal }) {
         <DialogHeader>
           <DialogTitle>Update "{goal.name}"</DialogTitle>
           <DialogDescription>
-            Add a transaction amount to this goal. Your current progress is {goal.currentAmount}.
+            Add a transaction amount to this goal. Your current progress is {formatCurrency(goal.currentAmount)}.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

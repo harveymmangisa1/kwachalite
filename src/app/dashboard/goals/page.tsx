@@ -11,6 +11,7 @@ import { UpdateGoalSheet } from '@/components/goals/update-goal-sheet';
 import { PiggyBank, ShoppingCart } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 export default function GoalsPage() {
 
@@ -30,7 +31,7 @@ export default function GoalsPage() {
                                 <CardHeader>
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
-                                            <ShoppingCart className="h-6 w-6 text-muted-foreground" />
+                                            <PiggyBank className="h-6 w-6 text-muted-foreground" />
                                             <div>
                                                 <CardTitle>{goal.name}</CardTitle>
                                                 <CardDescription>Deadline: {new Date(goal.deadline).toLocaleDateString()}</CardDescription>
