@@ -10,6 +10,8 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import React from 'react';
 import { Target } from 'lucide-react';
 import type { Category, Transaction } from '@/lib/types';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 interface BudgetCategory extends Category {
     spent: number;
@@ -25,7 +27,7 @@ export default function BudgetsPage() {
         const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
         const expenseCategories = categories.filter(
-            (c) => c.workspace === activeWorkspace && c.type === 'expense' && c.budget
+            (c) => c.workspace === activeWorkspace && c.type === 'expense' && c.budget && c.budget > 0
         );
 
         const monthlyTransactions = transactions.filter(t => {
@@ -70,7 +72,7 @@ export default function BudgetsPage() {
                                             </div>
                                             <Progress value={item.progress} />
                                              <p className="text-xs text-muted-foreground mt-1 text-right">
-                                                {formatCurrency(item.budget! - item.spent)} remaining
+                                                {formatCurrency(Math.max(0, item.budget! - item.spent))} {item.spent > item.budget! ? 'over' : 'remaining'}
                                             </p>
                                         </div>
                                     </div>
@@ -82,10 +84,15 @@ export default function BudgetsPage() {
                     <Card className="text-center py-12">
                         <CardContent>
                             <Target className="mx-auto h-12 w-12 text-muted-foreground" />
-                            <h3 className="mt-4 text-lg font-semibold">No Budgets Found</h3>
+                            <h3 className="mt-4 text-lg font-semibold">No Budgets Set</h3>
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Budgets can be set on expense categories in Settings.
+                                You haven't set any budgets for your expense categories yet.
                             </p>
+                            <div className="mt-6">
+                                <Button asChild>
+                                    <Link href="/dashboard/settings">Set Budgets</Link>
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 )}

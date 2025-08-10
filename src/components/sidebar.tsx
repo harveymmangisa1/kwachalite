@@ -32,14 +32,11 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 
 const mainNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', workspace: ['personal', 'business'] },
-  { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal', 'business'] },
-  { href: '/dashboard/budgets', icon: Target, label: 'Budgets', workspace: ['personal', 'business'] },
+  { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal'] },
+  { href: '/dashboard/budgets', icon: Target, label: 'Budgets', workspace: ['personal'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
   { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings', workspace: ['personal'] },
   { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']},
-  { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business'], isSubItem: true },
-  { href: '/dashboard/products', icon: Package, label: 'Products', workspace: ['business'], isSubItem: true },
-  { href: ' /dashboard/quotes', icon: FileText, label: 'Quotations', workspace: ['business'], isSubItem: true },
 ];
 
 const secondaryNavItems = [
@@ -51,7 +48,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { activeWorkspace } = useActiveWorkspace();
 
-  const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace) && !item.isSubItem);
+  const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
   return (
@@ -118,35 +115,30 @@ export function MobileNav() {
     const pathname = usePathname();
     const { activeWorkspace } = useActiveWorkspace();
     
-    let navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace) && !item.isSubItem);
+    let navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
     if (activeWorkspace === 'business') {
         const businessHubIndex = navItemsToShow.findIndex(item => item.href.includes('business'));
+        // Replace business hub with a direct link to quotes for mobile
         if (businessHubIndex !== -1) {
-            navItemsToShow.splice(businessHubIndex, 1);
+            navItemsToShow[businessHubIndex] = { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']};
         }
     }
-
-    if (activeWorkspace === 'personal') {
-       navItemsToShow.push(...secondaryNavItems.filter(item => item.workspace.includes('personal') && !item.href.includes('analytics')));
-    } else {
-       // For business, we only add Settings to keep it clean. Analytics is accessible from the Dashboard.
-       const settingsItem = secondaryNavItems.find(item => item.href.includes('settings'));
-       if (settingsItem) {
+    
+    // Add settings to both personal and business navs
+    const settingsItem = secondaryNavItems.find(item => item.href.includes('settings'));
+    if (settingsItem) {
         navItemsToShow.push(settingsItem);
-       }
     }
     
-    // Ensure we don't have too many items
-    navItemsToShow = navItemsToShow.slice(0, 5);
-
-
-    const gridColsClass = `grid-cols-${navItemsToShow.length}`;
+    // Ensure we don't have too many items and remove duplicates
+    const uniqueNavItems = Array.from(new Map(navItemsToShow.map(item => [item.href, item])).values()).slice(0, 5);
+    const gridColsClass = `grid-cols-${uniqueNavItems.length}`;
 
     return (
         <div className="sm:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t z-50">
             <nav className={cn('grid h-full items-center justify-items-center text-sm font-medium', gridColsClass)}>
-                {navItemsToShow.map(item => (
+                {uniqueNavItems.map(item => (
                     <Link
                         key={item.href}
                         href={item.href}
@@ -156,7 +148,7 @@ export function MobileNav() {
                         )}
                     >
                         <item.icon className="h-5 w-5" />
-                        <span className="text-xs">{item.label}</span>
+                        <span className="text-xs text-center">{item.label}</span>
                     </Link>
                 ))}
             </nav>
