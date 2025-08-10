@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,110 +10,176 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { categories } from '@/lib/data';
+import { categories as initialCategories } from '@/lib/data';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import React from 'react';
 import type { Category } from '@/lib/types';
 import { Label } from '../ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { formatCurrency } from '@/lib/utils';
+import { Pen, Trash2, Check, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 export function CategoryManager() {
   const { activeWorkspace } = useActiveWorkspace();
   const { toast } = useToast();
-  const [newCategory, setNewCategory] = React.useState('');
   
-  const [budgets, setBudgets] = React.useState<Record<string, number | undefined>>(() => {
-    const initialBudgets: Record<string, number | undefined> = {};
-    categories.forEach(cat => {
-      if (cat.type === 'expense') {
-        initialBudgets[cat.id] = cat.budget;
-      }
-    });
-    return initialBudgets;
-  });
+  const [categories, setCategories] = React.useState<Category[]>(initialCategories);
+  const [editingCategoryId, setEditingCategoryId] = React.useState<string | null>(null);
+  const [editedCategory, setEditedCategory] = React.useState<Partial<Category>>({});
+  
+  const [newCategoryName, setNewCategoryName] = React.useState('');
+  const [newCategoryType, setNewCategoryType] = React.useState<'income' | 'expense'>('expense');
+
 
   const handleAddCategory = () => {
-    if (newCategory.trim() !== '') {
-      console.log('Adding category:', newCategory);
-      // Here you would typically call an action to add the category
-      setNewCategory('');
+    if (newCategoryName.trim() !== '') {
+      const newCategory: Category = {
+        id: `new-${Date.now()}`,
+        name: newCategoryName,
+        type: newCategoryType,
+        workspace: activeWorkspace,
+        icon: Briefcase, // A default icon
+        color: 'hsl(var(--primary))',
+      };
+      setCategories(prev => [...prev, newCategory]);
+      setNewCategoryName('');
       toast({
         title: 'Category Added',
-        description: `The category "${newCategory}" has been added.`,
+        description: `The category "${newCategoryName}" has been added.`,
       });
     }
   };
 
-  const handleBudgetChange = (categoryId: string, value: string) => {
-    const amount = value ? parseFloat(value) : undefined;
-    setBudgets(prev => ({...prev, [categoryId]: amount}));
-  };
-
   const handleSaveChanges = () => {
-    console.log('Saving budgets:', budgets);
+    console.log('Saving categories:', categories);
+    // In a real app, this would be an API call
     toast({
-      title: 'Budgets Saved',
-      description: 'Your category budgets have been updated.',
+      title: 'Changes Saved',
+      description: 'Your category settings have been updated.',
     });
+  };
+  
+  const handleEdit = (category: Category) => {
+    setEditingCategoryId(category.id);
+    setEditedCategory({ name: category.name, budget: category.budget });
+  };
+  
+  const handleCancelEdit = () => {
+    setEditingCategoryId(null);
+    setEditedCategory({});
   }
 
+  const handleUpdateCategory = (categoryId: string) => {
+    setCategories(prev => prev.map(cat => 
+        cat.id === categoryId 
+        ? { ...cat, name: editedCategory.name!, budget: editedCategory.budget } 
+        : cat
+    ));
+    setEditingCategoryId(null);
+    setEditedCategory({});
+    toast({ title: 'Category Updated' });
+  };
+
+  const handleDeleteCategory = (categoryId: string) => {
+    setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+    toast({ title: 'Category Deleted', variant: 'destructive' });
+  };
+
   const filteredCategories = categories.filter(c => c.workspace === activeWorkspace);
+  const incomeCategories = filteredCategories.filter(c => c.type === 'income');
   const expenseCategories = filteredCategories.filter(c => c.type === 'expense');
+
+  const renderCategory = (category: Category) => {
+    const isEditing = editingCategoryId === category.id;
+
+    if (isEditing) {
+      return (
+        <div key={category.id} className="flex items-center justify-between rounded-md border p-3 gap-2">
+           <Input 
+            value={editedCategory.name}
+            onChange={(e) => setEditedCategory(prev => ({...prev, name: e.target.value}))}
+            className="text-sm h-8 flex-1"
+          />
+          {category.type === 'expense' && (
+            <Input 
+              type="number" 
+              placeholder="Set budget..." 
+              className="text-sm h-8 w-32"
+              value={editedCategory.budget || ''}
+              onChange={(e) => setEditedCategory(prev => ({...prev, budget: parseFloat(e.target.value) || undefined}))}
+            />
+          )}
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleUpdateCategory(category.id)}><Check className="h-4 w-4" /></Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCancelEdit}><X className="h-4 w-4" /></Button>
+        </div>
+      )
+    }
+
+    return (
+       <div key={category.id} className="flex items-center justify-between rounded-md border p-3">
+         <div className="flex items-center gap-3">
+           <category.icon className="h-5 w-5 text-muted-foreground" />
+           <span className="font-medium text-sm">{category.name}</span>
+         </div>
+         <div className="flex items-center gap-2">
+            {category.type === 'expense' && category.budget && (
+                <span className="text-sm text-muted-foreground w-32 text-right pr-2">
+                    Budget: {new Intl.NumberFormat().format(category.budget)}
+                </span>
+            )}
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(category)}>
+                <Pen className="h-4 w-4" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => handleDeleteCategory(category.id)}>
+                <Trash2 className="h-4 w-4" />
+            </Button>
+         </div>
+       </div>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Manage Categories</CardTitle>
         <CardDescription>
-          Add new categories and set monthly budgets for your expenses.
+          Add, edit, or delete categories and set monthly budgets for your expenses.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <Label className="font-semibold">Income Categories</Label>
-          {filteredCategories.filter(c => c.type === 'income').map((category) => (
-             <div key={category.id} className="flex items-center justify-between rounded-md border p-3">
-               <div className="flex items-center gap-3">
-                 <category.icon className="h-5 w-5 text-muted-foreground" />
-                 <span className="font-medium text-sm">{category.name}</span>
-               </div>
-             </div>
-          ))}
+          {incomeCategories.map(renderCategory)}
         </div>
          <div className="space-y-4">
           <Label className="font-semibold">Expense Categories & Budgets</Label>
-           {expenseCategories.map((category) => (
-             <div key={category.id} className="flex items-center justify-between rounded-md border p-3">
-                <div className="flex items-center gap-3">
-                  <category.icon className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium text-sm">{category.name}</span>
-                </div>
-                <div className="w-32">
-                  <Input 
-                    type="number" 
-                    placeholder="Set budget..." 
-                    className="text-sm h-8"
-                    value={budgets[category.id] || ''}
-                    onChange={(e) => handleBudgetChange(category.id, e.target.value)}
-                  />
-                </div>
-              </div>
-           ))}
+           {expenseCategories.map(renderCategory)}
         </div>
       </CardContent>
       <CardFooter className="border-t px-6 py-4 flex flex-col items-stretch gap-4">
-        <div className="flex w-full items-center gap-2">
-          <Input
-            type="text"
-            placeholder="New category name"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            className="flex-1"
-          />
-          <Button onClick={handleAddCategory}>Add Category</Button>
+        <div>
+            <Label className="text-sm font-medium">Add New Category</Label>
+            <div className="flex w-full items-center gap-2 mt-2">
+                <Input
+                    type="text"
+                    placeholder="New category name"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    className="flex-1"
+                />
+                <Select value={newCategoryType} onValueChange={(v) => setNewCategoryType(v as any)}>
+                    <SelectTrigger className="w-[120px]">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="expense">Expense</SelectItem>
+                        <SelectItem value="income">Income</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Button onClick={handleAddCategory}>Add</Button>
+            </div>
         </div>
-        <Button onClick={handleSaveChanges}>Save Changes</Button>
+        <Button onClick={handleSaveChanges}>Save All Changes</Button>
       </CardFooter>
     </Card>
   );
