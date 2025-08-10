@@ -16,7 +16,8 @@ import {
   Package,
   FileText,
   Briefcase,
-  Target
+  Target,
+  Landmark
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 const mainNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', workspace: ['personal', 'business'] },
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal'] },
+  { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets', workspace: ['personal'] },
   { href: '/dashboard/goals', icon: Target, label: 'Goals', workspace: ['personal'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
   { href: '/dashboard/savings', icon: PiggyBank, label: 'Savings', workspace: ['personal'] },
