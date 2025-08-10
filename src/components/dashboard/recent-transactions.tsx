@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Card,
@@ -10,6 +11,7 @@ import { transactions } from '@/lib/data';
 import { formatCurrency, cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '../ui/button';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 
 export function RecentTransactions() {
   const recentTransactions = transactions.slice(0, 5);
@@ -39,40 +41,14 @@ export function RecentTransactions() {
                   className={cn(
                     'p-2 rounded-md',
                     transaction.type === 'income'
-                      ? 'bg-green-100 dark:bg-green-900'
-                      : 'bg-red-100 dark:bg-red-900'
+                      ? 'bg-emerald-100 dark:bg-emerald-900'
+                      : 'bg-rose-100 dark:bg-rose-900'
                   )}
                 >
                   {transaction.type === 'income' ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-green-600 dark:text-green-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
+                    <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-red-600 dark:text-red-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M18 12H6"
-                      />
-                    </svg>
+                    <TrendingDown className="h-5 w-5 text-rose-600 dark:text-rose-400" />
                   )}
                 </div>
                 <div className="flex-1">
@@ -86,8 +62,8 @@ export function RecentTransactions() {
                 className={cn(
                   'font-medium',
                   transaction.type === 'income'
-                    ? 'text-green-600'
-                    : 'text-red-600'
+                    ? 'text-emerald-600'
+                    : 'text-rose-600'
                 )}
               >
                 {transaction.type === 'income' ? '+' : '-'}

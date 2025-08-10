@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { quotes } from '@/lib/data';
 import { AddQuoteSheet } from '@/components/quotes/add-quote-sheet';
 import { QuotesDataTable } from '@/components/quotes/data-table';
+import { FileText } from 'lucide-react';
 
 export default function QuotesPage() {
     return (
@@ -20,7 +21,20 @@ export default function QuotesPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <QuotesDataTable data={quotes} />
+                        {quotes.length > 0 ? (
+                           <QuotesDataTable data={quotes} />
+                        ) : (
+                            <div className="text-center py-12">
+                                <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
+                                <h3 className="mt-4 text-lg font-semibold">No Quotations Found</h3>
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                   You haven't created any quotations yet.
+                                </p>
+                                <div className="mt-6">
+                                    <AddQuoteSheet />
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
