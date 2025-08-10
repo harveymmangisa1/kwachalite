@@ -66,7 +66,7 @@ export function Sidebar() {
                   href={item.href}
                   className={cn(
                     'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8',
-                    pathname.startsWith(item.href)
+                    pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
                       ? 'bg-accent text-accent-foreground'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
@@ -116,32 +116,31 @@ export function MobileNav() {
 
     if (activeWorkspace === 'business') {
         const businessHubIndex = navItemsToShow.findIndex(item => item.href.includes('business'));
-        // Replace business hub with a direct link to quotes for mobile
         if (businessHubIndex !== -1) {
             navItemsToShow[businessHubIndex] = { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']};
         }
     }
     
-    // Add settings to both personal and business navs
     const settingsItem = secondaryNavItems.find(item => item.href.includes('settings'));
     if (settingsItem) {
         navItemsToShow.push(settingsItem);
     }
     
-    // Ensure we don't have too many items and remove duplicates
     const uniqueNavItems = Array.from(new Map(navItemsToShow.map(item => [item.href, item])).values()).slice(0, 5);
     const gridColsClass = `grid-cols-${uniqueNavItems.length}`;
 
     return (
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t z-50">
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t z-50 shadow-[0_-1px_3px_rgba(0,0,0,0.1)]">
             <nav className={cn('grid h-full items-center justify-items-center text-sm font-medium', gridColsClass)}>
                 {uniqueNavItems.map(item => (
                     <Link
                         key={item.href}
                         href={item.href}
                         className={cn(
-                            'flex flex-col items-center gap-1 w-full pt-2 pb-1',
-                            pathname.startsWith(item.href) ? 'text-primary' : 'text-muted-foreground'
+                            'flex flex-col items-center gap-1 w-full pt-2 pb-1 transition-colors',
+                            pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+                             ? 'text-primary' 
+                             : 'text-gray-500 hover:text-primary'
                         )}
                     >
                         <item.icon className="h-5 w-5" />
