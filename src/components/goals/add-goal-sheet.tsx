@@ -2,7 +2,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,24 +24,23 @@ import {
   SheetFooter,
   SheetClose,
 } from '@/components/ui/sheet';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Textarea } from '../ui/textarea';
+import { ScrollArea } from '../ui/scroll-area';
+import { formatCurrency } from '@/lib/utils';
+
+const goalItemSchema = z.object({
+  name: z.string().min(1, "Item name is required"),
+  price: z.coerce.number().min(0, "Price can't be negative"),
+  purchased: z.boolean().default(false),
+});
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  targetAmount: z.coerce.number().positive('Target amount must be positive'),
+  targetAmount: z.coerce.number(),
   deadline: z.string().min(1, 'Deadline is required'),
-  category: z.string().optional(),
-  notes: z.string().optional(),
+  items: z.array(goalItemSchema).optional(),
 });
 
 export function AddGoalSheet() {
@@ -53,10 +52,24 @@ export function AddGoalSheet() {
       name: '',
       targetAmount: 0,
       deadline: new Date().toISOString().split('T')[0],
-      category: '',
-      notes: '',
+      items: [{ name: '', price: 0, purchased: false }],
     },
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "items"
+  });
+
+  const items = form.watch('items');
+  const targetAmount = React.useMemo(() => {
+    return items?.reduce((total, item) => total + item.price, 0) || 0;
+  }, [items]);
+
+  React.useEffect(() => {
+    form.setValue('targetAmount', targetAmount);
+  }, [targetAmount, form]);
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -75,99 +88,107 @@ export function AddGoalSheet() {
           Add Goal
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="w-full sm:max-w-2xl flex flex-col">
         <SheetHeader>
           <SheetTitle>Create a New Financial Goal</SheetTitle>
           <SheetDescription>
-            What are you planning for? Set your goal below.
+            What are you planning for? Set your goal and shopping list below.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="grid gap-4 py-4"
+            className="flex-1 flex flex-col gap-4 overflow-hidden"
           >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Goal Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Saturday Market Run" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="targetAmount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Target Amount</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="MK 25,000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="deadline"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Date / Deadline</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Expense Category (Optional)</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Link to a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="food">Food & Dining</SelectItem>
-                       <SelectItem value="groceries">Groceries</SelectItem>
-                      <SelectItem value="transport">Transport</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes / Item List</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="e.g. Tomatoes, Onions, Milk" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <SheetFooter>
+             <ScrollArea className="flex-1 -mx-6 px-6">
+                <div className="grid gap-4 py-4">
+                    <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Goal Name</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g. Saturday Market Run" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                     <FormField
+                    control={form.control}
+                    name="deadline"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Date / Deadline</FormLabel>
+                        <FormControl>
+                            <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                           <h4 className="text-sm font-medium">Shopping List / Items</h4>
+                           <div className="text-sm font-medium">
+                                Total: {formatCurrency(targetAmount)}
+                           </div>
+                        </div>
+                        <div className="space-y-4">
+                            {fields.map((field, index) => (
+                                <div key={field.id} className="flex gap-4 items-end p-2 border rounded-md">
+                                    <FormField
+                                        control={form.control}
+                                        name={`items.${index}.name`}
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                            <FormLabel className="text-xs">Item Name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="e.g. Tomatoes" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`items.${index}.price`}
+                                        render={({ field }) => (
+                                            <FormItem className="w-32">
+                                            <FormLabel className="text-xs">Price</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="1000" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="mt-4"
+                            onClick={() => append({ name: '', price: 0, purchased: false })}
+                        >
+                            <PlusCircle className="h-4 w-4 mr-2" />
+                            Add Item
+                        </Button>
+                    </div>
+                 </div>
+            </ScrollArea>
+            <SheetFooter className="pt-4 border-t">
                 <SheetClose asChild>
-                    <Button type="submit">Create Goal</Button>
+                    <Button type="button" variant="ghost">Cancel</Button>
                 </SheetClose>
+                <Button type="submit">Create Goal</Button>
             </SheetFooter>
           </form>
         </Form>

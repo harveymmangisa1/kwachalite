@@ -134,10 +134,40 @@ export const bills: Bill[] = [
 ];
 
 export const savingsGoals: SavingsGoal[] = [
-    { id: '1', name: 'New Laptop', targetAmount: 800000, currentAmount: 250000, deadline: '2024-12-31', type: 'individual', workspace: 'personal' },
-    { id: '2', name: 'Group Vacation', targetAmount: 1200000, currentAmount: 600000, deadline: '2025-06-30', type: 'group', members: ['John', 'Jane', 'Pete'], workspace: 'personal' },
-    { id: '3', name: 'Emergency Fund', targetAmount: 500000, currentAmount: 500000, deadline: '2024-10-01', type: 'individual', workspace: 'personal' },
-    { id: '4', name: 'Business Expansion', targetAmount: 2000000, currentAmount: 450000, deadline: '2025-12-31', type: 'individual', workspace: 'business' },
+    { 
+        id: '1', 
+        name: 'Weekend Market Run', 
+        targetAmount: 28500, 
+        currentAmount: 15000, 
+        deadline: '2024-08-03', 
+        type: 'individual', 
+        workspace: 'personal',
+        items: [
+            { id: 'i1', name: 'Tomatoes', price: 2000, purchased: true },
+            { id: 'i2', name: 'Onions', price: 1500, purchased: true },
+            { id: 'i3', name: 'Chicken', price: 15000, purchased: false },
+            { id: 'i4', name: 'Bread', price: 3000, purchased: false },
+            { id: 'i5', name: 'Milk', price: 7000, purchased: false },
+        ]
+    },
+    { 
+        id: '2', 
+        name: 'New Laptop', 
+        targetAmount: 800000, 
+        currentAmount: 250000, 
+        deadline: '2024-12-31', 
+        type: 'individual', 
+        workspace: 'personal' 
+    },
+    { 
+        id: '3', 
+        name: 'Business Expansion', 
+        targetAmount: 2000000, 
+        currentAmount: 450000, 
+        deadline: '2025-12-31', 
+        type: 'individual', 
+        workspace: 'business' 
+    },
 ];
 
 export const clients: Client[] = [

@@ -34,6 +34,13 @@ export interface Bill {
     workspace: Workspace;
 }
 
+export interface GoalItem {
+    id: string;
+    name: string;
+    price: number;
+    purchased: boolean;
+}
+
 export interface SavingsGoal {
     id: string;
     name: string;
@@ -43,6 +50,7 @@ export interface SavingsGoal {
     type: 'individual' | 'group';
     members?: string[];
     workspace: Workspace;
+    items?: GoalItem[];
 }
 
 export interface Client {
