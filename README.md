@@ -22,9 +22,27 @@ To get started with the application:
    npm install
    ```
 
-2. Run the development server:
+2. Set up environment variables:
+   - Copy `.env.example` to `.env.local`
+   - Fill in your Supabase project credentials
+
+3. Run the development server:
    ```bash
    npm run dev
    ```
 
 Open [http://localhost:9002](http://localhost:9002) with your browser to see the result. You can start by exploring the dashboard and adding your first transaction.
+
+## Environment Variables
+
+The application requires the following environment variables:
+
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous API key
+- `VITE_SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key (optional for some operations)
+
+To find these values:
+1. Go to your Supabase project dashboard
+2. Click on the Settings icon (⚙️) in the sidebar
+3. Go to "API" section
+4. Copy the Project URL and Project API keys

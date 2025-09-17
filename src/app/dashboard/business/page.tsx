@@ -2,7 +2,7 @@
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Package, FileText } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 
 const businessLinks = [
     {
@@ -34,7 +34,7 @@ export default function BusinessHubPage() {
             />
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 px-4 sm:px-6">
                 {businessLinks.map(link => (
-                    <Link href={link.href} key={link.href}>
+                    <Link to={link.href} key={link.href}>
                         <Card className="hover:bg-muted/50 transition-colors h-full">
                             <CardHeader className="flex-row items-center gap-4 space-y-0">
                                 <div className="p-3 rounded-lg bg-primary/10 text-primary">

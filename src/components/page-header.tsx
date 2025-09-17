@@ -7,9 +7,10 @@ interface PageHeaderProps {
   title: string;
   description?: string;
   children?: ReactNode;
+  icon?: ReactNode;
 }
 
-export function PageHeader({ title, description, children }: PageHeaderProps) {
+export function PageHeader({ title, description, children, icon }: PageHeaderProps) {
   return (
     <div className="flex flex-col gap-4 mb-6 px-4 pt-4 sm:px-6 sm:pt-0">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background sm:static sm:h-auto sm:border-0 sm:bg-transparent">
@@ -27,7 +28,10 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
         </header>
         <div className="flex items-center justify-between">
           <div className="grid gap-1">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{title}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+              {icon && icon}
+              {title}
+            </h1>
             {description && (
               <p className="text-muted-foreground">{description}</p>
             )}

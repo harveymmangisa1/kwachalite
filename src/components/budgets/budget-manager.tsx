@@ -1,4 +1,3 @@
-
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,8 +15,9 @@ import React from 'react';
 import type { Category } from '@/lib/types';
 import { Label } from '../ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Pen, Trash2, Check, X, Briefcase } from 'lucide-react';
+import { Pen, Trash2, Check, X, Briefcase, Plus, Target, Wallet } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { formatCurrency } from '@/lib/utils';
 
 export function BudgetManager() {
   const { activeWorkspace } = useActiveWorkspace();
@@ -53,7 +53,11 @@ export function BudgetManager() {
   
   const handleEdit = (category: Category) => {
     setEditingCategoryId(category.id);
-    setEditedCategory({ name: category.name, budget: category.budget, budgetFrequency: category.budgetFrequency || 'monthly' });
+    setEditedCategory({ 
+      name: category.name, 
+      budget: category.budget, 
+      budgetFrequency: category.budgetFrequency || 'monthly' 
+    });
   };
   
   const handleCancelEdit = () => {
@@ -80,14 +84,57 @@ export function BudgetManager() {
   const incomeCategories = filteredCategories.filter(c => c.type === 'income');
   const expenseCategories = filteredCategories.filter(c => c.type === 'expense');
 
+  // Progress circle component
+  const ProgressCircle = ({ percentage, size = 40, strokeWidth = 3, color = '#10B981' }: { percentage: number, size?: number, strokeWidth?: number, color?: string }) => {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const strokeDasharray = `${circumference} ${circumference}`;
+    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+    return (
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg
+          className="transform -rotate-90"
+          width={size}
+          height={size}
+        >
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#E5E7EB"
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            className="transition-all duration-500"
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-[8px] font-semibold" style={{ color }}>
+            {Math.round(percentage)}%
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   const renderCategory = (category: Category) => {
     const isEditing = editingCategoryId === category.id;
 
     if (isEditing) {
       return (
-        <div key={category.id} className="flex items-center justify-between rounded-md border p-3 gap-2">
+        <div key={category.id} className="flex items-center justify-between rounded-md border p-3 gap-2 bg-white shadow-sm">
            <Input 
-            value={editedCategory.name}
+            value={editedCategory.name || ''}
             onChange={(e) => setEditedCategory(prev => ({...prev, name: e.target.value}))}
             className="text-sm h-8 flex-1"
           />
@@ -101,7 +148,7 @@ export function BudgetManager() {
               onChange={(e) => setEditedCategory(prev => ({...prev, budget: parseFloat(e.target.value) || undefined}))}
             />
             <Select 
-              value={editedCategory.budgetFrequency} 
+              value={editedCategory.budgetFrequency || 'monthly'} 
               onValueChange={(v) => setEditedCategory(prev => ({...prev, budgetFrequency: v as 'weekly' | 'monthly'}))}>
               <SelectTrigger className="w-[110px] h-8 text-xs">
                 <SelectValue />
@@ -113,26 +160,44 @@ export function BudgetManager() {
             </Select>
             </>
           )}
-          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleUpdateCategory(category.id)}><Check className="h-4 w-4" /></Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCancelEdit}><X className="h-4 w-4" /></Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleUpdateCategory(category.id)}><Check className="h-4 w-4 text-green-600" /></Button>
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCancelEdit}><X className="h-4 w-4 text-gray-600" /></Button>
         </div>
       )
     }
 
+    // Render the icon component properly
+    const IconComponent = category.icon;
+
+    // Calculate budget progress
+    const budgetProgress = category.budget && category.budget > 0 ? 50 : 0; // In a real app, this would be calculated from transactions
+
     return (
-       <div key={category.id} className="flex items-center justify-between rounded-md border p-3">
+       <div key={category.id} className="flex items-center justify-between rounded-md border p-3 bg-white shadow-sm hover:shadow-md transition-shadow">
          <div className="flex items-center gap-3">
-           <category.icon className="h-5 w-5 text-muted-foreground" />
+           <div className="relative">
+             <IconComponent className="h-5 w-5 text-muted-foreground" />
+             {category.type === 'expense' && category.budget && (
+               <div className="absolute -top-1 -right-1">
+                 <ProgressCircle 
+                   percentage={Math.min(100, budgetProgress)} 
+                   size={16} 
+                   strokeWidth={2}
+                   color={budgetProgress > 90 ? '#EF4444' : budgetProgress > 75 ? '#F59E0B' : '#10B981'} 
+                 />
+               </div>
+             )}
+           </div>
            <span className="font-medium text-sm">{category.name}</span>
          </div>
          <div className="flex items-center gap-2">
             {category.type === 'expense' && category.budget && (
-                <span className="text-sm text-muted-foreground w-48 text-right pr-2">
-                    Budget: {new Intl.NumberFormat().format(category.budget)} / {category.budgetFrequency === 'weekly' ? 'wk' : 'mo'}
+                <span className="text-sm text-muted-foreground w-32 text-right pr-2">
+                    {formatCurrency(category.budget || 0)} / {category.budgetFrequency === 'weekly' ? 'wk' : 'mo'}
                 </span>
             )}
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(category)}>
-                <Pen className="h-4 w-4" />
+                <Pen className="h-4 w-4 text-blue-600" />
             </Button>
             <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => handleDeleteCategory(category.id)}>
                 <Trash2 className="h-4 w-4" />
@@ -143,26 +208,71 @@ export function BudgetManager() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Budget Manager</CardTitle>
-        <CardDescription>
-          Add, edit, or delete categories and set weekly/monthly budgets for your expenses.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <Label className="font-semibold">Income Categories</Label>
-          {incomeCategories.map(renderCategory)}
-        </div>
-         <div className="space-y-4">
-          <Label className="font-semibold">Expense Categories & Budgets</Label>
-           {expenseCategories.map(renderCategory)}
-        </div>
-      </CardContent>
-      <CardFooter className="border-t px-6 py-4 flex flex-col items-stretch gap-4">
-        <div>
-            <Label className="text-sm font-medium">Add New Category</Label>
+    <div className="space-y-6">
+      {/* Header Card */}
+      <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-6 w-6" />
+            Budget Manager
+          </CardTitle>
+          <CardDescription className="text-blue-100">
+            Add, edit, or delete categories and set weekly/monthly budgets for your expenses.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Income Categories */}
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Wallet className="h-5 w-5 text-green-600" />
+              Income Categories
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {incomeCategories.length > 0 ? (
+              incomeCategories.map(renderCategory)
+            ) : (
+              <p className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
+                No income categories found. Add your first income category!
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Expense Categories */}
+        <Card className="rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Wallet className="h-5 w-5 text-red-600" />
+              Expense Categories & Budgets
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {expenseCategories.length > 0 ? (
+              expenseCategories.map(renderCategory)
+            ) : (
+              <p className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
+                No expense categories found. Add your first expense category!
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Add New Category */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-blue-600" />
+            Add New Category
+          </CardTitle>
+        </CardHeader>
+        <CardFooter className="flex flex-col items-stretch gap-4">
+          <div>
+            <Label className="text-sm font-medium">Create Category</Label>
             <div className="flex w-full items-center gap-2 mt-2">
                 <Input
                     type="text"
@@ -180,10 +290,14 @@ export function BudgetManager() {
                         <SelectItem value="income">Income</SelectItem>
                     </SelectContent>
                 </Select>
-                <Button onClick={handleAddCategory}>Add</Button>
+                <Button onClick={handleAddCategory} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add
+                </Button>
             </div>
-        </div>
-      </CardFooter>
-    </Card>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

@@ -28,6 +28,7 @@ import { Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '../ui/textarea';
 import type { Client } from '@/lib/types';
+import { useAppStore } from '@/lib/data';
 import React from 'react';
 
 const formSchema = z.object({
@@ -39,6 +40,7 @@ const formSchema = z.object({
 
 export function EditClientSheet({ client }: { client: Client }) {
   const { toast } = useToast();
+  const { updateClient } = useAppStore();
   const [open, setOpen] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -52,7 +54,13 @@ export function EditClientSheet({ client }: { client: Client }) {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({ clientId: client.id, ...values });
+    const updatedClient: Client = {
+      ...client,
+      ...values,
+    };
+    
+    updateClient(updatedClient);
+    
     toast({
       title: 'Client Updated',
       description: 'The client details have been successfully updated.',

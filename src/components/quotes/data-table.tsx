@@ -21,11 +21,14 @@ import {
 import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
 import type { Quote } from '@/lib/types';
-import { MoreHorizontal, View } from 'lucide-react';
-import Link from 'next/link';
+import { MoreHorizontal, View, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { EditQuoteSheet } from './edit-quote-sheet';
+import { useToast } from '@/hooks/use-toast';
 
 export function QuotesDataTable({ data }: { data: Quote[] }) {
-    const { clients } = useAppStore();
+    const { clients, deleteQuote } = useAppStore();
+    const { toast } = useToast();
     
     const getClientName = (clientId: string) => {
         return clients.find(c => c.id === clientId)?.name || 'Unknown Client';
@@ -34,6 +37,15 @@ export function QuotesDataTable({ data }: { data: Quote[] }) {
     const getTotalAmount = (items: Quote['items']) => {
         return items.reduce((total, item) => total + (item.price * item.quantity), 0);
     }
+
+    const handleDelete = (quote: Quote) => {
+        deleteQuote(quote.id);
+        toast({
+            title: 'Quote Deleted',
+            description: `Quote ${quote.quoteNumber} has been removed.`,
+            variant: 'destructive',
+        });
+    };
 
   return (
     <Table>
@@ -85,10 +97,18 @@ export function QuotesDataTable({ data }: { data: Quote[] }) {
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
-                           <Link href={`/dashboard/quotes/${quote.id}`}>
+                           <Link to={`/dashboard/quotes/${quote.id}`}>
                              <View className="mr-2 h-4 w-4" />
                              View Quote
                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <EditQuoteSheet quote={quote} />
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(quote)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Quote
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

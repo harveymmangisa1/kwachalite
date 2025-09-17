@@ -97,3 +97,74 @@ export interface Loan {
     status: 'active' | 'paid';
     workspace: Workspace;
 }
+
+export interface SalesReceipt {
+    id: string;
+    receiptNumber: string;
+    invoiceId?: string; // Optional link to invoice
+    quoteId?: string; // Optional link to quote
+    clientId: string;
+    date: string;
+    amount: number;
+    paymentMethod: 'cash' | 'check' | 'card' | 'bank_transfer' | 'mobile_money' | 'other';
+    referenceNumber?: string; // Transaction reference
+    notes?: string;
+    status: 'confirmed' | 'pending' | 'cancelled';
+}
+
+export interface DeliveryNote {
+    id: string;
+    deliveryNoteNumber: string;
+    invoiceId?: string; // Optional link to invoice
+    quoteId?: string; // Optional link to quote
+    clientId: string;
+    date: string;
+    deliveryDate: string;
+    deliveryAddress: string;
+    items: QuoteItem[]; // Same structure as quote items
+    deliveryMethod: 'pickup' | 'delivery' | 'courier' | 'shipping';
+    trackingNumber?: string;
+    notes?: string;
+    status: 'pending' | 'in_transit' | 'delivered' | 'cancelled';
+    receivedBy?: string; // Person who received the goods
+    receivedAt?: string; // Date/time received
+}
+
+// Business-specific financial types
+export interface BusinessBudget {
+    id: string;
+    name: string;
+    category: string;
+    budgetAmount: number;
+    period: 'monthly' | 'quarterly' | 'yearly';
+    startDate: string;
+    endDate: string;
+    currentSpent: number;
+    workspace: 'business';
+}
+
+export interface BusinessRevenue {
+    id: string;
+    source: 'quote' | 'invoice' | 'receipt' | 'direct';
+    sourceId?: string; // Link to quote, invoice, or receipt
+    clientId?: string;
+    amount: number;
+    date: string;
+    description: string;
+    category: string;
+    status: 'pending' | 'received';
+    paymentMethod?: string;
+}
+
+export interface BusinessExpense {
+    id: string;
+    vendor?: string;
+    amount: number;
+    date: string;
+    description: string;
+    category: string;
+    receiptUrl?: string;
+    taxDeductible: boolean;
+    status: 'pending' | 'paid';
+    paymentMethod?: string;
+}

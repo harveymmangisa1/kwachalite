@@ -6,21 +6,20 @@ import { DollarSign, Users, TrendingUp } from 'lucide-react';
 import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
 import React from 'react';
-import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import type { Transaction } from '@/lib/types';
 
-export function BusinessOverviewCards() {
-  const { transactions, clients } = useAppStore();
-  const { activeWorkspace } = useActiveWorkspace();
+interface BusinessOverviewCardsProps {
+  transactions: Transaction[];
+}
 
-  const filteredTransactions = React.useMemo(() => 
-    transactions.filter(t => t.workspace === activeWorkspace)
-  , [transactions, activeWorkspace]);
+export function BusinessOverviewCards({ transactions }: BusinessOverviewCardsProps) {
+  const { clients } = useAppStore();
 
-  const totalRevenue = filteredTransactions
+  const totalRevenue = transactions
     .filter((t) => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
 
-  const totalExpenses = filteredTransactions
+  const totalExpenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
 

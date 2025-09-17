@@ -1,7 +1,10 @@
 
 'use client';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,90 +14,95 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
-import { Building, Check, ChevronsUpDown, User, HelpCircle, Info } from 'lucide-react';
-import React from 'react';
-import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { useAuth } from '@/hooks/use-auth';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import React from 'react';
+import { Skeleton } from './ui/skeleton';
+import { Link } from 'react-router-dom';
+import { Briefcase, LogOut, Settings, User } from 'lucide-react';
+import { useAppStore } from '@/lib/data';
 
 export function UserNav() {
+  const { user, logout } = useAuth();
   const { activeWorkspace, setActiveWorkspace } = useActiveWorkspace();
-  const { userName, logout } = useAuth();
+  const { businessDetails } = useAppStore();
+  const [isClient, setIsClient] = React.useState(false);
   
-  const userInitials = userName
-    ? userName.split(' ').map(n => n[0]).join('').toUpperCase()
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient || !user) {
+    return (
+       <div className="hidden sm:block">
+         <Skeleton className="h-8 w-8 rounded-full" />
+       </div>
+    );
+  }
+
+  const handleWorkspaceChange = (workspace: 'personal' | 'business') => {
+    setActiveWorkspace(workspace);
+  };
+  
+  const userInitials = user?.displayName
+    ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase()
     : 'U';
+  
+  const businessInitials = businessDetails?.name
+    ? businessDetails.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    : 'B';
+
+  const avatarSrc = activeWorkspace === 'business' ? businessDetails?.logoUrl : user.photoURL;
+  const avatarFallback = activeWorkspace === 'business' ? businessInitials : userInitials;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={`https://placehold.co/40x40.png?text=${userInitials}`} alt={userName || 'User'} data-ai-hint="person avatar" />
-            <AvatarFallback>{userInitials}</AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{userName || 'User'}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {userName ? `${userName.split(' ')[0].toLowerCase()}@example.com` : ''}
-            </p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-                <ChevronsUpDown className="mr-2 h-4 w-4" />
-                <span>
-                    {activeWorkspace === 'personal' ? 'Personal' : 'My Business'} Workspace
-                </span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                    <DropdownMenuItem onClick={() => setActiveWorkspace('personal')}>
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Personal</span>
-                        {activeWorkspace === 'personal' && <Check className="ml-auto h-4 w-4" />}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveWorkspace('business')}>
-                        <Building className="mr-2 h-4 w-4" />
-                        <span>My Business</span>
-                        {activeWorkspace === 'business' && <Check className="ml-auto h-4 w-4" />}
-                    </DropdownMenuItem>
-                </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-        </DropdownMenuSub>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-             <Link href="/dashboard/settings">Settings</Link>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-9 w-9">
+              <AvatarImage
+                src={avatarSrc || `https://placehold.co/100x100.png?text=${avatarFallback}`}
+                alt={user.displayName || 'User'}
+              />
+              <AvatarFallback>{avatarFallback}</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">
+                {user.displayName}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {user.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onSelect={() => handleWorkspaceChange('personal')}>
+                <User className="mr-2 h-4 w-4" />
+                <span>Personal</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleWorkspaceChange('business')}>
+                <Briefcase className="mr-2 h-4 w-4" />
+                <span>Business</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link to="/dashboard/settings">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                </Link>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => logout()}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
           </DropdownMenuItem>
-           <DropdownMenuItem asChild>
-             <Link href="/dashboard/about">
-                <Info className="mr-2 h-4 w-4" />
-                About
-             </Link>
-          </DropdownMenuItem>
-           <DropdownMenuItem asChild>
-             <Link href="/dashboard/help">
-                <HelpCircle className="mr-2 h-4 w-4" />
-                Help
-             </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-           <Link href="/" onClick={() => logout()}>Log out</Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
   );
 }

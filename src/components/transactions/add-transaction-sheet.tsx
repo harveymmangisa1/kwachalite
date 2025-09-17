@@ -3,8 +3,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { createTransactionSchema, validateData } from '@/lib/validations';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import { AsyncButton } from '@/components/ui/async-button';
+import { LoadingState, ErrorState } from '@/components/ui/loading';
 import {
   Form,
   FormControl,
@@ -32,42 +35,122 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAppStore } from '@/lib/data';
-import { PlusCircle, Loader2 } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import React from 'react';
-import { suggestTransactionCategory } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import { useFormSubmission } from '@/hooks/use-async-operation';
 import { formatCurrency } from '@/lib/utils';
 import type { Transaction } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
 
-const formSchema = z.object({
-  type: z.enum(['income', 'expense']),
-  amount: z.coerce.number().positive('Amount must be positive'),
-  category: z.string().min(1, 'Category is required'),
-  description: z.string().min(1, 'Description is required'),
-  date: z.string().min(1, 'Date is required'),
-  receipt: z.any().optional(),
-});
+// Custom form data type that allows string for amount
+type TransactionFormInput = {
+  type: 'income' | 'expense';
+  amount: string;
+  category: string;
+  description: string;
+  date: string;
+};
 
 export function AddTransactionSheet() {
-  const [isSuggesting, setIsSuggesting] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const { toast } = useToast();
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { activeWorkspace } = useActiveWorkspace();
   const { categories, transactions, addTransaction } = useAppStore();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<TransactionFormInput>({
     defaultValues: {
       type: 'expense',
-      amount: 0,
+      amount: '',
       category: '',
       description: '',
       date: new Date().toISOString().split('T')[0],
     },
   });
+
+  // Create async operation for form submission
+  const { execute: submitTransaction, isLoading, error } = useFormSubmission(
+    async (values: TransactionFormInput) => {
+      console.log('Form submitted with values:', values);
+      console.log('Active workspace:', activeWorkspace);
+      
+      // Validate amount
+      const numericAmount = typeof values.amount === 'string' ? parseFloat(values.amount) : values.amount;
+      if (!numericAmount || numericAmount <= 0) {
+        throw new Error('Amount is required and must be positive');
+      }
+      
+      if (!values.category) {
+        throw new Error('Please select a category');
+      }
+      
+      if (!values.description.trim()) {
+        throw new Error('Description is required');
+      }
+      
+      // Validate the data schema
+      const validation = validateData(createTransactionSchema, {
+        ...values,
+        workspace: activeWorkspace,
+      });
+
+      if (!validation.success) {
+        throw new Error(validation.errors.join(', '));
+      }
+      
+      // Budget checking logic
+      if (values.type === 'expense') {
+        const category = categories.find(c => c.name === values.category && c.workspace === activeWorkspace);
+        
+        if (category && category.budget) {
+          const now = new Date();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+          const currentSpending = transactions
+            .filter(t => 
+              t.category === category.name && 
+              t.workspace === activeWorkspace &&
+              new Date(t.date) >= startOfMonth &&
+              new Date(t.date) <= endOfMonth
+            )
+            .reduce((sum, t) => sum + t.amount, 0);
+
+          const newTotalSpending = currentSpending + numericAmount;
+          const budgetThreshold = category.budget * 0.85;
+
+          if (newTotalSpending > category.budget) {
+            throw new Error(`This transaction would exceed your budget for ${category.name}. Current spending: ${formatCurrency(newTotalSpending)} of ${formatCurrency(category.budget)}.`);
+          } else if (newTotalSpending > budgetThreshold) {
+            toast({
+              title: 'Budget Warning',
+              description: `You are about to exceed your budget for ${category.name}. You've spent ${formatCurrency(newTotalSpending)} of ${formatCurrency(category.budget)}.`,
+              variant: 'destructive'
+            });
+          }
+        }
+      }
+      
+      // Create and add transaction
+      const newTransaction: Transaction = {
+          id: new Date().toISOString(),
+          ...values,
+          amount: numericAmount,
+          workspace: activeWorkspace,
+      };
+      
+      addTransaction(newTransaction);
+      
+      // Reset form and close sheet on success
+      form.reset();
+      setOpen(false);
+    },
+    {
+      successMessage: 'Transaction added successfully',
+      showErrorToast: false, // We'll handle errors in the UI
+    }
+  );
 
   const transactionType = form.watch('type');
 
@@ -79,108 +162,18 @@ export function AddTransactionSheet() {
     return categories.filter((c) => c.type === transactionType && c.workspace === activeWorkspace);
   }, [transactionType, activeWorkspace, categories]);
 
-
-  async function handleReceiptUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsSuggesting(true);
-    try {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        const receiptDataUri = reader.result as string;
-        const userCategories = categories.filter(c => c.type === 'expense').map((c) => c.name);
-
-        const result = await suggestTransactionCategory({
-          receiptDataUri,
-          userCategories,
-        });
-
-        if (result.suggestedCategory) {
-          const matchedCategory = categories.find(c => c.name === result.suggestedCategory);
-          if (matchedCategory) {
-            form.setValue('category', matchedCategory.name);
-            toast({
-              title: 'AI Suggestion',
-              description: `We've suggested the "${matchedCategory.name}" category for you.`,
-            });
-          }
-        } else {
-            toast({
-                title: 'AI Suggestion',
-                description: "Couldn't determine a category from the receipt.",
-                variant: 'destructive'
-            })
-        }
-      };
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: 'Error',
-        description: 'Failed to analyze receipt.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSuggesting(false);
-    }
-  }
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Budget checking logic
-    if (values.type === 'expense') {
-      const category = categories.find(c => c.name === values.category && c.workspace === activeWorkspace);
-      if (category && category.budget) {
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-        const currentSpending = transactions
-          .filter(t => 
-            t.category === category.name && 
-            t.workspace === activeWorkspace &&
-            new Date(t.date) >= startOfMonth &&
-            new Date(t.date) <= endOfMonth
-          )
-          .reduce((sum, t) => sum + t.amount, 0);
-
-        const newTotalSpending = currentSpending + values.amount;
-        const budgetThreshold = category.budget * 0.85;
-
-        if (newTotalSpending > category.budget) {
-            // This could be a different toast type
-        } else if (newTotalSpending > budgetThreshold) {
-          toast({
-            title: 'Budget Warning',
-            description: `You are about to exceed your budget for ${category.name}. You've spent ${formatCurrency(newTotalSpending)} of ${formatCurrency(category.budget)}.`,
-            variant: 'destructive'
-          });
-        }
-      }
-    }
-    
-    const newTransaction: Transaction = {
-        id: new Date().toISOString(),
-        workspace: activeWorkspace,
-        ...values
-    }
-    addTransaction(newTransaction);
-
-    toast({
-      title: 'Transaction Added',
-      description: 'Your transaction has been successfully saved.',
-    });
-    form.reset();
-    setOpen(false);
-  }
+  // Form submission handler that uses our async operation
+  const handleSubmit = form.handleSubmit((values) => {
+    submitTransaction(values);
+  });
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button size="sm" className="gap-1">
+        <AsyncButton size="sm" className="gap-1" loading={isLoading}>
           <PlusCircle className="h-4 w-4" />
           Add Transaction
-        </Button>
+        </AsyncButton>
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader>
@@ -191,9 +184,14 @@ export function AddTransactionSheet() {
         </SheetHeader>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit}
             className="flex-1 flex flex-col gap-4 overflow-hidden"
           >
+            {error && (
+              <div className="-mx-6 px-6 mb-4">
+                <ErrorState error={error} />
+              </div>
+            )}
             <ScrollArea className="flex-1 -mx-6 px-6">
               <div className="grid gap-4 py-4">
                 <FormField
@@ -227,7 +225,13 @@ export function AddTransactionSheet() {
                     <FormItem>
                       <FormLabel>Amount</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="MK 10,000" {...field} />
+                        <Input 
+                          type="number" 
+                          placeholder="MK 10,000" 
+                          {...field}
+                          step="0.01"
+                          min="0"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -286,46 +290,19 @@ export function AddTransactionSheet() {
                     </FormItem>
                   )}
                 />
-                {transactionType === 'expense' && (
-                  <FormField
-                    control={form.control}
-                    name="receipt"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Receipt</FormLabel>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={isSuggesting}
-                        >
-                          {isSuggesting ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : null}
-                          Upload and Analyze with AI
-                        </Button>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            className="hidden"
-                            ref={fileInputRef}
-                            onChange={handleReceiptUpload}
-                            accept="image/*"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
               </div>
             </ScrollArea>
             <SheetFooter className="pt-4 border-t">
               <SheetClose asChild>
-                <Button type="button" variant="ghost">Cancel</Button>
+                <AsyncButton type="button" variant="ghost" disabled={isLoading}>Cancel</AsyncButton>
               </SheetClose>
-              <Button type="submit">Save transaction</Button>
+              <AsyncButton 
+                type="submit" 
+                loading={isLoading}
+                loadingText="Saving..."
+              >
+                Save transaction
+              </AsyncButton>
             </SheetFooter>
           </form>
         </Form>

@@ -18,7 +18,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/lib/data';
 import { formatCurrency } from '@/lib/utils';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
 import type { Quote } from '@/lib/types';
 
@@ -44,7 +44,7 @@ export function RecentQuotes() {
           </CardDescription>
         </div>
         <Button asChild size="sm" variant="outline">
-          <Link href="/dashboard/quotes">View All</Link>
+          <Link to="/dashboard/quotes">View All</Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -61,7 +61,7 @@ export function RecentQuotes() {
                 {recentQuotes.map((quote) => (
                     <TableRow key={quote.id}>
                         <TableCell className="font-medium">
-                            <Link href={`/dashboard/quotes/${quote.id}`} className="hover:underline text-primary">
+                            <Link to={`/dashboard/quotes/${quote.id}`} className="hover:underline text-primary">
                                 {quote.quoteNumber}
                             </Link>
                         </TableCell>

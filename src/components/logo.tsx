@@ -1,18 +1,40 @@
-import { Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export default function Logo({ className }: { className?: string }) {
+interface LogoProps {
+  className?: string;
+  showText?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export default function Logo({ className, showText = true, size = 'md' }: LogoProps) {
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-10 h-10', 
+    lg: 'w-12 h-12'
+  };
+
+  const textSizeClasses = {
+    sm: 'text-lg',
+    md: 'text-xl',
+    lg: 'text-2xl'
+  };
+
   return (
     <div
       className={cn(
-        'flex items-center gap-2 text-primary font-bold text-xl',
+        'flex items-center gap-3 text-primary font-bold',
+        showText && textSizeClasses[size],
         className
       )}
     >
-      <div className="bg-primary text-primary-foreground p-2 rounded-lg">
-        <Wallet className="h-6 w-6" />
+      <div className={cn('rounded-xl overflow-hidden shadow-sm', sizeClasses[size])}>
+        <img 
+          src="/Assets/logo.png" 
+          alt="KwachaLite Logo" 
+          className="w-full h-full object-cover"
+        />
       </div>
-      <span>KwachaLite</span>
+      {showText && <span>KwachaLite</span>}
     </div>
   );
 }

@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, View, Edit, Trash2 } from 'lucide-react';
 import type { Client } from '@/lib/types';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { EditClientSheet } from './edit-client-sheet';
 import { useAppStore } from '@/lib/data';
 
@@ -59,7 +59,7 @@ export function ClientsDataTable({ data }: { data: Client[] }) {
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
-                           <Link href={`/dashboard/clients/${client.id}`}>
+                           <Link to={`/dashboard/clients/${client.id}`}>
                              <View className="mr-2 h-4 w-4" />
                              View Details
                            </Link>
