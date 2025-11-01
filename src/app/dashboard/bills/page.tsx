@@ -46,7 +46,7 @@ export default function BillsPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/40">
+        <div className="min-h-screen bg-slate-50">
             <div className="container-padding space-y-6 pb-8">
                 <PageHeader 
                     title="Bills" 

@@ -129,7 +129,7 @@ export default function BudgetDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="min-h-screen bg-slate-50 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -142,7 +142,7 @@ export default function BudgetDashboard() {
         {/* Hero Section - Budget Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Total Budget Overview */}
-          <div className="lg:col-span-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
+          <div className="lg:col-span-2 bg-slate-900 rounded-2xl p-6 text-white">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold mb-2">Monthly Budget Overview</h2>

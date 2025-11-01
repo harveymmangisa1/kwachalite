@@ -1,4 +1,3 @@
-'use client';
 
 import * as React from 'react';
 import { useEffect } from 'react';
@@ -20,17 +19,17 @@ export default function DashboardLayout() {
 
   if (loading || !user) {
     return (
-        <div className="flex min-h-screen w-full bg-gradient-to-br from-background to-muted/20">
-            <div className="hidden sm:flex flex-col gap-4 p-4 border-r bg-card/50 backdrop-blur-sm h-full shadow-lg">
+        <div className="flex min-h-screen w-full bg-slate-50">
+            <div className="hidden sm:flex flex-col gap-4 p-4 border-r bg-white h-full">
                 <div className="flex items-center gap-3 p-2">
-                    <Skeleton className="h-10 w-10 rounded-xl" />
+                    <Skeleton className="h-10 w-10 rounded-lg" />
                 </div>
-                <div className="w-8 h-px bg-border/50 mx-auto" />
-                <div className="flex flex-col gap-3 mt-4">
-                    <Skeleton className="h-10 w-10 rounded-xl mx-auto" />
-                    <Skeleton className="h-10 w-10 rounded-xl mx-auto" />
-                    <Skeleton className="h-10 w-10 rounded-xl mx-auto" />
-                    <Skeleton className="h-10 w-10 rounded-xl mx-auto" />
+                <div className="w-8 h-px bg-slate-200 mx-auto" />
+                <div className="flex flex-col gap-2 mt-4">
+                    <Skeleton className="h-10 w-10 rounded-lg mx-auto" />
+                    <Skeleton className="h-10 w-10 rounded-lg mx-auto" />
+                    <Skeleton className="h-10 w-10 rounded-lg mx-auto" />
+                    <Skeleton className="h-10 w-10 rounded-lg mx-auto" />
                 </div>
             </div>
             <div className="flex-1 container-padding py-6 space-y-6">
@@ -52,7 +51,7 @@ export default function DashboardLayout() {
   return (
     <ErrorBoundary>
       <MobileSidebarProvider>
-        <div className="flex min-h-screen w-full flex-col bg-gradient-to-br from-background to-muted/20">
+        <div className="flex min-h-screen w-full flex-col bg-slate-50">
           <Sidebar />
           <MobileSidebar />
           <div className="flex flex-col sm:pl-16">

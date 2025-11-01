@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,66 +12,57 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* Pure White */
-    --foreground: 224 71.4% 4.1%; /* Dark Blue Gray */
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 221.2 83.2% 53.3%; /* Modern Blue */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --chart-1: 221.2 83.2% 53.3%;
-    --chart-2: 173 80% 40%;
-    --chart-3: 10 90% 55%;
-    --chart-4: 48 96% 53%;
-    --chart-5: 0 72% 51%;
-    --radius: 0.75rem;
-    
-    /* Modern gradient variables */
-    --gradient-primary: linear-gradient(135deg, hsl(221.2 83.2% 53.3%) 0%, hsl(262.1 83.3% 57.8%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(210 40% 96%) 0%, hsl(220 14.3% 95.9%) 100%);
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    /* Corporate Light Theme */
+    --background: 248 250 252; /* slate-50 */
+    --foreground: 15 23 42; /* slate-900 */
+    --card: 255 255 255; /* white */
+    --card-foreground: 15 23 42; /* slate-900 */
+    --popover: 255 255 255; /* white */
+    --popover-foreground: 15 23 42; /* slate-900 */
+    --primary: 15 23 42; /* slate-900 */
+    --primary-foreground: 248 250 252; /* slate-50 */
+    --secondary: 241 245 249; /* slate-100 */
+    --secondary-foreground: 15 23 42; /* slate-900 */
+    --muted: 226 232 240; /* slate-200 */
+    --muted-foreground: 100 116 139; /* slate-500 */
+    --accent: 241 245 249; /* slate-100 */
+    --accent-foreground: 15 23 42; /* slate-900 */
+    --destructive: 39 91% 55%; /* red-500 */
+    --destructive-foreground: 248 250 252; /* slate-50 */
+    --border: 226 232 240; /* slate-200 */
+    --input: 226 232 240; /* slate-200 */
+    --ring: 15 23 42; /* slate-900 */
+    --radius: 0.5rem; /* rounded-lg */
+
+    /* Chart Colors */
+    --chart-1: 15 23 42; /* slate-900 */
+    --chart-2: 147 51% 42%; /* emerald-600 */
+    --chart-3: 41 95% 52%; /* amber-500 */
+    --chart-4: 21 89% 53%; /* blue-500 - Note: Not in original palette, consider slate */
+    --chart-5: 0 84% 60%; /* red-500 */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%; /* Dark Background */
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%; /* Lighter Blue for Dark Mode */
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-    --chart-1: 217.2 91.2% 59.8%;
-    --chart-2: 173 80% 40%;
-    --chart-3: 10 90% 55%;
-    --chart-4: 48 96% 53%;
-    --chart-5: 0 72% 51%;
+    /* Corporate Dark Theme */
+    --background: 15 23 42; /* slate-900 */
+    --foreground: 248 250 252; /* slate-50 */
+    --card: 2 6 23; /* slate-950 - A bit darker for cards */
+    --card-foreground: 248 250 252; /* slate-50 */
+    --popover: 2 6 23; /* slate-950 */
+    --popover-foreground: 248 250 252; /* slate-50 */
+    --primary: 248 250 252; /* slate-50 */
+    --primary-foreground: 15 23 42; /* slate-900 */
+    --secondary: 30 41 59; /* slate-800 */
+    --secondary-foreground: 248 250 252; /* slate-50 */
+    --muted: 51 65 85; /* slate-700 */
+    --muted-foreground: 148 163 184; /* slate-400 */
+    --accent: 30 41 59; /* slate-800 */
+    --accent-foreground: 248 250 252; /* slate-50 */
+    --destructive: 0 72% 51%; /* red-600 */
+    --destructive-foreground: 248 250 252; /* slate-50 */
+    --border: 51 65 85; /* slate-700 */
+    --input: 51 65 85; /* slate-700 */
+    --ring: 248 250 252; /* slate-50 */
   }
 }
 
@@ -84,47 +75,33 @@ body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
   }
   
-  /* Custom scrollbar */
+  /* Custom scrollbar - Minimal */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
+    height: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-muted;
+    @apply bg-secondary;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-border rounded-full;
+    @apply bg-muted rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    @apply bg-muted-foreground/60;
   }
 }
 
 @layer components {
-  /* Modern card with subtle shadow */
-  .modern-card {
-    @apply bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200;
-  }
-  
-  /* Glass morphism effect */
-  .glass {
-    @apply bg-background/80 backdrop-blur-lg border border-border/50;
-  }
-  
-  /* Gradient button */
-  .gradient-button {
-    @apply bg-gradient-to-r from-primary to-blue-600 text-primary-foreground hover:shadow-lg transition-all duration-200;
-  }
-  
-  /* Mobile-first responsive padding */
+  /* Standardized page padding */
   .container-padding {
     @apply px-4 sm:px-6 lg:px-8;
   }

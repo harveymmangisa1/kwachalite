@@ -26,23 +26,12 @@ export function IncomeExpenseChart({ transactions }: IncomeExpenseChartProps) {
             }
         });
         
-        // This is just to ensure we have some data for the chart, can be removed with real data
-        const dummyData = [
-          { month: 'Jan', income: 400000, expenses: 240000 },
-          { month: 'Feb', income: 300000, expenses: 139800 },
-          { month: 'Mar', income: 500000, expenses: 380000 },
-          { month: 'Apr', income: 478000, expenses: 390800 },
-          { month: 'May', income: 689000, expenses: 480000 },
-          { month: 'Jun', income: 539000, expenses: 380000 },
-          { month: 'Jul', income: 549000, expenses: 430000 },
-        ];
-
         const chartData = Object.entries(monthData).map(([month, values]) => ({
             month,
             ...values
         }));
 
-        return chartData.length > 0 ? chartData : dummyData;
+        return chartData;
 
     }, [transactions]);
 

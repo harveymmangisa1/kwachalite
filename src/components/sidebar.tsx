@@ -1,7 +1,3 @@
-
-
-'use client';
-
 import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowRightLeft,
@@ -17,7 +13,8 @@ import {
   TrendingUp,
   Receipt,
   Truck,
-  X
+  X,
+  Menu
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -51,7 +48,6 @@ export function useMobileSidebar() {
 export function MobileSidebarProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   
-  // Close sidebar on route change
   const location = useLocation();
   useEffect(() => {
     setIsOpen(false);
@@ -79,8 +75,8 @@ const mainNavItems = [
 ];
 
 const secondaryNavItems = [
-    { href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics', workspace: ['personal', 'business'] },
-    { href: '/dashboard/settings', icon: Settings, label: 'Settings', workspace: ['personal', 'business'] },
+  { href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics', workspace: ['personal', 'business'] },
+  { href: '/dashboard/settings', icon: Settings, label: 'Settings', workspace: ['personal', 'business'] },
 ];
 
 export function Sidebar() {
@@ -92,16 +88,16 @@ export function Sidebar() {
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
   return (
-    <aside className="hidden w-16 flex-col border-r bg-card/50 backdrop-blur-sm sm:flex fixed h-full z-40 shadow-lg">
-      <nav className="flex flex-col items-center gap-3 px-3 py-6">
+    <aside className="hidden w-16 flex-col border-r border-slate-200 bg-white sm:flex fixed h-full z-40">
+      <nav className="flex flex-col items-center gap-2 px-3 py-4">
         <Link
-              to="/dashboard"
-              className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-lg font-semibold text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+          to="/dashboard"
+          className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors"
         >
-            <Wallet className="h-5 w-5 transition-all group-hover:scale-110" />
-            <span className="sr-only">KwachaLite</span>
+          <Wallet className="h-5 w-5" />
+          <span className="sr-only">KwachaLite</span>
         </Link>
-        <div className="w-8 h-px bg-border/50 my-2" />
+        <div className="w-8 h-px bg-slate-200 my-2" />
         <TooltipProvider>
           {filteredMainNav.map((item) => (
             <Tooltip key={item.href}>
@@ -109,123 +105,110 @@ export function Sidebar() {
                 <Link
                   to={item.href}
                   className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
+                    'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
                     pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
-                      ? 'bg-primary/10 text-primary shadow-md border border-primary/20'
-                      : 'text-muted-foreground hover:text-primary hover:bg-accent/50 hover:shadow-sm'
+                      ? 'bg-slate-100 text-slate-900'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   )}
                 >
                   <item.icon className="h-5 w-5" />
                   <span className="sr-only">{item.label}</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
+              <TooltipContent side="right" className="font-medium bg-slate-900 text-white border-slate-800">
+                {item.label}
+              </TooltipContent>
             </Tooltip>
           ))}
         </TooltipProvider>
       </nav>
-       <nav className="mt-auto flex flex-col items-center gap-3 px-3 py-6">
-          <TooltipProvider>
-            {filteredSecondaryNav.map((item) => (
-              <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                  <Link
-                    to={item.href}
-                    className={cn(
-                      'flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
-                      pathname.startsWith(item.href)
-                        ? 'bg-primary/10 text-primary shadow-md border border-primary/20'
-                        : 'text-muted-foreground hover:text-primary hover:bg-accent/50 hover:shadow-sm'
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="sr-only">{item.label}</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
-              </Tooltip>
-            ))}
-          </TooltipProvider>
-          <div className="w-8 h-px bg-border/50 my-2" />
-          <UserNav />
-        </nav>
+      <nav className="mt-auto flex flex-col items-center gap-2 px-3 py-4 border-t border-slate-200">
+        <TooltipProvider>
+          {filteredSecondaryNav.map((item) => (
+            <Tooltip key={item.href}>
+              <TooltipTrigger asChild>
+                <Link
+                  to={item.href}
+                  className={cn(
+                    'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
+                    pathname.startsWith(item.href)
+                      ? 'bg-slate-100 text-slate-900'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span className="sr-only">{item.label}</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="font-medium bg-slate-900 text-white border-slate-800">
+                {item.label}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </TooltipProvider>
+        <div className="w-8 h-px bg-slate-200 my-2" />
+        <UserNav />
+      </nav>
     </aside>
   );
 }
 
 export function MobileNav() {
-    const location = useLocation();
-    const pathname = location.pathname;
-    const { activeWorkspace } = useActiveWorkspace();
-    
-    let navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
+  const location = useLocation();
+  const pathname = location.pathname;
+  const { activeWorkspace } = useActiveWorkspace();
+  
+  let navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
-    if (activeWorkspace === 'business') {
-        const businessHubIndex = navItemsToShow.findIndex(item => item.href.includes('business'));
-        if (businessHubIndex !== -1) {
-            navItemsToShow[businessHubIndex] = { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']};
-        }
+  if (activeWorkspace === 'business') {
+    const businessHubIndex = navItemsToShow.findIndex(item => item.href.includes('business'));
+    if (businessHubIndex !== -1) {
+      navItemsToShow[businessHubIndex] = { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']};
     }
-    
-    const analyticsItem = secondaryNavItems.find(item => item.href.includes('analytics'));
-    if (analyticsItem) {
-        navItemsToShow.push(analyticsItem);
-    }
-    
-    // Limit to 5 items for optimal mobile experience
-    const uniqueNavItems = Array.from(new Map(navItemsToShow.map(item => [item.href, item])).values()).slice(0, 5);
+  }
+  
+  const analyticsItem = secondaryNavItems.find(item => item.href.includes('analytics'));
+  if (analyticsItem) {
+    navItemsToShow.push(analyticsItem);
+  }
+  
+  const uniqueNavItems = Array.from(new Map(navItemsToShow.map(item => [item.href, item])).values()).slice(0, 5);
 
-    return (
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
-            {/* Modern glass effect background */}
-            <div className="glass border-t backdrop-blur-xl bg-background/95 shadow-2xl">
-                <nav className="flex items-center justify-around h-16 px-2">
-                    {uniqueNavItems.map((item, index) => {
-                        const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
-                        
-                        return (
-                            <Link
-                                key={item.href}
-                                to={item.href}
-                                className={cn(
-                                    'flex flex-col items-center justify-center min-w-0 flex-1 py-1 px-1 rounded-xl transition-all duration-200 group relative',
-                                    isActive
-                                        ? 'text-primary' 
-                                        : 'text-muted-foreground hover:text-primary'
-                                )}
-                            >
-                                {/* Active indicator */}
-                                {isActive && (
-                                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary rounded-full shadow-lg" />
-                                )}
-                                
-                                {/* Icon container with modern animation */}
-                                <div className={cn(
-                                    'flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200',
-                                    isActive 
-                                        ? 'bg-primary/10 shadow-sm transform scale-105' 
-                                        : 'group-hover:bg-accent/30 group-hover:scale-105'
-                                )}>
-                                    <item.icon className={cn(
-                                        'w-5 h-5 transition-all duration-200',
-                                        isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
-                                    )} />
-                                </div>
-                                
-                                {/* Label with truncation */}
-                                <span className={cn(
-                                    'text-xs font-medium mt-0.5 truncate max-w-full transition-all duration-200',
-                                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
-                                )}>
-                                    {item.label}
-                                </span>
-                            </Link>
-                        );
-                    })}
-                </nav>
-            </div>
-        </div>
-    );
+  return (
+    <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
+      <div className="bg-white border-t border-slate-200">
+        <nav className="flex items-center justify-around h-16 px-2">
+          {uniqueNavItems.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-colors',
+                  isActive ? 'text-slate-900' : 'text-slate-600'
+                )}
+              >
+                <div className={cn(
+                  'flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
+                  isActive ? 'bg-slate-100' : 'hover:bg-slate-50'
+                )}>
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <span className={cn(
+                  'text-xs font-medium mt-1 truncate max-w-full',
+                  isActive ? 'text-slate-900' : 'text-slate-600'
+                )}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
+  );
 }
 
 export function MobileSidebar() {
@@ -243,37 +226,38 @@ export function MobileSidebar() {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/50 z-40 sm:hidden" 
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 sm:hidden animate-in fade-in duration-200" 
         onClick={() => setIsOpen(false)}
       />
       
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-background border-r z-50 sm:hidden transform transition-transform duration-300">
+      <div className="fixed left-0 top-0 h-full w-72 bg-white border-r border-slate-200 z-50 sm:hidden animate-in slide-in-from-left duration-300 shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <Link
             to="/dashboard"
             className="flex items-center gap-3"
             onClick={() => setIsOpen(false)}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
               <Wallet className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg">KwachaLite</span>
+            <span className="font-semibold text-lg text-slate-900">KwachaLite</span>
           </Link>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsOpen(false)}
-            className="h-10 w-10"
+            className="h-10 w-10 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
         
         {/* Navigation */}
-        <div className="flex flex-col h-full">
-          <nav className="flex-1 p-4 space-y-2">
+        <div className="flex flex-col h-[calc(100%-73px)]">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            <p className="text-xs font-medium text-slate-500 px-3 mb-2">MAIN MENU</p>
             {filteredMainNav.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
               return (
@@ -282,22 +266,23 @@ export function MobileSidebar() {
                   to={item.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
+                    'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm',
                     isActive
-                      ? 'bg-primary/10 text-primary border border-primary/20'
-                      : 'text-muted-foreground hover:text-primary hover:bg-accent/50'
+                      ? 'bg-slate-100 text-slate-900'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   )}
                 >
                   <item.icon className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
           </nav>
           
           {/* Bottom Navigation */}
-          <div className="p-4 border-t">
-            <div className="space-y-2 mb-4">
+          <div className="p-4 border-t border-slate-200 bg-slate-50">
+            <div className="space-y-1 mb-4">
+              <p className="text-xs font-medium text-slate-500 px-3 mb-2">SETTINGS</p>
               {filteredSecondaryNav.map((item) => {
                 const isActive = pathname.startsWith(item.href);
                 return (
@@ -306,19 +291,19 @@ export function MobileSidebar() {
                     to={item.href}
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm',
                       isActive
-                        ? 'bg-primary/10 text-primary border border-primary/20'
-                        : 'text-muted-foreground hover:text-primary hover:bg-accent/50'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     )}
                   >
                     <item.icon className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
+                    <span>{item.label}</span>
                   </Link>
                 );
               })}
             </div>
-            <div className="pt-4 border-t">
+            <div className="pt-4 border-t border-slate-200">
               <UserNav />
             </div>
           </div>
@@ -336,21 +321,9 @@ export function MobileSidebarTrigger() {
       variant="ghost"
       size="icon"
       onClick={() => setIsOpen(true)}
-      className="h-9 w-9 sm:hidden"
+      className="h-9 w-9 sm:hidden text-slate-600 hover:text-slate-900 hover:bg-slate-100"
     >
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 6h16M4 12h16M4 18h16"
-        />
-      </svg>
+      <Menu className="h-5 w-5" />
     </Button>
   );
 }

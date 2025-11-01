@@ -1,3 +1,5 @@
+import React from 'react';
+import { LoadingScreen } from '@/components/ui/loading-screen';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import ErrorBoundary from '@/components/error-boundary';
@@ -30,6 +32,17 @@ import TestProfile from '@/app/dashboard/test-profile/page';
 import LandingPage from '@/app/landing/page';
 
 function App() {
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 3000); // Simulate loading time
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingScreen onComplete={() => setLoading(false)} />;
+  }
+
   return (
     <ErrorBoundary>
       <Router>

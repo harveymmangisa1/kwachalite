@@ -8,16 +8,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+
+// Replace it with:
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
+    storage: window.localStorage,
+    storageKey: 'kwachalite-auth',
   },
 });
 
@@ -34,3 +33,5 @@ export const supabaseAdmin = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
       }
     )
   : null;
+
+  

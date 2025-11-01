@@ -38,7 +38,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
       description: "Start by recording your first income or expense transaction",
       action: "Add Transaction",
       link: "/dashboard/transactions",
-      color: "from-blue-500 to-indigo-600"
+      color: "bg-blue-500"
     },
     {
       icon: Target,
@@ -46,7 +46,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
       description: "Create savings goals to track your progress",
       action: "Create Goal",
       link: "/dashboard/goals",
-      color: "from-emerald-500 to-teal-600"
+      color: "bg-emerald-500"
     },
     {
       icon: BarChart3,
@@ -54,7 +54,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
       description: "Plan your spending with smart budget categories",
       action: "Set Budget",
       link: "/dashboard/budgets", 
-      color: "from-purple-500 to-pink-600"
+      color: "bg-purple-500"
     },
     {
       icon: Receipt,
@@ -62,7 +62,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
       description: "Never miss a payment with bill reminders",
       action: "Add Bills",
       link: "/dashboard/bills",
-      color: "from-orange-500 to-red-600"
+      color: "bg-orange-500"
     }
   ];
 
@@ -123,14 +123,14 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
         <Button 
           variant="ghost" 
           onClick={handleSkip}
-          className="text-slate-600 hover:text-slate-800 gap-2"
+          className="text-slate-600 hover:text-slate-900 gap-2"
         >
           <X className="w-4 h-4" />
           Skip for now
         </Button>
         <Button 
           onClick={handleComplete}
-          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white gap-2"
+          className="bg-slate-900 hover:bg-slate-800 text-white gap-2 h-11"
         >
           <CheckCircle className="w-4 h-4" />
           Mark as Complete
@@ -138,7 +138,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
       </div>
       {/* Welcome Header */}
       <div className="text-center space-y-4">
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
+        <div className="w-20 h-20 bg-slate-900 rounded-3xl flex items-center justify-center mx-auto">
           <PiggyBank className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-3xl font-bold text-slate-900">Welcome to KwachaLite!</h1>
@@ -155,14 +155,12 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
           
           return (
             <Link to={step.link} key={index}>
-              <Card className={`h-full hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
-                isActive ? 'ring-2 ring-blue-500 ring-opacity-50 shadow-lg' : ''
+              <Card className={`h-full border-slate-200 hover:shadow-md transition-shadow duration-300 cursor-pointer ${
+                isActive ? 'ring-2 ring-slate-900' : ''
               }`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${step.color} rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      isActive ? 'animate-pulse' : ''
-                    }`}>
+                    <div className={`w-12 h-12 ${step.color} rounded-xl flex items-center justify-center flex-shrink-0`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
@@ -177,7 +175,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
                   <p className="text-slate-600 mb-4">{step.description}</p>
                   <Button 
                     variant="outline" 
-                    className="w-full justify-center gap-2 hover:bg-slate-50"
+                    className="w-full justify-center gap-2 h-11 hover:bg-slate-50 border-slate-300"
                     onClick={(e) => {
                       e.preventDefault();
                       window.location.href = step.link;
@@ -199,14 +197,14 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
           <div
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentStep ? 'bg-blue-500 w-8' : 'bg-slate-300'
+              index === currentStep ? 'bg-slate-900 w-8' : 'bg-slate-300'
             }`}
           />
         ))}
       </div>
 
       {/* Alternative Actions */}
-      <Card className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-slate-200">
+      <Card className="bg-slate-50 border-slate-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
             <h3 className="text-lg font-semibold text-slate-900">Need help getting started?</h3>
@@ -215,13 +213,13 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/dashboard/help">
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 h-11 border-slate-300">
                   <CheckCircle className="w-4 h-4" />
                   View Help Center
                 </Button>
               </Link>
               <Link to="/dashboard/analytics">
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 h-11 border-slate-300">
                   <TrendingUp className="w-4 h-4" />
                   See Demo Data
                 </Button>
@@ -248,7 +246,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
       </div>
 
       {/* Contact Support */}
-      <Card className="bg-gradient-to-r from-emerald-50 to-blue-50 border-emerald-200">
+      <Card className="bg-emerald-50 border-emerald-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-3">
@@ -263,7 +261,7 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
             <Button 
               onClick={handleEmailSupport}
               variant="outline" 
-              className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+              className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-100 h-11"
             >
               <Mail className="w-4 h-4" />
               Email Support (harveymmangisa@gmail.com)

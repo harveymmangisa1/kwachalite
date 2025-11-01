@@ -18,17 +18,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false, // Enable for debugging if needed
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-        },
-      },
-    },
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
   },
 })
+
