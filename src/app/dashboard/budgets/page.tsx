@@ -145,7 +145,7 @@ const BudgetDashboard = () => {
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="#E5E7EB"
+            stroke="hsl(var(--border))"
             strokeWidth={strokeWidth}
             fill="none"
           />
@@ -185,10 +185,10 @@ const BudgetDashboard = () => {
     };
 
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-lg">
+      <div className="card-elevated">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Budget Health</h3>
-          <Target className="w-5 h-5 text-gray-400" />
+          <h3 className="text-lg font-semibold text-foreground">Budget Health</h3>
+          <Target className="w-5 h-5 text-muted-foreground" />
         </div>
         <div className="flex items-center space-x-4">
           <ProgressCircle 
@@ -200,7 +200,7 @@ const BudgetDashboard = () => {
             <div className="text-2xl font-bold" style={{ color: getHealthColor(budgetHealthScore) }}>
               {Math.round(budgetHealthScore)}%
             </div>
-            <div className="text-sm text-gray-600">{getHealthText(budgetHealthScore)}</div>
+            <div className="text-sm text-muted-foreground">{getHealthText(budgetHealthScore)}</div>
           </div>
         </div>
       </div>
@@ -225,36 +225,36 @@ const BudgetDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Budget Dashboard</h1>
-            <p className="text-gray-600">Track, analyze, and optimize your spending</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Budget Dashboard</h1>
+            <p className="text-muted-foreground">Track, analyze, and optimize your spending</p>
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+                className="relative p-2 bg-card rounded-full shadow-sm hover:shadow-md transition-all duration-200 border border-border"
               >
-                <Bell className="w-5 h-5 text-gray-600" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <Bell className="w-5 h-5 text-muted-foreground" />
+                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {notifications.length}
                 </span>
               </button>
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border z-50">
-                  <div className="p-4 border-b">
-                    <h3 className="font-semibold text-gray-800">Notifications</h3>
+                <div className="absolute right-0 mt-2 w-80 bg-card rounded-xl shadow-lg border border-border z-50">
+                  <div className="p-4 border-b border-border">
+                    <h3 className="font-semibold text-foreground">Notifications</h3>
                   </div>
                   <div className="max-h-64 overflow-y-auto">
                     {notifications.map((notif) => (
-                      <div key={notif.id} className="p-4 border-b hover:bg-gray-50">
+                      <div key={notif.id} className="p-4 border-b border-border hover:bg-muted/50 transition-colors">
                         <div className="flex items-start space-x-3">
                           <div className={`w-2 h-2 rounded-full mt-2 ${
                             notif.type === 'warning' ? 'bg-orange-500' :
                             notif.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
                           }`} />
                           <div>
-                            <p className="text-sm text-gray-800">{notif.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+                            <p className="text-sm text-foreground">{notif.message}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{notif.time}</p>
                           </div>
                         </div>
                       </div>
@@ -266,7 +266,7 @@ const BudgetDashboard = () => {
             <select
               value={selectedTimeframe}
               onChange={(e) => setSelectedTimeframe(e.target.value)}
-              className="px-4 py-2 bg-white rounded-lg shadow-md border focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="px-4 py-2 bg-card rounded-lg shadow-sm border border-border focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-200"
             >
               <option value="week">This Week</option>
               <option value="month">This Month</option>
@@ -279,26 +279,26 @@ const BudgetDashboard = () => {
         {/* Hero Section - Budget Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Total Budget Overview */}
-          <div className="lg:col-span-2 bg-slate-900 rounded-2xl p-6 text-white">
+          <div className="lg:col-span-2 card-elevated bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold mb-2">Monthly Budget Overview</h2>
-                <p className="text-blue-100">Track your financial progress</p>
+                <p className="text-primary-foreground/80">Track your financial progress</p>
               </div>
-              <DollarSign className="w-8 h-8 text-blue-200" />
+              <DollarSign className="w-8 h-8 text-primary-foreground/60" />
             </div>
             
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <div className="text-blue-100 text-sm mb-1">Total Budget</div>
+              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                <div className="text-primary-foreground/80 text-sm mb-1">Total Budget</div>
                 <div className="text-2xl font-bold">{formatCurrency(totalBudget)}</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <div className="text-blue-100 text-sm mb-1">Total Spent</div>
+              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                <div className="text-primary-foreground/80 text-sm mb-1">Total Spent</div>
                 <div className="text-2xl font-bold">{formatCurrency(totalSpent)}</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <div className="text-blue-100 text-sm mb-1">Remaining</div>
+              <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                <div className="text-primary-foreground/80 text-sm mb-1">Remaining</div>
                 <div className={`text-2xl font-bold ${totalRemaining >= 0 ? 'text-green-300' : 'text-red-300'}`}>
                   {formatCurrency(Math.abs(totalRemaining))}
                 </div>
@@ -307,7 +307,7 @@ const BudgetDashboard = () => {
 
             {/* Progress Bar */}
             <div className="mb-4">
-              <div className="flex justify-between text-sm text-blue-100 mb-2">
+              <div className="flex justify-between text-sm text-primary-foreground/80 mb-2">
                 <span>Budget Progress</span>
                 <span>{totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0}%</span>
               </div>
@@ -330,26 +330,26 @@ const BudgetDashboard = () => {
         {/* Analytics Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Spending Trend */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Spending Trends</h3>
+          <div className="card-elevated">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Spending Trends</h3>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" stroke="#666" />
-                <YAxis stroke="#666" />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                <YAxis stroke="hsl(var(--muted-foreground))" />
                 <Tooltip 
                   formatter={(value) => [formatCurrency(Number(value)), 'Amount']}
-                  labelStyle={{ color: '#333' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
                 />
-                <Line type="monotone" dataKey="budget" stroke="#E5E7EB" strokeDasharray="5 5" strokeWidth={2} />
-                <Line type="monotone" dataKey="spent" stroke="#3B82F6" strokeWidth={3} />
+                <Line type="monotone" dataKey="budget" stroke="hsl(var(--border))" strokeDasharray="5 5" strokeWidth={2} />
+                <Line type="monotone" dataKey="spent" stroke="hsl(var(--primary))" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           {/* Category Distribution */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Spending Distribution</h3>
+          <div className="card-elevated">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Spending Distribution</h3>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
@@ -371,7 +371,7 @@ const BudgetDashboard = () => {
               {budgetData.map((category) => (
                 <div key={category.id} className="flex items-center space-x-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
-                  <span className="text-xs text-gray-600 truncate">{category.name}</span>
+                  <span className="text-xs text-muted-foreground truncate">{category.name}</span>
                 </div>
               ))}
             </div>
@@ -379,10 +379,10 @@ const BudgetDashboard = () => {
         </div>
 
         {/* Category Management */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg mb-8">
+        <div className="card-elevated mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-800">Budget Categories</h3>
-            <Button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <h3 className="text-xl font-semibold text-foreground">Budget Categories</h3>
+            <Button className="flex items-center space-x-2">
               <Plus className="w-4 h-4" />
               <span>Add Category</span>
             </Button>
@@ -397,13 +397,13 @@ const BudgetDashboard = () => {
               return (
                 <div
                   key={category.id}
-                  className="bg-gray-50 rounded-xl p-4 transition-all duration-200 hover:shadow-md"
+                  className="card-interactive p-4"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{category.icon}</span>
                       <div>
-                        <h4 className="font-semibold text-gray-800">{category.name}</h4>
+                        <h4 className="font-semibold text-foreground">{category.name}</h4>
                         <span className={`text-xs font-medium ${status.textColor}`}>
                           {status.status}
                         </span>
@@ -418,15 +418,15 @@ const BudgetDashboard = () => {
 
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Spent</span>
+                      <span className="text-muted-foreground">Spent</span>
                       <span className="font-semibold">{formatCurrency(category.spentAmount)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Budget</span>
+                      <span className="text-muted-foreground">Budget</span>
                       <span className="font-semibold">{formatCurrency(category.budgetAmount)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Remaining</span>
+                      <span className="text-muted-foreground">Remaining</span>
                       <span className={`font-semibold ${
                         category.budgetAmount - category.spentAmount >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
@@ -436,7 +436,7 @@ const BudgetDashboard = () => {
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                  <div className="w-full bg-muted rounded-full h-2 mb-3">
                     <div
                       className="h-2 rounded-full transition-all duration-500"
                       style={{ 
@@ -450,14 +450,14 @@ const BudgetDashboard = () => {
                   <div className="flex space-x-2">
                     <Button 
                       variant="outline" 
-                      className="flex-1 text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
+                      className="flex-1 text-xs"
                       onClick={() => handleViewDetails(category)}
                     >
                       View Details
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="flex-1 text-xs px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                      className="flex-1 text-xs"
                       onClick={() => handleAdjustBudget(category)}
                     >
                       Adjust Budget
@@ -472,33 +472,33 @@ const BudgetDashboard = () => {
         {/* AI Insights & Recommendations */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Smart Recommendations */}
-          <Card className="bg-white rounded-2xl shadow-lg">
+          <Card className="card-elevated">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-blue-600" />
+                <TrendingUp className="w-5 h-5 mr-2 text-primary" />
                 Smart Recommendations
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="p-4 bg-warning/10 rounded-lg border border-warning/20">
                   <div className="flex items-start space-x-3">
-                    <AlertTriangle className="w-5 h-5 text-gray-600 mt-0.5" />
+                    <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-gray-800">Food Spending Alert</h4>
-                      <p className="text-sm text-gray-700 mt-1">
+                      <h4 className="font-medium text-foreground">Food Spending Alert</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
                         You're 13% over budget in Food & Dining. Consider meal planning to reduce costs.
                       </p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="p-4 bg-success/10 rounded-lg border border-success/20">
                   <div className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-success mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-green-800">Great Job on Entertainment</h4>
-                      <p className="text-sm text-green-700 mt-1">
+                      <h4 className="font-medium text-foreground">Great Job on Entertainment</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
                         You're 40% under budget in Entertainment. Consider reallocating some funds to other categories.
                       </p>
                     </div>
@@ -509,7 +509,7 @@ const BudgetDashboard = () => {
           </Card>
 
           {/* Seasonal Spending */}
-          <Card className="bg-white rounded-2xl shadow-lg">
+          <Card className="card-elevated">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Calendar className="w-5 h-5 mr-2 text-purple-600" />
@@ -517,12 +517,12 @@ const BudgetDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="p-4 bg-info/10 rounded-lg border border-info/20">
                 <div className="flex items-start space-x-3">
-                  <div className="w-5 h-5 text-blue-600 mt-0.5">🎄</div>
+                  <div className="w-5 h-5 text-info mt-0.5">🎄</div>
                   <div>
-                    <h4 className="font-medium text-blue-800">Holiday Season Approaching</h4>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <h4 className="font-medium text-foreground">Holiday Season Approaching</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
                       Consider setting aside $300-500 for holiday gifts and celebrations in the next 2 months.
                     </p>
                   </div>

@@ -41,19 +41,19 @@ export function GroupSavingsCard({ goal, onUpdateGoal }: GroupSavingsCardProps) 
   };
 
   return (
-    <Card className="flex flex-col rounded-2xl shadow-sm border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
+    <Card className="flex flex-col card-elevated bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-blue-600" />
-            <CardTitle className="text-lg font-semibold text-blue-900">Group Savings Goal</CardTitle>
+            <Users className="h-5 w-5 text-primary" />
+            <CardTitle className="text-lg font-semibold text-foreground">Group Savings Goal</CardTitle>
           </div>
-          <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 rounded-full">
-            <Crown className="h-3 w-3 text-yellow-600" />
-            <span className="text-xs font-medium text-blue-800">Group</span>
+          <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 rounded-full border border-primary/20">
+            <Crown className="h-3 w-3 text-warning" />
+            <span className="text-xs font-medium text-primary">Group</span>
           </div>
         </div>
-        <CardDescription className="text-blue-700">
+        <CardDescription className="text-muted-foreground">
           Collaborative savings with {goal.members?.length || 0} members
         </CardDescription>
       </CardHeader>
@@ -61,23 +61,23 @@ export function GroupSavingsCard({ goal, onUpdateGoal }: GroupSavingsCardProps) 
       <CardContent className="flex-1 space-y-4">
         {/* Goal Details */}
         <div className="text-center space-y-2">
-          <h3 className="text-xl font-bold text-blue-900">{goal.name}</h3>
-          <div className="text-3xl font-bold text-blue-600">
+          <h3 className="text-xl font-bold text-foreground">{goal.name}</h3>
+          <div className="text-3xl font-bold text-primary">
             {formatCurrency(totalContributions)}
           </div>
-          <div className="text-sm text-blue-600">
+          <div className="text-sm text-muted-foreground">
             of {formatCurrency(goal.targetAmount)} goal
           </div>
         </div>
 
         {/* Progress */}
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-blue-700">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>Progress</span>
             <span>{progress.toFixed(1)}%</span>
           </div>
-          <Progress value={progress} className="h-2 bg-blue-100" />
-          <div className="flex justify-between text-sm text-blue-600">
+          <Progress value={progress} className="h-2" />
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>Remaining: {formatCurrency(remainingAmount)}</span>
           </div>
         </div>
@@ -85,12 +85,11 @@ export function GroupSavingsCard({ goal, onUpdateGoal }: GroupSavingsCardProps) 
         {/* Members Section */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-medium text-blue-900">Group Members</h4>
+            <h4 className="font-medium text-foreground">Group Members</h4>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowAddMember(!showAddMember)}
-              className="border-blue-200 text-blue-700 hover:bg-blue-50"
             >
               <UserPlus className="h-4 w-4 mr-1" />
               Add Member
@@ -99,33 +98,31 @@ export function GroupSavingsCard({ goal, onUpdateGoal }: GroupSavingsCardProps) 
 
           {/* Add Member Form */}
           {showAddMember && (
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 space-y-2">
+            <div className="p-3 bg-muted/50 rounded-lg border border-border space-y-2">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label htmlFor="memberName" className="text-blue-700">Member Name</Label>
+                  <Label htmlFor="memberName" className="text-muted-foreground">Member Name</Label>
                   <Input
                     id="memberName"
                     value={newMemberName}
                     onChange={(e) => setNewMemberName(e.target.value)}
                     placeholder="Enter name"
-                    className="bg-white border-blue-200"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="contribution" className="text-blue-700">Contribution</Label>
+                  <Label htmlFor="contribution" className="text-muted-foreground">Contribution</Label>
                   <Input
                     id="contribution"
                     type="number"
                     value={newMemberContribution}
                     onChange={(e) => setNewMemberContribution(e.target.value)}
                     placeholder="0.00"
-                    className="bg-white border-blue-200"
                   />
                 </div>
               </div>
               <Button 
                 onClick={handleAddMember}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full"
                 disabled={!newMemberName || !newMemberContribution}
               >
                 Add Contribution
@@ -136,24 +133,24 @@ export function GroupSavingsCard({ goal, onUpdateGoal }: GroupSavingsCardProps) 
           {/* Members List */}
           <div className="space-y-2">
             {goal.members?.map((member, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-white rounded-lg border border-blue-200">
+              <div key={index} className="flex items-center justify-between p-2 bg-card rounded-lg border border-border">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-medium text-blue-700">
+                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-medium text-primary">
                       {member.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-blue-900">{member.name}</p>
-                    <p className="text-sm text-blue-600">{formatCurrency(member.contribution)}</p>
+                    <p className="font-medium text-foreground">{member.name}</p>
+                    <p className="text-sm text-muted-foreground">{formatCurrency(member.contribution)}</p>
                   </div>
                 </div>
-                <div className="text-sm text-blue-600">
+                <div className="text-sm text-muted-foreground">
                   {member.joinedAt && `Joined ${new Date(member.joinedAt).toLocaleDateString()}`}
                 </div>
               </div>
             )) || (
-              <div className="text-center py-4 text-blue-600">
+              <div className="text-center py-4 text-muted-foreground">
                 No members yet. Add members to start saving together!
               </div>
             )}
@@ -161,8 +158,8 @@ export function GroupSavingsCard({ goal, onUpdateGoal }: GroupSavingsCardProps) 
         </div>
 
         {/* Goal Info */}
-        <div className="pt-2 border-t border-blue-200">
-          <div className="text-sm text-blue-600 space-y-1">
+        <div className="pt-2 border-t border-border">
+          <div className="text-sm text-muted-foreground space-y-1">
             <div className="flex justify-between">
               <span>Target Date:</span>
               <span>{new Date(goal.deadline).toLocaleDateString()}</span>
