@@ -202,7 +202,7 @@ export function BudgetAdjustModal({
                     <div
                       className={`h-2 rounded-full ${
                         percentage > 100 ? 'bg-red-500' : 
-                        percentage > 90 ? 'bg-yellow-500' : 'bg-green-500'
+                        percentage > 90 ? 'bg-orange-500' : 'bg-green-500'
                       }`}
                       style={{ width: `${Math.min(100, percentage)}%` }}
                     />

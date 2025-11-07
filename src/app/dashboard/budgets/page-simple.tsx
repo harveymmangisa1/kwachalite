@@ -178,7 +178,7 @@ export default function BudgetDashboard() {
                 <div
                   className={`h-3 rounded-full transition-all duration-500 ${
                     totalBudget > 0 && (totalSpent / totalBudget) > 1 ? 'bg-red-400' : 
-                    totalBudget > 0 && (totalSpent / totalBudget) > 0.9 ? 'bg-yellow-400' : 'bg-green-400'
+                    totalBudget > 0 && (totalSpent / totalBudget) > 0.9 ? 'bg-orange-400' : 'bg-green-400'
                   }`}
                   style={{ width: `${totalBudget > 0 ? Math.min(100, (totalSpent / totalBudget) * 100) : 0}%` }}
                 />
