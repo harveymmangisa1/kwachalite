@@ -22,6 +22,7 @@ import { Skeleton } from './ui/skeleton';
 import { Link } from 'react-router-dom';
 import { Briefcase, LogOut, Settings, User } from 'lucide-react';
 import { useAppStore } from '@/lib/data';
+import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 
 export function UserNav() {
   const { user, logout } = useAuth();
@@ -91,6 +92,10 @@ src={avatarSrc || `https://placehold.co/100x100.png?text=${avatarFallback}`}
                 </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <div className="px-2 py-1.5">
+            <DarkModeToggle />
+          </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => logout()}>
             <LogOut className="mr-2 h-4 w-4" />
