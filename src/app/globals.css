@@ -13,33 +13,21 @@
  * 2. TAILWIND BASE LAYER
  * ------------------------------------ */
 @layer base {
-  /*
-   * 💡 IMPROVEMENT: Set font via CSS variable defined below
-   * This ties into the Tailwind config for a clean global font setup.
-   */
-  :root {
-    --font-sans: 'Inter', sans-serif;
-  }
-  
-  /* Global Body Styling */
-  body {
-    /* ✨ NEW: Use the CSS variable defined above for global font. */
-    font-family: var(--font-sans); 
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Typography rhythm adjustments: Kept as is, a good practice. */
-  h1, h2, h3, h4, h5 {
-    letter-spacing: -0.01em;
-  }
-  p { line-height: 1.6; }
-
   /* 🎨 MODERN THEME COLORS (Light Mode) 
    * Enhanced with sophisticated color palette for better visual hierarchy
    * and modern aesthetics for finance tracking application
    */
   :root {
+    /* Font & Typography */
+    --font-sans: 'Inter', sans-serif;
+    
+    /* Primary UI Colors - Modern neutral palette */
+    --background: 250 251 252; /* slate-50 - cleaner white */
+    --foreground: 15 23 42;     /* slate-900 - stronger contrast */
+    --card: 255 255 255;        /* white */
+    --card-foreground: 15 23 42; /* slate-900 */
+    --popover: 255 255 255;    /* white */
+    --popover-foreground: 15 23 42; /* slate-900 */
     /* Primary UI Colors - Modern neutral palette */
     --background: 250 251 252; /* slate-50 - cleaner white */
     --foreground: 15 23 42;     /* slate-900 - stronger contrast */
@@ -98,6 +86,19 @@
     --safe-bottom: env(safe-area-inset-bottom);
     --safe-left: env(safe-area-inset-left);
   }
+  
+  /* Global Body Styling */
+  body {
+    font-family: var(--font-sans); 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typography rhythm adjustments: Kept as is, a good practice. */
+  h1, h2, h3, h4, h5 {
+    letter-spacing: -0.01em;
+  }
+  p { line-height: 1.6; }
 
   /* 🌙 MODERN DARK MODE */
   .dark {
@@ -161,7 +162,7 @@
     @apply border-border;
   }
   
-  /* Kept as is, applies theme colors and font features. */
+  /* Enhanced body styling with theme colors and font features */
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
