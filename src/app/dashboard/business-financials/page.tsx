@@ -115,7 +115,7 @@ export default function BusinessFinancialsPage() {
       <div className="px-4 sm:px-6">
         {/* Financial Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -128,7 +128,7 @@ export default function BusinessFinancialsPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
@@ -141,7 +141,7 @@ export default function BusinessFinancialsPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -156,7 +156,7 @@ export default function BusinessFinancialsPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
@@ -379,7 +379,7 @@ export default function BusinessFinancialsPage() {
           </div>
 
           <TabsContent value="revenue" className="space-y-4">
-            <Card>
+            <Card className="card-minimal">
               <CardHeader>
                 <CardTitle>Business Revenue</CardTitle>
                 <CardDescription>
@@ -406,19 +406,19 @@ export default function BusinessFinancialsPage() {
                       </TableRow>
                     ) : (
                       businessRevenues.map((revenue) => (
-                        <TableRow key={revenue.id}>
+                        <TableRow key={revenue.id} className="row-hover-minimal">
                           <TableCell>{new Date(revenue.date).toLocaleDateString()}</TableCell>
                           <TableCell>{revenue.description}</TableCell>
                           <TableCell>
                             {revenueCategories.find(c => c.id === revenue.category)?.name || revenue.category}
                           </TableCell>
-                          <TableCell className="font-medium text-green-600">
+                          <TableCell className="font-medium text-[rgb(var(--success))]">
                             {formatCurrency(revenue.amount)}
                           </TableCell>
                           <TableCell>
-                            <Badge variant={revenue.status === 'received' ? 'secondary' : 'outline'}>
+                            <span className={`${revenue.status === 'received' ? 'badge-success' : 'badge-info'} px-2 py-0.5 rounded-md text-xs capitalize`}>
                               {revenue.status}
-                            </Badge>
+                            </span>
                           </TableCell>
                         </TableRow>
                       ))
@@ -430,7 +430,7 @@ export default function BusinessFinancialsPage() {
           </TabsContent>
 
           <TabsContent value="expenses" className="space-y-4">
-            <Card>
+            <Card className="card-minimal">
               <CardHeader>
                 <CardTitle>Business Expenses</CardTitle>
                 <CardDescription>
@@ -457,19 +457,19 @@ export default function BusinessFinancialsPage() {
                       </TableRow>
                     ) : (
                       businessExpenses.map((expense) => (
-                        <TableRow key={expense.id}>
+                        <TableRow key={expense.id} className="row-hover-minimal">
                           <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
                           <TableCell>{expense.description}</TableCell>
                           <TableCell>
                             {expenseCategories.find(c => c.id === expense.category)?.name || expense.category}
                           </TableCell>
-                          <TableCell className="font-medium text-red-600">
+                          <TableCell className="font-medium text-[rgb(var(--error))]">
                             {formatCurrency(expense.amount)}
                           </TableCell>
                           <TableCell>
-                            <Badge variant={expense.status === 'paid' ? 'secondary' : 'outline'}>
+                            <span className={`${expense.status === 'paid' ? 'badge-success' : 'badge-info'} px-2 py-0.5 rounded-md text-xs capitalize`}>
                               {expense.status}
-                            </Badge>
+                            </span>
                           </TableCell>
                         </TableRow>
                       ))

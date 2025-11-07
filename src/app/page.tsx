@@ -25,6 +25,7 @@ export default function LoginPage() {
   const [password, setPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [formError, setFormError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!loading && user) {
@@ -36,14 +37,17 @@ export default function LoginPage() {
     e.preventDefault();
     
     if (!email || !password) {
+      const msg = 'Please enter both email and password.';
+      setFormError(msg);
       toast({
         title: 'Missing Information',
-        description: 'Please enter both email and password.',
+        description: msg,
         variant: 'destructive',
       });
       return;
     }
 
+    setFormError(null);
     setIsSubmitting(true);
     try {
       await loginWithEmail(email, password);
@@ -53,7 +57,7 @@ export default function LoginPage() {
       
       let errorMessage = 'Could not log you in. Please try again.';
       
-      if (error.message) {
+      if (error?.message) {
         if (error.message.includes('Failed to fetch') || error.message.includes('fetch')) {
           errorMessage = 'Unable to connect to authentication service. Please check your internet connection and try again.';
         } else if (error.message.includes('Invalid login credentials')) {
@@ -63,12 +67,13 @@ export default function LoginPage() {
         } else {
           errorMessage = error.message;
         }
-      } else if (error.status === 0) {
+      } else if (error?.status === 0) {
         errorMessage = 'Network error. Please check your internet connection and try again.';
-      } else if (error.name === 'AuthApiError') {
+      } else if (error?.name === 'AuthApiError') {
         errorMessage = 'Authentication service error. Please try again later.';
       }
       
+      setFormError(errorMessage);
       toast({
         title: 'Login Failed',
         description: errorMessage,
@@ -213,18 +218,20 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     className="h-11 border-slate-300 focus:border-slate-900 focus:ring-slate-900 pr-11"
+                    aria-describedby={formError ? 'login-error' : undefined}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute right-1 top-1/2 transform -translate-y-1/2 h-9 w-9 hover:bg-slate-100"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-slate-500" />
+                      <EyeOff className="h-4 w-4 text-slate-500" aria-hidden="true" />
                     ) : (
-                      <Eye className="h-4 w-4 text-slate-500" />
+                      <Eye className="h-4 w-4 text-slate-500" aria-hidden="true" />
                     )}
                   </Button>
                 </div>
@@ -232,12 +239,19 @@ export default function LoginPage() {
               
               <Button 
                 type="submit" 
-                className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium transition-colors" 
+                className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium transition-colors disabled:opacity-70" 
                 disabled={isSubmitting}
+                aria-busy={isSubmitting}
               >
                 {isSubmitting ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
+
+            {formError && (
+              <div id="login-error" role="alert" aria-live="polite" className="mt-4 text-sm text-destructive">
+                {formError}
+              </div>
+            )}
             
             <div className="mt-6 space-y-4">
               <div className="text-center text-sm text-slate-600">

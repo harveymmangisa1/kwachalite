@@ -32,14 +32,35 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Top Nav */}
+      <div className="border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="container mx-auto px-6 h-14 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+              <Wallet className="w-4 h-4 text-white" aria-hidden="true" />
+            </div>
+            <span className="font-semibold text-slate-900">KwachaLite</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/">
+              <Button variant="ghost" className="h-9">Sign in</Button>
+            </Link>
+            <Link to="/signup">
+              <Button className="h-9 bg-slate-900 text-white hover:bg-slate-800">Get started</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="relative z-10 container mx-auto px-6 py-20">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(15,23,42,0.06),transparent_60%)]" />
+        <div className="relative z-10 container mx-auto px-6 py-20 container-narrow">
           <div className="text-center space-y-12">
             {/* Logo and Title */}
             <div className="space-y-6">
               <div className="relative inline-block">
-                <div className="relative w-24 h-24 bg-slate-900 rounded-3xl flex items-center justify-center shadow-sm mx-auto">
+                <div className="relative w-24 h-24 bg-slate-900 rounded-3xl flex items-center justify-center shadow-sm mx-auto ui-smooth hover:scale-[1.02]">
                   <Wallet className="w-10 h-10 text-white" />
                 </div>
               </div>
@@ -63,13 +84,13 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/signup">
-                <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-sm h-11">
+                <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-sm h-11 ui-smooth hover:-translate-y-0.5">
                   Get Started in 2 Minutes
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/">
-                <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold rounded-xl border-2 h-11 border-slate-300 hover:bg-slate-100">
+                <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold rounded-xl border-2 h-11 border-slate-300 hover:bg-slate-100 ui-smooth">
                   Sign In
                 </Button>
               </Link>

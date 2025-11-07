@@ -38,7 +38,7 @@ export function ClientsDataTable({ data }: { data: Client[] }) {
       <TableBody>
         {data.map((client) => {
           return (
-            <TableRow key={client.id}>
+            <TableRow key={client.id} className="row-hover-minimal">
               <TableCell>
                 <div className="font-medium">{client.name}</div>
               </TableCell>

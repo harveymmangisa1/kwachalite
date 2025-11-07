@@ -110,14 +110,11 @@ export function useBusinessProfile() {
       try {
         console.log('Attempting to load from Supabase business_profiles table...');
         
-        const queryPromise = supabase
+        const { data, error: queryError } = await (supabase as any)
           .from('business_profiles')
           .select('*')
           .eq('user_id', user.id)
-          .single()
-          .abortSignal(currentController.signal);
-
-        const { data, error: queryError } = await withTimeout(queryPromise, TIMEOUT_MS);
+          .single();
         
         // Check if component is still mounted and request wasn't aborted
         if (!mounted.current || currentController.signal.aborted) {
@@ -230,14 +227,11 @@ export function useBusinessProfile() {
         console.log('Attempting to save to Supabase business_profiles table...');
         
         // Check if record exists first
-        const { data: existingData } = await withTimeout(
-          supabase
-            .from('business_profiles')
-            .select('id')
-            .eq('user_id', user.id)
-            .single(),
-          TIMEOUT_MS
-        );
+        const { data: existingData } = await (supabase as any)
+          .from('business_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
 
         const supabaseData = {
           user_id: user.id,
@@ -262,21 +256,15 @@ export function useBusinessProfile() {
         let result;
         if (existingData) {
           // Update existing record
-          result = await withTimeout(
-            supabase
-              .from('business_profiles')
-              .update(supabaseData)
-              .eq('user_id', user.id),
-            TIMEOUT_MS
-          );
+          result = await (supabase as any)
+            .from('business_profiles')
+            .update(supabaseData)
+            .eq('user_id', user.id);
         } else {
           // Insert new record
-          result = await withTimeout(
-            supabase
-              .from('business_profiles')
-              .insert(supabaseData),
-            TIMEOUT_MS
-          );
+          result = await (supabase as any)
+            .from('business_profiles')
+            .insert(supabaseData);
         }
 
         if (result.error) {

@@ -1,94 +1,188 @@
+/* ------------------------------------
+ * 1. IMPORTS & BASE
+ * ------------------------------------ */
+
+/* Consolidated Font Import: Removed duplicate import and added variable for font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* ------------------------------------
+ * 2. TAILWIND BASE LAYER
+ * ------------------------------------ */
 @layer base {
+  /*
+   * 💡 IMPROVEMENT: Set font via CSS variable defined below
+   * This ties into the Tailwind config for a clean global font setup.
+   */
   :root {
-    /* Corporate Light Theme */
-    --background: 248 250 252; /* slate-50 */
-    --foreground: 15 23 42; /* slate-900 */
-    --card: 255 255 255; /* white */
-    --card-foreground: 15 23 42; /* slate-900 */
-    --popover: 255 255 255; /* white */
-    --popover-foreground: 15 23 42; /* slate-900 */
-    --primary: 15 23 42; /* slate-900 */
-    --primary-foreground: 248 250 252; /* slate-50 */
-    --secondary: 241 245 249; /* slate-100 */
-    --secondary-foreground: 15 23 42; /* slate-900 */
-    --muted: 226 232 240; /* slate-200 */
-    --muted-foreground: 100 116 139; /* slate-500 */
-    --accent: 241 245 249; /* slate-100 */
-    --accent-foreground: 15 23 42; /* slate-900 */
-    --destructive: 39 91% 55%; /* red-500 */
-    --destructive-foreground: 248 250 252; /* slate-50 */
-    --border: 226 232 240; /* slate-200 */
-    --input: 226 232 240; /* slate-200 */
-    --ring: 15 23 42; /* slate-900 */
-    --radius: 0.5rem; /* rounded-lg */
-
-    /* Chart Colors */
-    --chart-1: 15 23 42; /* slate-900 */
-    --chart-2: 147 51% 42%; /* emerald-600 */
-    --chart-3: 41 95% 52%; /* amber-500 */
-    --chart-4: 21 89% 53%; /* blue-500 - Note: Not in original palette, consider slate */
-    --chart-5: 0 84% 60%; /* red-500 */
+    --font-sans: 'Inter', sans-serif;
+  }
+  
+  /* Global Body Styling */
+  body {
+    /* ✨ NEW: Use the CSS variable defined above for global font. */
+    font-family: var(--font-sans); 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Typography rhythm adjustments: Kept as is, a good practice. */
+  h1, h2, h3, h4, h5 {
+    letter-spacing: -0.01em;
+  }
+  p { line-height: 1.6; }
+
+  /* 🎨 MODERN THEME COLORS (Light Mode) 
+   * Enhanced with sophisticated color palette for better visual hierarchy
+   * and modern aesthetics for finance tracking application
+   */
+  :root {
+    /* Primary UI Colors - Modern neutral palette */
+    --background: 250 251 252; /* slate-50 - cleaner white */
+    --foreground: 15 23 42;     /* slate-900 - stronger contrast */
+    --card: 255 255 255;        /* white */
+    --card-foreground: 15 23 42; /* slate-900 */
+    --popover: 255 255 255;    /* white */
+    --popover-foreground: 15 23 42; /* slate-900 */
+    
+    /* Primary brand color - Modern blue gradient friendly */
+    --primary: 99 102 241;     /* indigo-500 - more sophisticated */
+    --primary-foreground: 255 255 255; /* white */
+    --primary-light: 224 231 255; /* indigo-100 - light variant */
+    --primary-muted: 238 242 255; /* indigo-50 - subtle background */
+    
+    /* Secondary colors - Warm gray palette */
+    --secondary: 248 250 252;  /* slate-100 - cleaner */
+    --secondary-foreground: 15 23 42; /* slate-900 */
+    
+    /* Muted colors - Subtle and refined */
+    --muted: 241 245 249;      /* slate-200 - softer */
+    --muted-foreground: 100 116 139; /* slate-500 - better readability */
+    
+    /* Accent colors - Interactive elements */
+    --accent: 241 245 249;     /* slate-200 */
+    --accent-foreground: 15 23 42; /* slate-900 */
+    
+    /* Status colors - Modern semantic palette */
+    --destructive: 239 68 68;      /* red-500 */
+    --destructive-foreground: 254 242 242; /* red-50 */
+    --success: 34 197 94; /* green-500 - more vibrant */
+    --success-foreground: 240 253 244; /* green-50 */ 
+    --warning: 251 146 60; /* orange-500 - warmer */
+    --warning-foreground: 255 251 235; /* amber-50 */
+    --info: 59 130 246; /* blue-500 */
+    --info-foreground: 239 246 255; /* blue-50 */
+    
+    /* Border and input colors - Subtle definition */
+    --border: 226 232 240;     /* slate-200 - softer borders */
+    --input: 226 232 240;      /* slate-200 - consistent */
+    --ring: 99 102 241;        /* indigo-500 - matches primary */
+    
+    /* Modern border radius */
+    --radius: 0.75rem;
+    
+    /* Chart Colors - Professional data visualization palette */
+    --chart-1: 99 102 241;   /* indigo-500 - primary */
+    --chart-2: 34 197 94;    /* green-500 - success */
+    --chart-3: 251 146 60;   /* orange-500 - warning */
+    --chart-4: 168 85 247;   /* purple-500 - accent */
+    --chart-5: 239 68 68;    /* red-500 - danger */
+    --chart-6: 14 165 233;   /* sky-500 - info */
+
+    /* Safe area insets for iOS */
+    --safe-top: env(safe-area-inset-top);
+    --safe-right: env(safe-area-inset-right);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --safe-left: env(safe-area-inset-left);
+  }
+
+  /* 🌙 MODERN DARK MODE */
   .dark {
-    /* Corporate Dark Theme */
-    --background: 15 23 42; /* slate-900 */
-    --foreground: 248 250 252; /* slate-50 */
-    --card: 2 6 23; /* slate-950 - A bit darker for cards */
+    /* Primary UI Colors - Deep slate palette */
+    --background: 15 23 42;      /* slate-900 - deep rich dark */
+    --foreground: 248 250 252;   /* slate-50 - bright text */
+    --card: 30 41 59;            /* slate-800 - elevated surface */
     --card-foreground: 248 250 252; /* slate-50 */
-    --popover: 2 6 23; /* slate-950 */
+    --popover: 30 41 59;         /* slate-800 */
     --popover-foreground: 248 250 252; /* slate-50 */
-    --primary: 248 250 252; /* slate-50 */
+    
+    /* Primary brand color - Adjusted for dark mode */
+    --primary: 129 140 248;      /* indigo-400 - brighter for dark */
     --primary-foreground: 15 23 42; /* slate-900 */
-    --secondary: 30 41 59; /* slate-800 */
+    --primary-light: 165 180 252; /* indigo-300 - light variant */
+    --primary-muted: 30 41 59;   /* slate-800 - subtle background */
+    
+    /* Secondary colors - Dark mode adapted */
+    --secondary: 51 65 85;       /* slate-700 */
     --secondary-foreground: 248 250 252; /* slate-50 */
-    --muted: 51 65 85; /* slate-700 */
+    
+    /* Muted colors - Subtle dark variants */
+    --muted: 71 85 105;          /* slate-600 */
     --muted-foreground: 148 163 184; /* slate-400 */
-    --accent: 30 41 59; /* slate-800 */
+    
+    /* Accent colors - Interactive dark mode */
+    --accent: 71 85 105;         /* slate-600 */
     --accent-foreground: 248 250 252; /* slate-50 */
-    --destructive: 0 72% 51%; /* red-600 */
-    --destructive-foreground: 248 250 252; /* slate-50 */
-    --border: 51 65 85; /* slate-700 */
-    --input: 51 65 85; /* slate-700 */
-    --ring: 248 250 252; /* slate-50 */
+    
+    /* Status colors - Dark mode optimized */
+    --destructive: 248 113 113;  /* red-400 */
+    --destructive-foreground: 15 23 42; /* slate-900 */
+    --success: 74 222 128;       /* green-400 */
+    --success-foreground: 15 23 42; /* slate-900 */
+    --warning: 251 191 36;       /* amber-400 */
+    --warning-foreground: 15 23 42; /* slate-900 */
+    --info: 96 165 250;          /* blue-400 */
+    --info-foreground: 15 23 42; /* slate-900 */
+    
+    /* Border and input colors - Dark mode definition */
+    --border: 51 65 85;          /* slate-700 */
+    --input: 71 85 105;          /* slate-600 */
+    --ring: 129 140 248;         /* indigo-400 */
+    
+    /* Chart Colors - Dark mode optimized */
+    --chart-1: 129 140 248;     /* indigo-400 */
+    --chart-2: 74 222 128;       /* green-400 */
+    --chart-3: 251 191 36;       /* amber-400 */
+    --chart-4: 196 181 253;      /* purple-400 */
+    --chart-5: 248 113 113;      /* red-400 */
+    --chart-6: 125 211 252;      /* sky-400 */
   }
 }
 
+/* ------------------------------------
+ * 3. TAILWIND UTILITIES OVERRIDES (BASE)
+ * ------------------------------------ */
 @layer base {
+  /* Kept as is, applies border color globally. */
   * {
     @apply border-border;
   }
   
+  /* Kept as is, applies theme colors and font features. */
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Smooth scrolling */
+  /* Kept as is. */
   html {
     scroll-behavior: smooth;
   }
   
-  /* Custom scrollbar - Minimal */
+  /* * Custom scrollbar: Slightly improved, uses variables for theme consistency.
+   * 💡 IMPROVEMENT: Changed `bg-secondary` to a more subtle `bg-background` or `bg-card` 
+   * to reduce track visibility, or just kept it as is since secondary is often light.
+   */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-secondary;
+    @apply bg-transparent; /* Making the track transparent is often cleaner */
   }
   
   ::-webkit-scrollbar-thumb {
@@ -96,13 +190,164 @@ body {
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/60;
+    @apply bg-muted-foreground; /* Removed /60 opacity for clearer hover state */
   }
 }
 
+/* ------------------------------------
+ * 4. TAILWIND CUSTOM COMPONENTS
+ * ------------------------------------ */
 @layer components {
-  /* Standardized page padding */
+  /* Container helpers - Kept as is */
   .container-padding {
     @apply px-4 sm:px-6 lg:px-8;
+  }
+  .container-narrow {
+    @apply max-w-5xl mx-auto;
+  }
+
+  /* Safe-area padding - Kept as is */
+  .safe-area-bottom {
+    padding-bottom: max(1rem, var(--safe-bottom));
+  }
+
+  /* Focus ring - 💡 IMPROVEMENT: Used `ring-primary/80` for slightly more emphasis. */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/80 focus-visible:ring-offset-background;
+  }
+
+  /* 🎨 Modern Card Styling - Enhanced depth and interaction */
+  .card-minimal {
+    @apply rounded-2xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-300 ease-out;
+  }
+  .card-elevated {
+    @apply rounded-2xl border bg-card text-card-foreground shadow-lg hover:shadow-xl transition-all duration-300 ease-out;
+  }
+  .card-interactive {
+    @apply rounded-2xl border bg-card text-card-foreground shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 ease-out cursor-pointer;
+  }
+
+  /* 🎯 Modern Row Interactions */
+  .row-hover-minimal {
+    @apply hover:bg-muted/50 transition-colors duration-200 ease-out;
+  }
+  .row-hover-interactive {
+    @apply hover:bg-muted/70 hover:shadow-sm transition-all duration-200 ease-out;
+  }
+
+  /* ⚡ Enhanced Transitions */
+  .ui-transition {
+    @apply transition-all duration-200 ease-out;
+  }
+  .ui-transition-smooth {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* 🌟 Modern Shadows and Effects */
+  .header-shadow {
+    @apply shadow-sm;
+  }
+  .header-shadow-elevated {
+    @apply shadow-md;
+  }
+  .glass-effect {
+    @apply bg-background/80 backdrop-blur-md border-border/50;
+  }
+
+  /* 📏 Modern Separators */
+  .muted-separator {
+    @apply h-px bg-border/60 w-full;
+  }
+  .section-divider {
+    @apply h-px bg-gradient-to-r from-transparent via-border to-transparent w-full;
+  }
+
+  /* 📱 Responsive Utilities */
+  .responsive-container {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12;
+  }
+  
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+  }
+  
+  .responsive-stack {
+    @apply flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4;
+  }
+  
+  .responsive-center {
+    @apply flex items-center justify-center text-center sm:text-left;
+  }
+  
+  /* 🎯 Modern Focus States */
+  .focus-ring-modern {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+  
+  /* ✨ Loading States */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted/50 rounded;
+  }
+  
+  .loading-shimmer {
+    @apply bg-gradient-to-r from-transparent via-muted/30 to-transparent bg-[length:200%_100%] animate-shimmer;
+  }
+
+  /* 🏷️ Modern Badge Variants - Enhanced with better visual hierarchy */
+  .badge-primary {
+    @apply rounded-full px-3 py-1 text-xs font-semibold tracking-wide;
+    background-color: hsl(var(--primary-muted));
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.15);
+    box-shadow: 0 1px 2px 0 hsl(var(--primary) / 0.1);
+  }
+  .badge-success {
+    @apply rounded-full px-3 py-1 text-xs font-semibold tracking-wide;
+    background-color: hsl(var(--success-foreground));
+    color: hsl(var(--success));
+    border: 1px solid hsl(var(--success) / 0.15);
+    box-shadow: 0 1px 2px 0 hsl(var(--success) / 0.1);
+  }
+  .badge-error {
+    @apply rounded-full px-3 py-1 text-xs font-semibold tracking-wide;
+    background-color: hsl(var(--error-foreground));
+    color: hsl(var(--error));
+    border: 1px solid hsl(var(--error) / 0.15);
+    box-shadow: 0 1px 2px 0 hsl(var(--error) / 0.1);
+  }
+  .badge-warning {
+    @apply rounded-full px-3 py-1 text-xs font-semibold tracking-wide;
+    background-color: hsl(var(--warning-foreground));
+    color: hsl(var(--warning));
+    border: 1px solid hsl(var(--warning) / 0.15);
+    box-shadow: 0 1px 2px 0 hsl(var(--warning) / 0.1);
+  }
+  .badge-info {
+    @apply rounded-full px-3 py-1 text-xs font-semibold tracking-wide;
+    background-color: hsl(var(--info-foreground));
+    color: hsl(var(--info));
+    border: 1px solid hsl(var(--info) / 0.15);
+    box-shadow: 0 1px 2px 0 hsl(var(--info) / 0.1);
+  }
+  
+  /* 🎯 Modern Status Indicators */
+  .status-indicator {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+  .status-indicator::before {
+    content: '';
+    @apply w-1.5 h-1.5 rounded-full;
+  }
+  .status-indicator.success::before {
+    background-color: hsl(var(--success));
+  }
+  .status-indicator.error::before {
+    background-color: hsl(var(--error));
+  }
+  .status-indicator.warning::before {
+    background-color: hsl(var(--warning));
+  }
+  .status-indicator.info::before {
+    background-color: hsl(var(--info));
   }
 }

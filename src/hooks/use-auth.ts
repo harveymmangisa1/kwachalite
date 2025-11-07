@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { supabaseSync } from '@/lib/supabase-sync';
 import type { User, Session } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 
 interface AuthState {
   user: User | null;
@@ -49,7 +50,6 @@ export const useAuth = () => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
 
       // Update Supabase sync with user
       supabaseSync.setUser(session?.user ?? null);
@@ -64,7 +64,7 @@ export const useAuth = () => {
 
         if (!existingUser) {
           // Create user profile if it doesn't exist
-          const { error } = await supabase
+          const { error } = await (supabase as any)
             .from('users')
             .insert({
               id: session.user.id,
@@ -125,8 +125,9 @@ export const useAuth = () => {
       return data;
     } catch (error) {
       console.error('Error during email sign-in:', error);
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   }, [setLoading]);
 
@@ -151,8 +152,9 @@ export const useAuth = () => {
       return data;
     } catch (error) {
       console.error('Error during email sign-up:', error);
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   }, [setLoading]);
 

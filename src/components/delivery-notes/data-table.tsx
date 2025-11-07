@@ -124,7 +124,7 @@ export function DeliveryNotesDataTable() {
             </TableRow>
           ) : (
             filteredDeliveryNotes.map((deliveryNote) => (
-              <TableRow key={deliveryNote.id}>
+              <TableRow key={deliveryNote.id} className="row-hover-minimal">
                 <TableCell className="font-medium">
                   {deliveryNote.deliveryNoteNumber}
                 </TableCell>
@@ -141,9 +141,13 @@ export function DeliveryNotesDataTable() {
                   {getDeliveryMethodDisplay(deliveryNote.deliveryMethod)}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusVariant(deliveryNote.status)} className="capitalize">
+                  <span className={`capitalize px-2 py-0.5 rounded-md text-xs inline-flex items-center justify-center ${
+                    deliveryNote.status === 'delivered' ? 'badge-success' :
+                    deliveryNote.status === 'in_transit' ? 'badge-info' :
+                    deliveryNote.status === 'cancelled' ? 'badge-error' : ''
+                  }`}>
                     {deliveryNote.status.replace('_', ' ')}
-                  </Badge>
+                  </span>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {deliveryNote.trackingNumber || '-'}

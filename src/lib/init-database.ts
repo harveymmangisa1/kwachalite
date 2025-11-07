@@ -8,7 +8,7 @@ export async function initializeDatabase() {
 
   try {
     // Try to create user_metadata table
-    const { error: createTableError } = await supabase.rpc('exec_sql', {
+    const { error: createTableError } = await (supabase as any).rpc('exec_sql', {
       sql: `
         -- Create user_metadata table if it doesn't exist
         CREATE TABLE IF NOT EXISTS user_metadata (

@@ -118,7 +118,6 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
 
   return (
     <div className="space-y-8 relative">
-      {/* Skip/Complete Bar */}
       <div className="flex justify-between items-center mb-6">
         <Button 
           variant="ghost" 
@@ -136,7 +135,6 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
           Mark as Complete
         </Button>
       </div>
-      {/* Welcome Header */}
       <div className="text-center space-y-4">
         <div className="w-20 h-20 bg-slate-900 rounded-3xl flex items-center justify-center mx-auto">
           <PiggyBank className="w-10 h-10 text-white" />
@@ -147,7 +145,6 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
         </p>
       </div>
 
-      {/* Quick Actions Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {steps.map((step, index) => {
           const Icon = step.icon;
@@ -191,7 +188,6 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
         })}
       </div>
 
-      {/* Progress Indicators */}
       <div className="flex justify-center gap-2">
         {steps.map((_, index) => (
           <div
@@ -203,7 +199,6 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
         ))}
       </div>
 
-      {/* Alternative Actions */}
       <Card className="bg-slate-50 border-slate-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
@@ -229,7 +224,6 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
         </CardContent>
       </Card>
 
-      {/* Tips */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div className="flex gap-4">
           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -245,7 +239,6 @@ export function GettingStarted({ onSkip, onComplete }: GettingStartedProps = {})
         </div>
       </div>
 
-      {/* Contact Support */}
       <Card className="bg-emerald-50 border-emerald-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">

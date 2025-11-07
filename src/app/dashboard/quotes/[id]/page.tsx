@@ -171,7 +171,7 @@ export default function QuotePage() {
                 )}
             </PageHeader>
             <div className="px-4 sm:px-6">
-                <Card ref={quoteRef} className="p-8">
+                <Card ref={quoteRef} className="p-8 card-minimal">
                     <CardHeader className="p-0 mb-8">
                         <div className="flex justify-between items-start">
                             <div>
@@ -186,17 +186,13 @@ export default function QuotePage() {
                                 <p className="text-muted-foreground"><strong>Quote #:</strong> {quote.quoteNumber}</p>
                                 <p className="text-muted-foreground"><strong>Date:</strong> {new Date(quote.date).toLocaleDateString()}</p>
                                 <p className="text-muted-foreground"><strong>Expires:</strong> {new Date(quote.expiryDate).toLocaleDateString()}</p>
-                                <Badge 
-                                    className="mt-2"
-                                    variant={
-                                        quote.status === 'accepted' ? 'secondary' : 
-                                        quote.status === 'sent' ? 'default' : 
-                                        quote.status === 'rejected' ? 'destructive' : 
-                                        'outline'
-                                    }
-                                >
+                                <span className={`mt-2 px-2 py-0.5 rounded-md text-xs capitalize ${
+                                    quote.status === 'accepted' ? 'badge-success' :
+                                    quote.status === 'sent' ? 'badge-info' :
+                                    quote.status === 'rejected' ? 'badge-error' : ''
+                                }`}>
                                     {quote.status}
-                                </Badge>
+                                </span>
                             </div>
                         </div>
                     </CardHeader>
@@ -220,7 +216,7 @@ export default function QuotePage() {
                             </TableHeader>
                             <TableBody>
                                 {quote.items.map((item, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={index} className="row-hover-minimal">
                                         <TableCell className="font-medium">{getProductName(item.productId)}</TableCell>
                                         <TableCell className="text-center">{item.quantity}</TableCell>
                                         <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>

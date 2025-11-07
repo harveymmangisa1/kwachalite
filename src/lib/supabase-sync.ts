@@ -1,6 +1,9 @@
 'use client';
 
 import { supabase } from './supabase';
+
+// Type assertion to bypass Supabase type inference issues
+const supa = supabase as any;
 import type { User } from '@supabase/supabase-js';
 import type { Transaction, Bill, SavingsGoal, Client, Product, Quote, Loan, Category } from './types';
 
@@ -257,7 +260,7 @@ export class SupabaseSync {
   private async fetchAndUpdateTransactions() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('transactions')
       .select('*')
       .eq('user_id', this.user.id)
@@ -269,7 +272,7 @@ export class SupabaseSync {
       return;
     }
 
-    const transactions: Transaction[] = data.map(item => ({
+    const transactions: Transaction[] = (data as any[]).map(item => ({
       id: item.id,
       date: item.date,
       description: item.description,

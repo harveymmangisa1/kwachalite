@@ -125,7 +125,7 @@ export function ReceiptsDataTable() {
             </TableRow>
           ) : (
             filteredReceipts.map((receipt) => (
-              <TableRow key={receipt.id}>
+              <TableRow key={receipt.id} className="row-hover-minimal">
                 <TableCell className="font-medium">
                   {receipt.receiptNumber}
                 </TableCell>
@@ -142,9 +142,15 @@ export function ReceiptsDataTable() {
                   {getPaymentMethodDisplay(receipt.paymentMethod)}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusVariant(receipt.status)} className="capitalize">
+                  <span className="capitalize px-2 py-0.5 rounded-md text-xs inline-flex items-center justify-center \n                    "
+                    style={{
+                      backgroundColor: receipt.status === 'confirmed' ? `rgb(var(--info-light))` : (receipt.status === 'cancelled' ? `rgb(var(--error-light))` : `rgb(var(--muted))`),
+                      color: receipt.status === 'cancelled' ? `rgb(var(--error))` : 'inherit',
+                      border: '1px solid rgba(0,0,0,0.06)'
+                    }}
+                  >
                     {receipt.status}
-                  </Badge>
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>

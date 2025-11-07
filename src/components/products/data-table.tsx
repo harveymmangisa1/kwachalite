@@ -51,7 +51,7 @@ export function ProductsDataTable({ data }: { data: Product[] }) {
       <TableBody>
         {data.map((product) => {
           return (
-            <TableRow key={product.id}>
+            <TableRow key={product.id} className="row-hover-minimal">
               <TableCell>
                 <div className="font-medium">{product.name}</div>
               </TableCell>

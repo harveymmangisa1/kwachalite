@@ -69,7 +69,7 @@ export default function InvoicesPage() {
             <div className="px-4 sm:px-6">
                 {acceptedQuotes.length > 0 ? (
                     <div className="space-y-6">
-                        <Card>
+                        <Card className="card-minimal">
                             <CardHeader>
                                 <CardTitle>Ready to Invoice</CardTitle>
                                 <CardDescription>
@@ -91,7 +91,7 @@ export default function InvoicesPage() {
                                         {acceptedQuotes.map((quote) => {
                                             const totalAmount = getTotalAmount(quote.items);
                                             return (
-                                                <TableRow key={quote.id}>
+                                                <TableRow key={quote.id} className="row-hover-minimal">
                                                     <TableCell>
                                                         <div className="font-medium">{quote.quoteNumber}</div>
                                                     </TableCell>
@@ -106,7 +106,7 @@ export default function InvoicesPage() {
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         <div className="flex justify-end gap-2">
-                                                            <Button variant="outline" size="sm" asChild>
+                                                            <Button variant="outline" size="sm" className="h-8 px-3" asChild>
                                                                 <Link to={`/dashboard/invoices/${quote.id}`}>
                                                                     <Eye className="h-4 w-4 mr-2" />
                                                                     View
@@ -115,6 +115,7 @@ export default function InvoicesPage() {
                                                             <Button 
                                                                 variant="outline" 
                                                                 size="sm"
+                                                                className="h-8 px-3"
                                                                 onClick={() => handleEmailInvoice(quote)}
                                                             >
                                                                 <Mail className="h-4 w-4 mr-2" />
@@ -122,6 +123,7 @@ export default function InvoicesPage() {
                                                             </Button>
                                                             <Button 
                                                                 size="sm"
+                                                                className="h-8 px-3"
                                                                 onClick={() => handleDownloadInvoice(quote)}
                                                             >
                                                                 <Download className="h-4 w-4 mr-2" />
@@ -147,7 +149,7 @@ export default function InvoicesPage() {
                                     <Card 
                                         key={quote.id} 
                                         id={`invoice-${quote.id}`} 
-                                        className="p-8 max-w-4xl"
+                                        className="p-8 max-w-4xl card-minimal"
                                     >
                                         <CardHeader className="p-0 mb-8">
                                             <div className="flex justify-between items-start">
@@ -223,7 +225,7 @@ export default function InvoicesPage() {
                         </div>
                     </div>
                 ) : (
-                    <Card className="text-center py-12">
+                    <Card className="text-center py-12 card-minimal">
                         <CardContent>
                             <Receipt className="mx-auto h-12 w-12 text-muted-foreground" />
                             <h3 className="mt-4 text-lg font-semibold">No Invoices Ready</h3>

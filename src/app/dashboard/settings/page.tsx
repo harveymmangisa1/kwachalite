@@ -41,9 +41,11 @@ export default function SettingsPage() {
     return <div>Loading...</div>;
   }
 
-  const handleUpdateUser = async (formData: FormData) => {
+  const handleUpdateUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!user) return;
     
+    const formData = new FormData(event.currentTarget);
     const profileData = {
         name: formData.get('name') as string,
         bio: formData.get('bio') as string,
@@ -75,15 +77,15 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4">
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <PageHeader
         title="Settings"
         description="Manage your account and application settings."
       />
-      <div className="px-4 sm:px-6">
+      <div className="grid gap-8">
         {activeWorkspace === 'personal' ? (
-          <Card className="max-w-2xl mx-auto">
-            <form action={handleUpdateUser}>
+          <Card className="max-w-2xl">
+            <form onSubmit={handleUpdateUser}>
               <CardHeader>
                 <CardTitle>Profile</CardTitle>
                 <CardDescription>
@@ -123,19 +125,10 @@ export default function SettingsPage() {
             </form>
           </Card>
         ) : (
-          <div className="space-y-6">
-            <BusinessProfileSettings />
-            
-            {/* Temporary debug component - remove after testing */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-4">Database Connection Test</h3>
-              <SupabaseTest />
-            </div>
-          </div>
+          <BusinessProfileSettings />
         )}
         
-        {/* Onboarding Reset Section - Available for both workspaces */}
-        <Card className="max-w-2xl mx-auto">
+        <Card className="max-w-2xl">
           <CardHeader>
             <CardTitle>Onboarding</CardTitle>
             <CardDescription>

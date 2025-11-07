@@ -16,7 +16,7 @@ export default function QuotesPage() {
                 <AddQuoteSheet />
             </PageHeader>
             <div className="px-4 sm:px-6">
-                <Card>
+                <Card className="card-minimal">
                     <CardHeader>
                         <CardTitle>All Quotations</CardTitle>
                         <CardDescription>

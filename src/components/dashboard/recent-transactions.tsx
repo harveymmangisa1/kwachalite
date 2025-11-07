@@ -27,20 +27,20 @@ const TransactionItem = React.memo(({ transaction }: { transaction: Transaction 
   const isIncome = transaction.type === 'income';
   
   return (
-    <div className="flex items-center justify-between group hover:bg-muted/30 -mx-3 px-3 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-border/50">
+    <div className="flex items-center justify-between group row-hover-minimal -mx-3 px-3 py-3 rounded-xl border border-transparent hover:border-border/50">
       <div className="flex items-center gap-4 min-w-0 flex-1">
         <div
           className={cn(
-            'p-2.5 rounded-xl flex-shrink-0 shadow-sm',
+            'p-2.5 rounded-xl flex-shrink-0',
             isIncome
-              ? 'bg-emerald-500/10 border border-emerald-500/20'
-              : 'bg-rose-500/10 border border-rose-500/20'
+              ? 'bg-[rgb(var(--success-light))]'
+              : 'bg-[rgb(var(--error-light))]'
           )}
         >
           {isIncome ? (
-            <TrendingUp className="h-4 w-4 text-emerald-600" />
+            <TrendingUp className="h-4 w-4" style={{ color: `rgb(var(--success))` }} />
           ) : (
-            <TrendingDown className="h-4 w-4 text-rose-600" />
+            <TrendingDown className="h-4 w-4" style={{ color: `rgb(var(--error))` }} />
           )}
         </div>
         <div className="min-w-0 flex-1 space-y-1">
@@ -60,10 +60,8 @@ const TransactionItem = React.memo(({ transaction }: { transaction: Transaction 
       </div>
       <div
         className={cn(
-          'font-semibold text-sm flex-shrink-0 px-2 py-1 rounded-lg',
-          isIncome
-            ? 'text-emerald-600 bg-emerald-50'
-            : 'text-rose-600 bg-rose-50'
+          'font-medium text-sm flex-shrink-0 px-2 py-1 rounded-lg',
+          isIncome ? 'badge-success' : 'badge-error'
         )}
       >
         {isIncome ? '+' : '-'}
@@ -106,7 +104,7 @@ function RecentTransactionsInner({
 
   if (isLoading) {
     return (
-      <Card className="modern-card">
+      <Card className="card-minimal">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="space-y-2">
             <Skeleton className="h-5 w-36" />
@@ -125,7 +123,7 @@ function RecentTransactionsInner({
 
   if (recentTransactions.length === 0) {
     return (
-      <Card className="modern-card">
+      <Card className="card-minimal">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="space-y-1">
             <CardTitle className="text-lg font-semibold">
@@ -157,7 +155,7 @@ function RecentTransactionsInner({
   }
 
   return (
-    <Card className="modern-card">
+    <Card className="card-minimal">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="space-y-1">
           <CardTitle className="text-lg font-semibold">

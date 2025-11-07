@@ -56,7 +56,7 @@ export default function BillsPage() {
                     <AddBillSheet />
                 </PageHeader>
                 <div className="grid grid-cols-1 gap-6">
-                    <Card className="rounded-2xl shadow-sm">
+                    <Card className="card-minimal">
                         <CardHeader>
                             <CardTitle>Upcoming Bills</CardTitle>
                             <CardDescription>
@@ -77,7 +77,7 @@ export default function BillsPage() {
                                     </TableHeader>
                                     <TableBody>
                                         {sortedBills.map((bill) => (
-                                            <TableRow key={bill.id}>
+                                            <TableRow key={bill.id} className="row-hover-minimal">
                                                 <TableCell className="font-medium flex items-center gap-2">
                                                     {bill.name}
                                                     {bill.isRecurring && (
@@ -95,9 +95,9 @@ export default function BillsPage() {
                                                 </TableCell>
                                                 <TableCell>{new Date(bill.dueDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>
-                                                    <Badge variant={bill.status === 'paid' ? 'secondary' : 'destructive'}>
+                                                    <span className={bill.status === 'paid' ? 'badge-info px-2 py-0.5 rounded-md text-xs' : 'badge-error px-2 py-0.5 rounded-md text-xs'}>
                                                         {bill.status}
-                                                    </Badge>
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell className="text-right">{formatCurrency(bill.amount)}</TableCell>
                                                 <TableCell className="text-right">
@@ -105,7 +105,7 @@ export default function BillsPage() {
                                                         <Button 
                                                             size="sm" 
                                                             onClick={() => handlePayBill(bill.id)}
-                                                            className="bg-emerald-600 hover:bg-emerald-700"
+                                                            className="h-8 px-3"
                                                         >
                                                             Pay Bill
                                                         </Button>

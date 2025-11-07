@@ -158,7 +158,7 @@ export default function BusinessBudgetsPage() {
       <div className="px-4 sm:px-6">
         {/* Budget Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
@@ -171,7 +171,7 @@ export default function BusinessBudgetsPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
@@ -184,7 +184,7 @@ export default function BusinessBudgetsPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Remaining Budget</CardTitle>
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
@@ -199,7 +199,7 @@ export default function BusinessBudgetsPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="card-minimal">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Over Budget</CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
@@ -216,7 +216,7 @@ export default function BusinessBudgetsPage() {
         </div>
 
         {/* Budgets Management */}
-        <Card>
+        <Card className="card-minimal">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Budget Management</CardTitle>
@@ -229,7 +229,7 @@ export default function BusinessBudgetsPage() {
               if (!open) setEditingBudget(null);
             }}>
               <DialogTrigger asChild>
-                <Button>
+                <Button className="h-9 px-3">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Budget
                 </Button>
@@ -381,12 +381,12 @@ export default function BusinessBudgetsPage() {
                     const category = expenseCategories.find(c => c.id === budget.category);
                     
                     return (
-                      <TableRow key={budget.id}>
+                      <TableRow key={budget.id} className="row-hover-minimal">
                         <TableCell className="font-medium">{budget.name}</TableCell>
                         <TableCell>{category?.name || budget.category}</TableCell>
                         <TableCell className="capitalize">{budget.period}</TableCell>
                         <TableCell>{formatCurrency(budget.budgetAmount)}</TableCell>
-                        <TableCell className={performance.isOverBudget ? 'text-red-600' : ''}>
+                        <TableCell className={performance.isOverBudget ? 'text-[rgb(var(--error))]' : ''}>
                           {formatCurrency(performance.spent)}
                         </TableCell>
                         <TableCell>
@@ -403,9 +403,9 @@ export default function BusinessBudgetsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={performance.daysLeft <= 7 ? 'destructive' : 'outline'}>
+                          <span className={`${performance.daysLeft <= 7 ? 'badge-error' : 'badge-info'} px-2 py-0.5 rounded-md text-xs`}>
                             {performance.daysLeft} days
-                          </Badge>
+                          </span>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">

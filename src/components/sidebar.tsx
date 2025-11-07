@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowRightLeft,
-  BarChart2,
   Settings,
   Wallet,
   ReceiptText,
@@ -88,65 +87,84 @@ export function Sidebar() {
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
   return (
-    <aside className="hidden w-16 flex-col border-r border-slate-200 bg-white sm:flex fixed h-full z-40">
-      <nav className="flex flex-col items-center gap-2 px-3 py-4">
+    <aside className="hidden w-20 flex-col border-r border-border bg-card/50 backdrop-blur-sm sm:flex fixed h-full z-40">
+      <nav className="flex flex-col items-center gap-3 px-4 py-6">
         <Link
           to="/dashboard"
-          className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+          className="group flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105 shadow-lg"
         >
-          <Wallet className="h-5 w-5" />
+          <Wallet className="h-6 w-6" />
           <span className="sr-only">KwachaLite</span>
         </Link>
-        <div className="w-8 h-px bg-slate-200 my-2" />
+        
+        {/* Workspace indicator */}
+        <div className="mt-3 mb-2">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20">
+            {activeWorkspace === 'business' ? 'B' : 'P'}
+          </span>
+        </div>
+        
+        <div className="w-10 h-px bg-border/60 my-3" />
+        
         <TooltipProvider>
-          {filteredMainNav.map((item) => (
-            <Tooltip key={item.href}>
-              <TooltipTrigger asChild>
-                <Link
-                  to={item.href}
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
-                    pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
-                      ? 'bg-slate-100 text-slate-900'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="sr-only">{item.label}</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="font-medium bg-slate-900 text-white border-slate-800">
-                {item.label}
-              </TooltipContent>
-            </Tooltip>
-          ))}
+          {filteredMainNav.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            return (
+              <Tooltip key={item.href}>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={item.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cn(
+                      'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
+                      isActive
+                        ? 'bg-primary text-primary-foreground shadow-md'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="sr-only">{item.label}</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="font-medium bg-popover text-popover-foreground border-border shadow-lg">
+                  {item.label}
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
         </TooltipProvider>
       </nav>
-      <nav className="mt-auto flex flex-col items-center gap-2 px-3 py-4 border-t border-slate-200">
+      
+      <nav className="mt-auto flex flex-col items-center gap-3 px-4 py-6 border-t border-border/60">
         <TooltipProvider>
-          {filteredSecondaryNav.map((item) => (
-            <Tooltip key={item.href}>
-              <TooltipTrigger asChild>
-                <Link
-                  to={item.href}
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
-                    pathname.startsWith(item.href)
-                      ? 'bg-slate-100 text-slate-900'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="sr-only">{item.label}</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="font-medium bg-slate-900 text-white border-slate-800">
-                {item.label}
-              </TooltipContent>
-            </Tooltip>
-          ))}
+          {filteredSecondaryNav.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <Tooltip key={item.href}>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={item.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cn(
+                      'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
+                      isActive
+                        ? 'bg-muted text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="sr-only">{item.label}</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="font-medium bg-popover text-popover-foreground border-border shadow-lg">
+                  {item.label}
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
         </TooltipProvider>
-        <div className="w-8 h-px bg-slate-200 my-2" />
+        
+        <div className="w-10 h-px bg-border/60 my-3" />
         <UserNav />
       </nav>
     </aside>
@@ -172,12 +190,12 @@ export function MobileNav() {
     navItemsToShow.push(analyticsItem);
   }
   
-  const uniqueNavItems = Array.from(new Map(navItemsToShow.map(item => [item.href, item])).values()).slice(0, 5);
+  const uniqueNavItems = Array.from(new Map(navItemsToShow.map(item => [item.href, item])).values());
 
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
-      <div className="bg-white border-t border-slate-200">
-        <nav className="flex items-center justify-around h-16 px-2">
+      <div className="bg-card/95 backdrop-blur-md border-t border-border/60 safe-area-bottom">
+        <nav className="flex items-center justify-around h-18 px-2 overflow-x-auto">
           {uniqueNavItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             
@@ -185,20 +203,22 @@ export function MobileNav() {
               <Link
                 key={item.href}
                 to={item.href}
+                aria-current={isActive ? 'page' : undefined}
+                aria-label={item.label}
                 className={cn(
-                  'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-colors',
-                  isActive ? 'text-slate-900' : 'text-slate-600'
+                  'flex flex-col items-center justify-center min-w-0 flex-1 py-3 px-2 rounded-xl transition-all duration-200',
+                  isActive ? 'text-primary' : 'text-muted-foreground'
                 )}
               >
                 <div className={cn(
-                  'flex items-center justify-center w-10 h-10 rounded-lg transition-colors',
-                  isActive ? 'bg-slate-100' : 'hover:bg-slate-50'
+                  'flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200',
+                  isActive ? 'bg-primary text-primary-foreground shadow-md' : 'hover:bg-muted/50'
                 )}>
-                  <item.icon className="w-5 h-5" />
+                  <item.icon className="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span className={cn(
-                  'text-xs font-medium mt-1 truncate max-w-full',
-                  isActive ? 'text-slate-900' : 'text-slate-600'
+                  'text-[11px] font-semibold mt-2 truncate max-w-full',
+                  isActive ? 'text-primary' : 'text-muted-foreground'
                 )}>
                   {item.label}
                 </span>
@@ -226,38 +246,38 @@ export function MobileSidebar() {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 sm:hidden animate-in fade-in duration-200" 
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 sm:hidden animate-in fade-in duration-200" 
         onClick={() => setIsOpen(false)}
       />
       
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-72 bg-white border-r border-slate-200 z-50 sm:hidden animate-in slide-in-from-left duration-300 shadow-xl">
+      <div className="fixed left-0 top-0 h-full w-80 bg-card/95 backdrop-blur-md border-r border-border/60 z-50 sm:hidden animate-in slide-in-from-left duration-300 shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-200">
+        <div className="flex items-center justify-between p-6 border-b border-border/60">
           <Link
             to="/dashboard"
             className="flex items-center gap-3"
             onClick={() => setIsOpen(false)}
           >
-            <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
-              <Wallet className="h-5 w-5 text-white" />
+            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
+              <Wallet className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg text-slate-900">KwachaLite</span>
+            <span className="font-bold text-xl text-foreground">KwachaLite</span>
           </Link>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsOpen(false)}
-            className="h-10 w-10 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
         
         {/* Navigation */}
-        <div className="flex flex-col h-[calc(100%-73px)]">
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            <p className="text-xs font-medium text-slate-500 px-3 mb-2">MAIN MENU</p>
+        <div className="flex flex-col h-[calc(100%-88px)]">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            <p className="text-xs font-semibold text-muted-foreground px-4 mb-3 uppercase tracking-wider">Main Menu</p>
             {filteredMainNav.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
               return (
@@ -265,11 +285,12 @@ export function MobileSidebar() {
                   key={item.href}
                   to={item.href}
                   onClick={() => setIsOpen(false)}
+                  aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm',
+                    'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm',
                     isActive
-                      ? 'bg-slate-100 text-slate-900'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -280,9 +301,9 @@ export function MobileSidebar() {
           </nav>
           
           {/* Bottom Navigation */}
-          <div className="p-4 border-t border-slate-200 bg-slate-50">
-            <div className="space-y-1 mb-4">
-              <p className="text-xs font-medium text-slate-500 px-3 mb-2">SETTINGS</p>
+          <div className="p-4 border-t border-border/60 bg-muted/20">
+            <div className="space-y-2 mb-4">
+              <p className="text-xs font-semibold text-muted-foreground px-4 mb-3 uppercase tracking-wider">Settings</p>
               {filteredSecondaryNav.map((item) => {
                 const isActive = pathname.startsWith(item.href);
                 return (
@@ -290,11 +311,12 @@ export function MobileSidebar() {
                     key={item.href}
                     to={item.href}
                     onClick={() => setIsOpen(false)}
+                    aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm',
+                      'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm',
                       isActive
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        ? 'bg-card text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-card/60'
                     )}
                   >
                     <item.icon className="h-5 w-5" />
@@ -303,7 +325,7 @@ export function MobileSidebar() {
                 );
               })}
             </div>
-            <div className="pt-4 border-t border-slate-200">
+            <div className="pt-4 border-t border-border/60">
               <UserNav />
             </div>
           </div>

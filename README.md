@@ -1,3 +1,4 @@
+
 # KwachaLite Finance Tracker
 
 This is a modern, minimal personal and business finance tracker built with Next.js, ShadCN UI, Tailwind CSS, and Genkit.

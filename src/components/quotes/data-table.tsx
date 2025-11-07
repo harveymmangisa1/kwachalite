@@ -62,7 +62,7 @@ export function QuotesDataTable({ data }: { data: Quote[] }) {
       <TableBody>
         {data.map((quote) => {
           return (
-            <TableRow key={quote.id}>
+            <TableRow key={quote.id} className="row-hover-minimal">
               <TableCell>
                 <div className="font-medium">{quote.quoteNumber}</div>
               </TableCell>
@@ -77,9 +77,9 @@ export function QuotesDataTable({ data }: { data: Quote[] }) {
                 })}
               </TableCell>
                <TableCell>
-                <Badge variant={quote.status === 'accepted' ? 'secondary' : (quote.status === 'sent' ? 'default' : 'outline')}>
+                <span className={`${quote.status === 'accepted' ? 'badge-success' : (quote.status === 'sent' ? 'badge-info' : '')} px-2 py-0.5 rounded-md text-xs capitalize`}>
                     {quote.status}
-                </Badge>
+                </span>
               </TableCell>
               <TableCell
                 className="text-right font-medium"

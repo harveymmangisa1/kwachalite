@@ -68,7 +68,7 @@ export default function LoansPage() {
                     <AddLoanSheet />
                 </PageHeader>
                 <div className="grid grid-cols-1 gap-6">
-                    <Card className="rounded-2xl shadow-sm">
+                    <Card className="card-minimal">
                         <CardHeader>
                             <CardTitle>Your Loans</CardTitle>
                             <CardDescription>
@@ -90,15 +90,15 @@ export default function LoansPage() {
                                     </TableHeader>
                                     <TableBody>
                                         {sortedLoans.map((loan) => (
-                                            <TableRow key={loan.id}>
+                                            <TableRow key={loan.id} className="row-hover-minimal">
                                                 <TableCell className="font-medium">{loan.lender}</TableCell>
                                                 <TableCell>{formatCurrency(loan.principal)}</TableCell>
                                                 <TableCell>{formatCurrency(loan.remainingAmount)}</TableCell>
                                                 <TableCell>{loan.interestRate}%</TableCell>
                                                 <TableCell>
-                                                    <Badge variant={loan.status === 'paid' ? 'secondary' : 'default'}>
+                                                    <span className={loan.status === 'paid' ? 'badge-info px-2 py-0.5 rounded-md text-xs' : 'badge-success px-2 py-0.5 rounded-md text-xs'}>
                                                         {loan.status}
-                                                    </Badge>
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>

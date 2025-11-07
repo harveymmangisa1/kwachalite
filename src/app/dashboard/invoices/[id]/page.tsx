@@ -96,7 +96,7 @@ export default function InvoicePage() {
                 </Button>
             </PageHeader>
             <div className="px-4 sm:px-6">
-                <Card ref={invoiceRef} className="p-8">
+                <Card ref={invoiceRef} className="p-8 card-minimal">
                     <CardHeader className="p-0 mb-8">
                         <div className="flex justify-between items-start">
                             <div>
@@ -134,7 +134,7 @@ export default function InvoicePage() {
                             </TableHeader>
                             <TableBody>
                                 {quote.items.map((item, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={index} className="row-hover-minimal">
                                         <TableCell className="font-medium">{getProductName(item.productId)}</TableCell>
                                         <TableCell className="text-center">{item.quantity}</TableCell>
                                         <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>

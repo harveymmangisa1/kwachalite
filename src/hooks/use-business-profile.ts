@@ -104,10 +104,15 @@ export function useBusinessProfile() {
         .eq('user_id', user.id)
         .eq('key', 'business_profile')
         .single()
-        .abortSignal(currentController.signal);
+        ;
 
       // Add timeout to the query
-      const { data, error: queryError } = await withTimeout(queryPromise, TIMEOUT_MS);
+      const { data, error: queryError } = await (supabase as any)
+        .from('user_metadata')
+        .select('metadata')
+        .eq('user_id', user.id)
+        .eq('key', 'business_profile')
+        .single();
       
       // Check if component is still mounted and request wasn't aborted
       if (!mounted.current || currentController.signal.aborted) {
@@ -211,13 +216,18 @@ export function useBusinessProfile() {
           .eq('key', 'business_profile')
           .single();
         
-        const { data: existingData } = await withTimeout(existingQuery, TIMEOUT_MS);
+        const { data: existingData } = await (supabase as any)
+          .from('user_metadata')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('key', 'business_profile')
+          .single();
 
         let result;
         
         if (existingData) {
           // Update existing record
-          const updateQuery = supabase
+          result = await (supabase as any)
             .from('user_metadata')
             .update({
               metadata: updatedProfile,
@@ -225,19 +235,15 @@ export function useBusinessProfile() {
             })
             .eq('user_id', user.id)
             .eq('key', 'business_profile');
-          
-          result = await withTimeout(updateQuery, TIMEOUT_MS);
         } else {
           // Insert new record
-          const insertQuery = supabase
+          result = await (supabase as any)
             .from('user_metadata')
             .insert({
               user_id: user.id,
               key: 'business_profile',
               metadata: updatedProfile
             });
-          
-          result = await withTimeout(insertQuery, TIMEOUT_MS);
         }
 
         if (result.error) {

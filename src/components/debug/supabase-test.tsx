@@ -48,7 +48,7 @@ export function SupabaseTest() {
         setTestResult(prev => prev + '\n⚠️ User not found in users table, creating...');
         
         // Create user record
-        const { error: insertError } = await supabase
+        const { error: insertError } = await (supabase as any)
           .from('users')
           .insert({
             id: user.id,
@@ -82,7 +82,7 @@ export function SupabaseTest() {
         metadata: { test: 'success', timestamp: new Date().toISOString() }
       };
 
-      const { error: insertMetadataError } = await supabase
+      const { error: insertMetadataError } = await (supabase as any)
         .from('user_metadata')
         .upsert(testMetadata, { 
           onConflict: 'user_id,key'
@@ -102,7 +102,7 @@ export function SupabaseTest() {
         address: 'Test Address'
       };
 
-      const { error: businessError } = await supabase
+      const { error: businessError } = await (supabase as any)
         .from('user_metadata')
         .upsert({
           user_id: user.id,

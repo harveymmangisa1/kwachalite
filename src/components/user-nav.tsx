@@ -26,7 +26,6 @@ import { useAppStore } from '@/lib/data';
 export function UserNav() {
   const { user, logout } = useAuth();
   const { activeWorkspace, setActiveWorkspace } = useActiveWorkspace();
-  const { businessDetails } = useAppStore();
   const [isClient, setIsClient] = React.useState(false);
   
   React.useEffect(() => {
@@ -45,15 +44,10 @@ export function UserNav() {
     setActiveWorkspace(workspace);
   };
   
-  const userInitials = user?.displayName
-    ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase()
-    : 'U';
-  
-  const businessInitials = businessDetails?.name
-    ? businessDetails.name.split(' ').map(n => n[0]).join('').toUpperCase()
-    : 'B';
+  const userInitials = user?.user_metadata?.name || user?.email?.charAt(0).toUpperCase() || 'U';
+  const businessInitials = 'B'; // Placeholder for business initials
 
-  const avatarSrc = activeWorkspace === 'business' ? businessDetails?.logoUrl : user.photoURL;
+  const avatarSrc = activeWorkspace === 'business' ? undefined : user?.user_metadata?.avatar_url;
   const avatarFallback = activeWorkspace === 'business' ? businessInitials : userInitials;
 
   return (
@@ -62,8 +56,8 @@ export function UserNav() {
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-9 w-9">
               <AvatarImage
-                src={avatarSrc || `https://placehold.co/100x100.png?text=${avatarFallback}`}
-                alt={user.displayName || 'User'}
+src={avatarSrc || `https://placehold.co/100x100.png?text=${avatarFallback}`}
+                 alt={user?.user_metadata?.name || user?.email || 'User'}
               />
               <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>
@@ -72,9 +66,9 @@ export function UserNav() {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">
-                {user.displayName}
-              </p>
+<p className="text-sm font-medium leading-none">
+                 {user?.user_metadata?.name || user?.email}
+               </p>
               <p className="text-xs leading-none text-muted-foreground">
                 {user.email}
               </p>

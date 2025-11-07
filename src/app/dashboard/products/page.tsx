@@ -15,7 +15,7 @@ export default function ProductsPage() {
                 <AddProductSheet />
             </PageHeader>
             <div className="px-4 sm:px-6">
-                <Card>
+                <Card className="card-minimal">
                     <CardHeader>
                         <CardTitle>All Products</CardTitle>
                         <CardDescription>

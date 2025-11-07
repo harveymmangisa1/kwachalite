@@ -32,15 +32,10 @@ import TestProfile from '@/app/dashboard/test-profile/page';
 import LandingPage from '@/app/landing/page';
 
 function App() {
-  const [loading, setLoading] = React.useState(true);
+  const [showLoading, setShowLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 3000); // Simulate loading time
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return <LoadingScreen onComplete={() => setLoading(false)} />;
+  if (showLoading) {
+    return <LoadingScreen onComplete={() => setShowLoading(false)} />;
   }
 
   return (

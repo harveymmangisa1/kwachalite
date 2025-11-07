@@ -52,12 +52,14 @@ export function TransactionsDataTable({ data }: { data: Transaction[] }) {
       <TableBody>
         {data.map((transaction) => {
           return (
-            <TableRow key={transaction.id}>
+            <TableRow key={transaction.id} className="row-hover-minimal">
               <TableCell>
                 <div className="font-medium">{transaction.description}</div>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{transaction.category}</Badge>
+                <span className="px-2 py-0.5 rounded-md text-xs bg-accent text-secondary-foreground">
+                  {transaction.category}
+                </span>
               </TableCell>
               <TableCell>
                 {new Date(transaction.date).toLocaleDateString('en-US', {
@@ -69,7 +71,7 @@ export function TransactionsDataTable({ data }: { data: Transaction[] }) {
               <TableCell
                 className={cn(
                   'text-right font-medium',
-                  transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
+                  transaction.type === 'income' ? 'text-[rgb(var(--success))]' : 'text-[rgb(var(--error))]'
                 )}
               >
                 {transaction.type === 'income' ? '+' : '-'}
