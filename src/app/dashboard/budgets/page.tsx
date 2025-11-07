@@ -122,8 +122,8 @@ const BudgetDashboard = () => {
   const getBudgetStatus = (spent: number, budget: number) => {
     const percentage = budget > 0 ? (spent / budget) * 100 : 0;
     if (percentage >= 100) return { status: 'Over Budget', color: '#EF4444', textColor: 'text-red-600' };
-    if (percentage >= 90) return { status: 'Near Limit', color: '#F59E0B', textColor: 'text-yellow-600' };
-    if (percentage >= 75) return { status: 'On Track', color: '#F59E0B', textColor: 'text-yellow-600' };
+    if (percentage >= 90) return { status: 'Near Limit', color: '#F59E0B', textColor: 'text-orange-600' };
+    if (percentage >= 75) return { status: 'On Track', color: '#F59E0B', textColor: 'text-orange-600' };
     return { status: 'Under Budget', color: '#10B981', textColor: 'text-green-600' };
   };
 
@@ -220,7 +220,7 @@ const BudgetDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -249,7 +249,7 @@ const BudgetDashboard = () => {
                       <div key={notif.id} className="p-4 border-b hover:bg-gray-50">
                         <div className="flex items-start space-x-3">
                           <div className={`w-2 h-2 rounded-full mt-2 ${
-                            notif.type === 'warning' ? 'bg-yellow-500' :
+                            notif.type === 'warning' ? 'bg-orange-500' :
                             notif.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
                           }`} />
                           <div>
@@ -315,7 +315,7 @@ const BudgetDashboard = () => {
                 <div
                   className={`h-3 rounded-full transition-all duration-500 ${
                     totalBudget > 0 && (totalSpent / totalBudget) > 1 ? 'bg-red-400' : 
-                    totalBudget > 0 && (totalSpent / totalBudget) > 0.9 ? 'bg-yellow-400' : 'bg-green-400'
+                    totalBudget > 0 && (totalSpent / totalBudget) > 0.9 ? 'bg-orange-400' : 'bg-green-400'
                   }`}
                   style={{ width: `${totalBudget > 0 ? Math.min(100, (totalSpent / totalBudget) * 100) : 0}%` }}
                 />
@@ -481,12 +481,12 @@ const BudgetDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex items-start space-x-3">
-                    <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                    <AlertTriangle className="w-5 h-5 text-gray-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-yellow-800">Food Spending Alert</h4>
-                      <p className="text-sm text-yellow-700 mt-1">
+                      <h4 className="font-medium text-gray-800">Food Spending Alert</h4>
+                      <p className="text-sm text-gray-700 mt-1">
                         You're 13% over budget in Food & Dining. Consider meal planning to reduce costs.
                       </p>
                     </div>

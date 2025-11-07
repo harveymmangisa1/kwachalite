@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { DollarSign, TrendingUp, Activity, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { useBusinessProfile } from '@/hooks/use-business-profile';
+import { useBusinessProfile } from '@/hooks/use-business-profile-v2';
 import { formatCurrency } from '@/lib/utils';
 import React from 'react';
 import type { Transaction } from '@/lib/types';
@@ -47,7 +47,7 @@ export function BusinessDashboardDebug({ transactions }: { transactions: Transac
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/40">
+      <div className="min-h-screen bg-background">
         <div className="container-padding space-y-6 pb-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -60,7 +60,7 @@ export function BusinessDashboardDebug({ transactions }: { transactions: Transac
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/40">
+    <div className="min-h-screen bg-background">
       <div className="container-padding space-y-6 pb-8">
         {/* Debug Information */}
         <Card className="bg-gray-50 border-gray-200">
@@ -76,17 +76,6 @@ export function BusinessDashboardDebug({ transactions }: { transactions: Transac
             <p>Transactions: {transactions?.length || 0}</p>
           </CardContent>
         </Card>
-
-        {/* Error Warning */}
-        {profileError && (
-          <Card className="bg-yellow-50 border-yellow-200">
-            <CardContent className="p-4">
-              <div className="text-yellow-800">
-                <strong>Profile Error:</strong> {profileError}
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Simple Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

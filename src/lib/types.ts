@@ -42,6 +42,13 @@ export interface GoalItem {
     purchased: boolean;
 }
 
+export interface GroupMember {
+    id: string;
+    name: string;
+    contribution: number;
+    joinedAt: string;
+}
+
 export interface SavingsGoal {
     id: string;
     name: string;
@@ -49,9 +56,9 @@ export interface SavingsGoal {
     currentAmount: number;
     deadline: string;
     type: 'individual' | 'group';
-    members?: string[];
-    workspace: Workspace;
     items?: GoalItem[];
+    members?: GroupMember[];
+    workspace: Workspace;
 }
 
 export interface Client {
