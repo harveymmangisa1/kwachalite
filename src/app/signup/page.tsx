@@ -29,7 +29,8 @@ export default function SignupPage() {
 
   React.useEffect(() => {
     if (!loading && user) {
-              navigate('/dashboard');    }
+      navigate('/dashboard');
+    }
   }, [user, loading, navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -63,13 +64,15 @@ export default function SignupPage() {
           description: 'Please check your email and click the confirmation link to complete your registration.',
           variant: 'default',
         });
-      } else {
+        // Redirect to email verification page
+        navigate('/email-verification');
+      } else if (result.user) {
         toast({
           title: 'Account Created',
           description: 'Your account has been created successfully!',
           variant: 'default',
         });
-      navigate('/dashboard');
+        navigate('/dashboard');
       }
     } catch (error: any) {
       console.error('Signup error details:', error);

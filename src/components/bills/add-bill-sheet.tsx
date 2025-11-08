@@ -21,8 +21,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetFooter,
   SheetClose,
+  SheetFooter,
 } from '@/components/ui/sheet';
 import {
   Select,
@@ -31,13 +31,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, FileText, Calendar, Settings } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
 import { useAppStore } from '@/lib/data';
 import type { Bill } from '@/lib/types';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -56,11 +58,18 @@ const formSchema = z.object({
     path: ["recurringFrequency"],
 });
 
+const STEPS = [
+  { id: 1, name: 'Basic Info', icon: FileText, description: 'Bill details' },
+  { id: 2, name: 'Amount & Date', icon: Calendar, description: 'Financial info' },
+  { id: 3, name: 'Settings', icon: Settings, description: 'Status & recurrence' },
+];
+
 export function AddBillSheet() {
   const { toast } = useToast();
   const { activeWorkspace } = useActiveWorkspace();
   const { addBill } = useAppStore();
   const [open, setOpen] = React.useState(false);
+  const [currentStep, setCurrentStep] = React.useState(1);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,6 +81,21 @@ export function AddBillSheet() {
       isRecurring: false,
     },
   });
+
+  const watchedValues = form.watch();
+
+  const canProceed = React.useMemo(() => {
+    switch (currentStep) {
+      case 1:
+        return !!watchedValues.name;
+      case 2:
+        return !!watchedValues.amount && !!watchedValues.dueDate;
+      case 3:
+        return true;
+      default:
+        return false;
+    }
+  }, [currentStep, watchedValues]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const newBill: Bill = {
@@ -87,146 +111,185 @@ export function AddBillSheet() {
     });
     form.reset();
     setOpen(false);
+    setCurrentStep(1);
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+      setOpen(isOpen);
+      if (!isOpen) {
+        setCurrentStep(1);
+        form.reset();
+      }
+    }}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />
           Add Bill
         </Button>
       </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
+      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
+        <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-slate-200">
           <SheetTitle>Add a New Bill</SheetTitle>
           <SheetDescription>
             Enter the details of your bill below.
           </SheetDescription>
         </SheetHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="grid gap-4 py-4"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Netflix Subscription" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="MK 15,000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="dueDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Due Date</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="unpaid">Unpaid</SelectItem>
-                      <SelectItem value="paid">Paid</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="isRecurring"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                        <FormLabel>Recurring Bill</FormLabel>
+
+        <ProgressiveForm
+          steps={STEPS}
+          currentStep={currentStep}
+          onStepChange={setCurrentStep}
+          canProceed={canProceed}
+          onSubmit={() => form.handleSubmit(onSubmit)()}
+          submitText="Save Bill"
+        >
+          <Form {...form}>
+            <form className="flex-1 flex flex-col overflow-hidden">
+              <ScrollArea className="flex-1 px-4 sm:px-6">
+                <div className="py-6">
+                  {/* Step 1: Basic Info */}
+                  <StepContent step={1} currentStep={currentStep}>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Basic Information</h3>
+                      <p className="text-sm text-slate-600 mb-4">Enter the basic details of your bill</p>
                     </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bill Name *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. Netflix Subscription" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            {form.watch('isRecurring') && (
-                <FormField
-                control={form.control}
-                name="recurringFrequency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Frequency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a frequency" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="quarterly">Quarterly</SelectItem>
-                        <SelectItem value="yearly">Yearly</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            <SheetFooter>
-                <SheetClose asChild>
-                  <Button type="button" variant="ghost">Cancel</Button>
-                </SheetClose>
-                <Button type="submit">Save Bill</Button>
-            </SheetFooter>
-          </form>
-        </Form>
+                  </StepContent>
+
+                  {/* Step 2: Amount & Date */}
+                  <StepContent step={2} currentStep={currentStep}>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Amount & Due Date</h3>
+                      <p className="text-sm text-slate-600 mb-4">Enter the financial details</p>
+                    </div>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="amount"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Amount *</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="MK 15,000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="dueDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Due Date *</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </StepContent>
+
+                  {/* Step 3: Settings */}
+                  <StepContent step={3} currentStep={currentStep}>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Settings</h3>
+                      <p className="text-sm text-slate-600 mb-4">Configure status and recurrence</p>
+                    </div>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a status" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="unpaid">Unpaid</SelectItem>
+                                <SelectItem value="paid">Paid</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="isRecurring"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                              <div className="space-y-0.5">
+                                  <FormLabel>Recurring Bill</FormLabel>
+                              </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      {watchedValues.isRecurring && (
+                          <FormField
+                          control={form.control}
+                          name="recurringFrequency"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Frequency</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select a frequency" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="daily">Daily</SelectItem>
+                                  <SelectItem value="weekly">Weekly</SelectItem>
+                                  <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                                  <SelectItem value="monthly">Monthly</SelectItem>
+                                  <SelectItem value="quarterly">Quarterly</SelectItem>
+                                  <SelectItem value="yearly">Yearly</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                    </div>
+                  </StepContent>
+                </div>
+              </ScrollArea>
+            </form>
+          </Form>
+        </ProgressiveForm>
       </SheetContent>
     </Sheet>
   );
