@@ -31,6 +31,7 @@ import BusinessFinancials from '@/app/dashboard/business-financials/page';
 import BusinessBudgets from '@/app/dashboard/business-budgets/page';
 import TestProfile from '@/app/dashboard/test-profile/page';
 import LandingPage from '@/app/landing/page';
+import NotFoundPage from '@/app/404/page';
 
 function App() {
   const [showLoading, setShowLoading] = React.useState(true);
@@ -72,7 +73,8 @@ function App() {
               <Route path="transactions" element={<Transactions />} />
               <Route path="about" element={<About />} />
             </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/404" element={<NotFoundPage />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
           <Toaster />
         </Router>

@@ -1,11 +1,10 @@
 'use client';
 
 import { supabase } from './supabase';
-
-// Type assertion to bypass Supabase type inference issues
-const supa = supabase as any;
 import type { User } from '@supabase/supabase-js';
-import type { Transaction, Bill, SavingsGoal, Client, Product, Quote, Loan, Category } from './types';
+
+// Temporary type assertion to bypass TypeScript issues
+const db = supabase as any;
 
 export interface SyncState {
   isOnline: boolean;
@@ -76,7 +75,7 @@ export class SupabaseSync {
 
     try {
       // Listen to transactions
-      const transactionsSubscription = supabase
+      const transactionsSubscription = db
         .channel('transactions_channel')
         .on(
           'postgres_changes',
@@ -93,7 +92,7 @@ export class SupabaseSync {
         .subscribe();
 
       // Listen to bills
-      const billsSubscription = supabase
+      const billsSubscription = db
         .channel('bills_channel')
         .on(
           'postgres_changes',
@@ -110,7 +109,7 @@ export class SupabaseSync {
         .subscribe();
 
       // Listen to savings goals
-      const goalsSubscription = supabase
+      const goalsSubscription = db
         .channel('savings_goals_channel')
         .on(
           'postgres_changes',
@@ -127,7 +126,7 @@ export class SupabaseSync {
         .subscribe();
 
       // Listen to categories
-      const categoriesSubscription = supabase
+      const categoriesSubscription = db
         .channel('categories_channel')
         .on(
           'postgres_changes',
@@ -144,7 +143,7 @@ export class SupabaseSync {
         .subscribe();
 
       // Listen to clients
-      const clientsSubscription = supabase
+      const clientsSubscription = db
         .channel('clients_channel')
         .on(
           'postgres_changes',
@@ -161,7 +160,7 @@ export class SupabaseSync {
         .subscribe();
 
       // Listen to products
-      const productsSubscription = supabase
+      const productsSubscription = db
         .channel('products_channel')
         .on(
           'postgres_changes',
@@ -178,7 +177,7 @@ export class SupabaseSync {
         .subscribe();
 
       // Listen to quotes
-      const quotesSubscription = supabase
+      const quotesSubscription = db
         .channel('quotes_channel')
         .on(
           'postgres_changes',
@@ -195,7 +194,7 @@ export class SupabaseSync {
         .subscribe();
 
       // Listen to loans
-      const loansSubscription = supabase
+      const loansSubscription = db
         .channel('loans_channel')
         .on(
           'postgres_changes',
@@ -212,14 +211,14 @@ export class SupabaseSync {
         .subscribe();
 
       this.subscriptions = [
-        () => supabase.removeChannel(transactionsSubscription),
-        () => supabase.removeChannel(billsSubscription),
-        () => supabase.removeChannel(goalsSubscription),
-        () => supabase.removeChannel(categoriesSubscription),
-        () => supabase.removeChannel(clientsSubscription),
-        () => supabase.removeChannel(productsSubscription),
-        () => supabase.removeChannel(quotesSubscription),
-        () => supabase.removeChannel(loansSubscription),
+        () => db.removeChannel(transactionsSubscription),
+        () => db.removeChannel(billsSubscription),
+        () => db.removeChannel(goalsSubscription),
+        () => db.removeChannel(categoriesSubscription),
+        () => db.removeChannel(clientsSubscription),
+        () => db.removeChannel(productsSubscription),
+        () => db.removeChannel(quotesSubscription),
+        () => db.removeChannel(loansSubscription),
       ];
 
       // Initial data fetch
@@ -260,7 +259,7 @@ export class SupabaseSync {
   private async fetchAndUpdateTransactions() {
     if (!this.user) return;
 
-    const { data, error } = await (supabase as any)
+    const { data, error } = await (db as any)
       .from('transactions')
       .select('*')
       .eq('user_id', this.user.id)
@@ -288,11 +287,11 @@ export class SupabaseSync {
   private async fetchAndUpdateBills() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('bills')
       .select('*')
       .eq('user_id', this.user.id)
-      .order('due_date', { ascending: true });
+      .order('due_date', { ascending: true }) as { data: Database['public']['Tables']['bills']['Row'][] | null, error: any };
 
     if (error) {
       console.error('Error fetching bills:', error);
@@ -317,7 +316,7 @@ export class SupabaseSync {
   private async fetchAndUpdateSavingsGoals() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('savings_goals')
       .select('*')
       .eq('user_id', this.user.id)
@@ -347,7 +346,7 @@ export class SupabaseSync {
   private async fetchAndUpdateCategories() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('categories')
       .select('*')
       .eq('user_id', this.user.id)
@@ -376,7 +375,7 @@ export class SupabaseSync {
   private async fetchAndUpdateClients() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('clients')
       .select('*')
       .eq('user_id', this.user.id)
@@ -402,7 +401,7 @@ export class SupabaseSync {
   private async fetchAndUpdateProducts() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('products')
       .select('*')
       .eq('user_id', this.user.id)
@@ -428,7 +427,7 @@ export class SupabaseSync {
   private async fetchAndUpdateQuotes() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('quotes')
       .select('*')
       .eq('user_id', this.user.id)
@@ -456,7 +455,7 @@ export class SupabaseSync {
   private async fetchAndUpdateLoans() {
     if (!this.user) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('loans')
       .select('*')
       .eq('user_id', this.user.id)
@@ -492,7 +491,7 @@ export class SupabaseSync {
     // Dispatch custom event to update the Zustand store
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
-        new CustomEvent('supabase-sync-update', {
+        new CustomEvent('db-sync-update', {
           detail: { key, data }
         })
       );
@@ -510,7 +509,7 @@ export class SupabaseSync {
 
     try {
       if (operation === 'delete') {
-        const { error } = await supabase
+        const { error } = await db
           .from('transactions')
           .delete()
           .eq('id', transaction.id)
@@ -523,7 +522,7 @@ export class SupabaseSync {
           user_id: this.user.id,
         };
 
-        const { error } = await supabase
+        const { error } = await db
           .from('transactions')
           .upsert(syncData, { onConflict: 'id' });
         
@@ -555,7 +554,7 @@ export class SupabaseSync {
 
     try {
       if (operation === 'delete') {
-        const { error } = await supabase
+        const { error } = await db
           .from('bills')
           .delete()
           .eq('id', bill.id)
@@ -575,7 +574,7 @@ export class SupabaseSync {
           user_id: this.user.id,
         };
 
-        const { error } = await supabase
+        const { error } = await db
           .from('bills')
           .upsert(syncData, { onConflict: 'id' });
         
@@ -607,7 +606,7 @@ export class SupabaseSync {
 
     try {
       if (operation === 'delete') {
-        const { error } = await supabase
+        const { error } = await db
           .from('savings_goals')
           .delete()
           .eq('id', goal.id)
@@ -628,7 +627,7 @@ export class SupabaseSync {
           user_id: this.user.id,
         };
 
-        const { error } = await supabase
+        const { error } = await db
           .from('savings_goals')
           .upsert(syncData, { onConflict: 'id' });
         
@@ -660,7 +659,7 @@ export class SupabaseSync {
 
     try {
       if (operation === 'delete') {
-        const { error } = await supabase
+        const { error } = await db
           .from('clients')
           .delete()
           .eq('id', client.id)
@@ -677,7 +676,7 @@ export class SupabaseSync {
           user_id: this.user.id,
         };
 
-        const { error } = await supabase
+        const { error } = await db
           .from('clients')
           .upsert(syncData, { onConflict: 'id' });
         
@@ -709,7 +708,7 @@ export class SupabaseSync {
 
     try {
       if (operation === 'delete') {
-        const { error } = await supabase
+        const { error } = await db
           .from('products')
           .delete()
           .eq('id', product.id)
@@ -726,7 +725,7 @@ export class SupabaseSync {
           user_id: this.user.id,
         };
 
-        const { error } = await supabase
+        const { error } = await db
           .from('products')
           .upsert(syncData, { onConflict: 'id' });
         
@@ -758,7 +757,7 @@ export class SupabaseSync {
 
     try {
       if (operation === 'delete') {
-        const { error } = await supabase
+        const { error } = await db
           .from('quotes')
           .delete()
           .eq('id', quote.id)
@@ -776,7 +775,7 @@ export class SupabaseSync {
           user_id: this.user.id,
         };
 
-        const { error } = await supabase
+        const { error } = await db
           .from('quotes')
           .upsert(syncData, { onConflict: 'id' });
         
@@ -808,7 +807,7 @@ export class SupabaseSync {
 
     try {
       if (operation === 'delete') {
-        const { error } = await supabase
+        const { error } = await db
           .from('loans')
           .delete()
           .eq('id', loan.id)
@@ -829,7 +828,7 @@ export class SupabaseSync {
           user_id: this.user.id,
         };
 
-        const { error } = await supabase
+        const { error } = await db
           .from('loans')
           .upsert(syncData, { onConflict: 'id' });
         
@@ -876,7 +875,7 @@ export class SupabaseSync {
 
     // Save to localStorage for persistence
     if (typeof window !== 'undefined') {
-      localStorage.setItem('supabase-sync-queue', JSON.stringify(this.offlineQueue));
+      localStorage.setItem('db-sync-queue', JSON.stringify(this.offlineQueue));
     }
   }
 
@@ -899,7 +898,7 @@ export class SupabaseSync {
       // Clear the queue
       this.offlineQueue = [];
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('supabase-sync-queue');
+        localStorage.removeItem('db-sync-queue');
       }
 
       this.updateSyncState({
@@ -920,13 +919,13 @@ export class SupabaseSync {
   loadOfflineQueue() {
     if (typeof window === 'undefined') return;
 
-    const saved = localStorage.getItem('supabase-sync-queue');
+    const saved = localStorage.getItem('db-sync-queue');
     if (saved) {
       try {
         this.offlineQueue = JSON.parse(saved);
       } catch (error) {
         console.error('Error loading offline queue:', error);
-        localStorage.removeItem('supabase-sync-queue');
+        localStorage.removeItem('db-sync-queue');
       }
     }
   }
@@ -946,4 +945,4 @@ export class SupabaseSync {
 }
 
 // Singleton instance
-export const supabaseSync = new SupabaseSync();
+export const dbSync = new SupabaseSync();

@@ -20,9 +20,9 @@ const BudgetDashboard = () => {
   const { transactions, categories } = useAppStore();
   
   const [notifications, setNotifications] = useState([
-    { id: 1, message: "You're 13% over budget in Food & Dining", type: 'warning', time: '2 hours ago' },
-    { id: 2, message: "Great job staying under budget in Entertainment!", type: 'success', time: '1 day ago' },
-    { id: 3, message: "Monthly budget summary is ready", type: 'info', time: '2 days ago' }
+    { id: 1, message: "Budget review available", type: 'info', time: 'Recently' },
+    { id: 2, message: "Track your spending progress", type: 'success', time: 'Today' },
+    { id: 3, message: "New budget recommendations ready", type: 'info', time: 'This week' }
   ]);
 
   const [showNotifications, setShowNotifications] = useState(false);

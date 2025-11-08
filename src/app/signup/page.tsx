@@ -177,45 +177,29 @@ export default function SignupPage() {
               </div>
             </div>
             
-            {/* Stats */}
-            <div className="max-w-md border-t border-slate-800 pt-8">
-              <div className="grid grid-cols-3 gap-8">
-                <div>
-                  <div className="text-2xl font-bold text-white mb-1">50K+</div>
-                  <div className="text-xs text-slate-400">Active Users</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white mb-1">99.9%</div>
-                  <div className="text-xs text-slate-400">Uptime</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white mb-1">4.8★</div>
-                  <div className="text-xs text-slate-400">User Rating</div>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
         
         {/* Right Panel - Signup Form */}
-        <div className="flex-1 lg:max-w-xl flex items-center justify-center p-6 lg:p-12 bg-white">
+        <div className="flex-1 lg:max-w-xl flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-white">
           <div className="w-full max-w-md">
             {/* Mobile Logo */}
-            <div className="lg:hidden text-center mb-8">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center">
-                  <Wallet className="w-6 h-6 text-white" />
+            <div className="lg:hidden text-center mb-6 sm:mb-8">
+              <div className="flex justify-center mb-3 sm:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-lg flex items-center justify-center">
+                  <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <h1 className="text-xl font-semibold text-slate-900">KwachaLite</h1>
+              <h1 className="text-lg sm:text-xl font-semibold text-slate-900">KwachaLite</h1>
             </div>
             
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Create Account</h2>
-              <p className="text-slate-600">Get started with your free account today</p>
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Create Account</h2>
+              <p className="text-sm sm:text-base text-slate-600">Get started with your free account today</p>
             </div>
             
-            <form className="space-y-5" onSubmit={handleSignUp}>
+            <form className="space-y-4 sm:space-y-5" onSubmit={handleSignUp}>
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-sm font-medium text-slate-700">
                   Full Name
@@ -227,7 +211,8 @@ export default function SignupPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  className="h-11 border-slate-300 focus:border-slate-900 focus:ring-slate-900"
+                  className="h-12 sm:h-11 border-slate-300 focus:border-slate-900 focus:ring-slate-900 text-base"
+                  autoComplete="name"
                 />
               </div>
               
@@ -242,7 +227,8 @@ export default function SignupPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11 border-slate-300 focus:border-slate-900 focus:ring-slate-900"
+                  className="h-12 sm:h-11 border-slate-300 focus:border-slate-900 focus:ring-slate-900 text-base"
+                  autoComplete="email"
                 />
               </div>
               
@@ -259,13 +245,14 @@ export default function SignupPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
-                    className="h-11 border-slate-300 focus:border-slate-900 focus:ring-slate-900 pr-11"
+                    className="h-12 sm:h-11 border-slate-300 focus:border-slate-900 focus:ring-slate-900 pr-12 text-base"
+                    autoComplete="new-password"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-1 top-1/2 transform -translate-y-1/2 h-9 w-9 hover:bg-slate-100"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 sm:h-9 sm:w-9 hover:bg-slate-100"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -286,11 +273,6 @@ export default function SignupPage() {
                     <div className="w-4 h-4 rounded-full bg-slate-900 flex items-center justify-center">
                       <Check className="w-3 h-3 text-white" />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-slate-900 flex items-center justify-center">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
                     <span className="text-xs text-slate-600">Advanced analytics</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -299,12 +281,18 @@ export default function SignupPage() {
                     </div>
                     <span className="text-xs text-slate-600">Priority support</span>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-slate-900 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-xs text-slate-600">Secure data storage</span>
+                  </div>
                 </div>
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium transition-colors" 
+                className="w-full h-12 sm:h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium transition-colors text-base" 
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Creating Account...' : 'Create Account'}

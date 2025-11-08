@@ -206,9 +206,9 @@ export function AddTransactionSheet() {
         </AsyncButton>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
-        <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-slate-200">
-          <SheetTitle>Add New Transaction</SheetTitle>
-          <SheetDescription>
+        <SheetHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-slate-200">
+          <SheetTitle className="text-lg sm:text-xl">Add New Transaction</SheetTitle>
+          <SheetDescription className="text-sm">
             Enter the details of your transaction below. This will be added to your <span className="font-semibold">{activeWorkspace}</span> workspace.
           </SheetDescription>
         </SheetHeader>
@@ -230,55 +230,56 @@ export function AddTransactionSheet() {
                 </div>
               )}
               <ScrollArea className="flex-1 px-4 sm:px-6">
-                <div className="py-6">
+                <div className="py-4 sm:py-6">
                   {/* Step 1: Type & Amount */}
                   <StepContent step={1} currentStep={currentStep}>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Transaction Basics</h3>
-                      <p className="text-sm text-slate-600 mb-4">Select type and enter amount</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">Transaction Basics</h3>
+                      <p className="text-sm text-slate-600 mb-3 sm:mb-4">Select type and enter amount</p>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <FormField
                         control={form.control}
                         name="type"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Type *</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a transaction type" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="expense">Expense</SelectItem>
-                                <SelectItem value="income">Income</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
+<FormItem>
+                             <FormLabel className="text-sm font-medium">Type *</FormLabel>
+                             <Select
+                               onValueChange={field.onChange}
+                               defaultValue={field.value}
+                             >
+                               <FormControl>
+                                 <SelectTrigger className="h-11 sm:h-10">
+                                   <SelectValue placeholder="Select a transaction type" />
+                                 </SelectTrigger>
+                               </FormControl>
+                               <SelectContent>
+                                 <SelectItem value="expense">Expense</SelectItem>
+                                 <SelectItem value="income">Income</SelectItem>
+                               </SelectContent>
+                             </Select>
+                             <FormMessage />
+                           </FormItem>
                         )}
                       />
                       <FormField
                         control={form.control}
                         name="amount"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Amount *</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                placeholder="MK 10,000" 
-                                {...field}
-                                step="0.01"
-                                min="0"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+<FormItem>
+                             <FormLabel className="text-sm font-medium">Amount *</FormLabel>
+                             <FormControl>
+                               <Input 
+                                 type="number" 
+                                 placeholder="MK 10,000" 
+                                 {...field}
+                                 step="0.01"
+                                 min="0"
+                                 className="h-11 sm:h-10 text-base"
+                               />
+                             </FormControl>
+                             <FormMessage />
+                           </FormItem>
                         )}
                       />
                     </div>
@@ -287,48 +288,48 @@ export function AddTransactionSheet() {
                   {/* Step 2: Details */}
                   <StepContent step={2} currentStep={currentStep}>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Transaction Details</h3>
-                      <p className="text-sm text-slate-600 mb-4">Add description and category</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">Transaction Details</h3>
+                      <p className="text-sm text-slate-600 mb-3 sm:mb-4">Add description and category</p>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <FormField
                         control={form.control}
                         name="description"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Description *</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. Groceries at Shoprite" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+<FormItem>
+                             <FormLabel className="text-sm font-medium">Description *</FormLabel>
+                             <FormControl>
+                               <Input placeholder="e.g. Groceries at Shoprite" {...field} className="h-11 sm:h-10 text-base" />
+                             </FormControl>
+                             <FormMessage />
+                           </FormItem>
                         )}
                       />
                       <FormField
                         control={form.control}
                         name="category"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Category *</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a category" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {filteredCategories.map((cat) => (
-                                  <SelectItem key={cat.id} value={cat.name}>
-                                    {cat.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
+<FormItem>
+                             <FormLabel className="text-sm font-medium">Category *</FormLabel>
+                             <Select
+                               onValueChange={field.onChange}
+                               value={field.value}
+                             >
+                               <FormControl>
+                                 <SelectTrigger className="h-11 sm:h-10">
+                                   <SelectValue placeholder="Select a category" />
+                                 </SelectTrigger>
+                               </FormControl>
+                               <SelectContent>
+                                 {filteredCategories.map((cat) => (
+                                   <SelectItem key={cat.id} value={cat.name}>
+                                     {cat.name}
+                                   </SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
+                             <FormMessage />
+                           </FormItem>
                         )}
                       />
                     </div>
@@ -337,20 +338,20 @@ export function AddTransactionSheet() {
                   {/* Step 3: Date */}
                   <StepContent step={3} currentStep={currentStep}>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Transaction Date</h3>
-                      <p className="text-sm text-slate-600 mb-4">Select the transaction date</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">Transaction Date</h3>
+                      <p className="text-sm text-slate-600 mb-3 sm:mb-4">Select the transaction date</p>
                     </div>
                     <FormField
                       control={form.control}
                       name="date"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Date *</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+<FormItem>
+                           <FormLabel className="text-sm font-medium">Date *</FormLabel>
+                           <FormControl>
+                             <Input type="date" {...field} className="h-11 sm:h-10 text-base" />
+                           </FormControl>
+                           <FormMessage />
+                         </FormItem>
                       )}
                     />
                   </StepContent>

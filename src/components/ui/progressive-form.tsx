@@ -103,15 +103,15 @@ export function ProgressiveForm({
       </div>
 
       {/* Navigation Footer */}
-      <div className="px-4 sm:px-6 py-4 border-t border-slate-200 bg-white">
-        <div className="flex items-center justify-between gap-3">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 bg-white">
+        <div className="flex items-center justify-between gap-2 sm:gap-3">
           <div className="flex gap-2">
             {currentStep > 1 && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={prevStep}
-                className="gap-2"
+                className="gap-2 h-10 sm:h-9 text-sm sm:text-base"
                 disabled={isSubmitting}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -123,7 +123,7 @@ export function ProgressiveForm({
               variant="ghost"
               onClick={() => {}}
               disabled={isSubmitting}
-              className="text-slate-600"
+              className="text-slate-600 h-10 sm:h-9 text-sm sm:text-base"
             >
               Cancel
             </Button>
@@ -135,7 +135,7 @@ export function ProgressiveForm({
                 type="button"
                 onClick={nextStep}
                 disabled={!canProceed || isSubmitting}
-                className="gap-2 bg-slate-900 hover:bg-slate-800"
+                className="gap-2 bg-slate-900 hover:bg-slate-800 h-10 sm:h-9 text-sm sm:text-base"
               >
                 <span className="hidden sm:inline">Continue</span>
                 <span className="sm:hidden">Next</span>
@@ -146,7 +146,7 @@ export function ProgressiveForm({
                 type="submit"
                 onClick={onSubmit}
                 disabled={!canProceed || isSubmitting}
-                className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+                className="gap-2 bg-emerald-600 hover:bg-emerald-700 h-10 sm:h-9 text-sm sm:text-base"
               >
                 <Check className="h-4 w-4" />
                 {isSubmitting ? 'Submitting...' : submitText}

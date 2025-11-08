@@ -43,10 +43,10 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/">
-              <Button variant="ghost" className="h-9">Sign in</Button>
+              <Button variant="ghost" className="h-9 text-sm px-3 sm:px-4">Sign in</Button>
             </Link>
             <Link to="/signup">
-              <Button className="h-9 bg-slate-900 text-white hover:bg-slate-800">Get started</Button>
+              <Button className="h-9 bg-slate-900 text-white hover:bg-slate-800 text-sm px-3 sm:px-4">Get started</Button>
             </Link>
           </div>
         </div>
@@ -82,37 +82,21 @@ export default function LandingPage() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/signup">
-                <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-sm h-11 ui-smooth hover:-translate-y-0.5">
-                  Get Started in 2 Minutes
-                  <ArrowRight className="ml-2 h-5 w-5" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-sm sm:max-w-none mx-auto">
+              <Link to="/signup" className="w-full sm:w-auto">
+                <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-sm h-12 sm:h-11 ui-smooth hover:-translate-y-0.5 w-full">
+                  <span className="truncate">Get Started</span>
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                 </Button>
               </Link>
-              <Link to="/">
-                <Button variant="outline" size="lg" className="px-8 py-4 text-lg font-semibold rounded-xl border-2 h-11 border-slate-300 hover:bg-slate-100 ui-smooth">
+              <Link to="/" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl border-2 h-12 sm:h-11 border-slate-300 hover:bg-slate-100 ui-smooth w-full">
                   Sign In
                 </Button>
               </Link>
             </div>
 
-            {/* Trust Indicators */}
-            <div className="pt-8 border-t border-slate-200">
-              <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
-                <div className="text-center">
-                  <div className="text-3xl sm:text-4xl font-bold text-slate-800">10K+</div>
-                  <div className="text-sm text-slate-600">Active Users</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl sm:text-4xl font-bold text-slate-800">$2M+</div>
-                  <div className="text-sm text-slate-600">Tracked Funds</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl sm:text-4xl font-bold text-slate-800">98%</div>
-                  <div className="text-sm text-slate-600">Satisfaction</div>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -216,7 +200,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to transform your finances?</h2>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of users who have already taken control of their financial future with KwachaLite.
+            Take control of your financial future with KwachaLite's powerful tools and insights.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/signup">
