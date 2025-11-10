@@ -38,6 +38,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAppStore } from '@/lib/data';
 import type { Bill } from '@/lib/types';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import { getCurrentCurrencySymbol } from '@/lib/utils';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -183,7 +184,7 @@ export function AddBillSheet() {
                           <FormItem>
                             <FormLabel>Amount *</FormLabel>
                             <FormControl>
-                              <Input type="number" placeholder="MK 15,000" {...field} />
+                              <Input type="number" placeholder={`${getCurrentCurrencySymbol()} 15,000`} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

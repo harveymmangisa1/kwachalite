@@ -21,10 +21,52 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
 
   const balance = totalIncome - totalExpenses;
 
-  // Calculate percentage changes (mock data for now)
-  const incomeChange = { value: 12.5, label: 'from last month', trend: 'up' as const };
-  const expenseChange = { value: 8.2, label: 'from last month', trend: 'down' as const };
-  const balanceChange = { value: 15.3, label: 'from last month', trend: 'up' as const };
+  // Calculate percentage changes compared to previous month
+  const calculateMonthlyChange = (currentData: Transaction[], type: 'income' | 'expense') => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    const currentMonthTotal = currentData
+      .filter(t => t.type === type)
+      .filter(t => {
+        const date = new Date(t.date);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const lastMonthTotal = currentData
+      .filter(t => t.type === type)
+      .filter(t => {
+        const date = new Date(t.date);
+        return date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear;
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    if (lastMonthTotal === 0) {
+      return currentMonthTotal > 0 ? { value: 100, label: 'from last month', trend: 'up' as const } : undefined;
+    }
+
+    const changePercent = ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
+    return {
+      value: Math.abs(changePercent),
+      label: 'from last month',
+      trend: (changePercent >= 0 ? 'up' : 'down') as 'up' | 'down' | 'neutral'
+    };
+  };
+
+  const incomeChange = calculateMonthlyChange(transactions, 'income');
+  const expenseChange = calculateMonthlyChange(transactions, 'expense');
+  
+  // Calculate balance change
+  const currentBalance = totalIncome - totalExpenses;
+  const balanceChange = incomeChange && expenseChange ? {
+    value: Math.abs(incomeChange.value - expenseChange.value),
+    label: 'from last month',
+    trend: (currentBalance >= 0 ? 'up' : 'down') as 'up' | 'down' | 'neutral'
+  } : undefined;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

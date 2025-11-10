@@ -27,6 +27,7 @@ import { Textarea } from '../ui/textarea';
 import { useAppStore } from '@/lib/data';
 import type { Product } from '@/lib/types';
 import React from 'react';
+import { getCurrentCurrencySymbol } from '@/lib/utils';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -185,7 +186,7 @@ export function AddProductSheet() {
                               <FormControl>
                                 <div className="relative">
                                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                                    MK
+                                    {getCurrentCurrencySymbol()}
                                   </span>
                                   <Input
                                     type="number"
@@ -210,7 +211,7 @@ export function AddProductSheet() {
                               <FormControl>
                                 <div className="relative">
                                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                                    MK
+                                    {getCurrentCurrencySymbol()}
                                   </span>
                                   <Input
                                     type="number"
@@ -232,7 +233,7 @@ export function AddProductSheet() {
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-muted-foreground">Profit Margin</span>
                               <span className="font-medium">
-                                MK {(watchedValues.price - watchedValues.costPrice).toFixed(2)}
+                                {getCurrentCurrencySymbol()} {(watchedValues.price - watchedValues.costPrice).toFixed(2)}
                               </span>
                             </div>
                             <div className="flex items-center justify-between text-xs">

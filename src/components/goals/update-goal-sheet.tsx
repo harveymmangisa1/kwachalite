@@ -28,7 +28,7 @@ import { Edit } from 'lucide-react';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { SavingsGoal } from '@/lib/types';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getCurrentCurrencySymbol } from '@/lib/utils';
 import { useAppStore } from '@/lib/data';
 
 const formSchema = z.object({
@@ -84,7 +84,7 @@ export function UpdateGoalSheet({ goal }: { goal: SavingsGoal }) {
                 <FormItem>
                   <FormLabel>Amount to Add</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="MK 5,000" {...field} />
+                    <Input type="number" placeholder={`${getCurrentCurrencySymbol()} 5,000`} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

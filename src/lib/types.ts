@@ -175,3 +175,73 @@ export interface BusinessExpense {
     status: 'pending' | 'paid';
     paymentMethod?: string;
 }
+
+// Group Savings Types
+export interface SavingsGroup {
+    id: string;
+    name: string;
+    description?: string;
+    targetAmount: number;
+    currentAmount: number;
+    deadline?: string;
+    createdBy: string;
+    createdAt: string;
+    updatedAt: string;
+    isPublic: boolean;
+    status: 'active' | 'completed' | 'paused';
+    currency?: string;
+    contributionRules?: {
+        minAmount?: number;
+        frequency?: 'daily' | 'weekly' | 'monthly' | 'one_time';
+        deadlineDay?: number; // For monthly contributions
+    };
+}
+
+export interface GroupMember {
+    id: string;
+    groupId: string;
+    userId: string;
+    name: string;
+    email: string;
+    role: 'admin' | 'member';
+    joinedAt: string;
+    totalContributed: number;
+    lastContributionAt?: string;
+    status: 'active' | 'inactive';
+}
+
+export interface GroupInvitation {
+    id: string;
+    groupId: string;
+    invitedBy: string;
+    invitedEmail: string;
+    token: string;
+    status: 'pending' | 'accepted' | 'rejected' | 'expired';
+    createdAt: string;
+    expiresAt: string;
+    acceptedAt?: string;
+    message?: string;
+}
+
+export interface GroupContribution {
+    id: string;
+    groupId: string;
+    memberId: string;
+    amount: number;
+    description?: string;
+    contributedAt: string;
+    method: 'cash' | 'bank_transfer' | 'mobile_money' | 'other';
+    status: 'confirmed' | 'pending';
+    confirmedBy?: string;
+    confirmedAt?: string;
+}
+
+export interface GroupActivity {
+    id: string;
+    groupId: string;
+    type: 'member_joined' | 'member_left' | 'contribution_made' | 'goal_updated' | 'group_created';
+    userId: string;
+    description: string;
+    metadata?: Record<string, any>;
+    createdAt: string;
+}

@@ -40,7 +40,7 @@ import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { useFormSubmission } from '@/hooks/use-async-operation';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getCurrentCurrencySymbol } from '@/lib/utils';
 import type { Transaction } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
@@ -271,7 +271,7 @@ export function AddTransactionSheet() {
                              <FormControl>
                                <Input 
                                  type="number" 
-                                 placeholder="MK 10,000" 
+                                 placeholder={`${getCurrentCurrencySymbol()} 10,000`} 
                                  {...field}
                                  step="0.01"
                                  min="0"

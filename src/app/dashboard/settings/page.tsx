@@ -18,12 +18,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { BusinessProfileSettings } from '@/components/settings/business-profile-settings';
 import { SupabaseTest } from '@/components/debug/supabase-test';
+import { CurrencySelector } from '@/components/ui/currency-selector';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { supabase } from '@/lib/supabase';
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, DollarSign } from 'lucide-react';
 
 export default function SettingsPage() {
   const { activeWorkspace } = useActiveWorkspace();
@@ -127,6 +129,44 @@ export default function SettingsPage() {
         ) : (
           <BusinessProfileSettings />
         )}
+        
+        <Card className="max-w-2xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Currency Settings
+            </CardTitle>
+            <CardDescription>
+              Choose your preferred currency for displaying monetary values throughout the application.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                <div>
+                  <h4 className="font-medium text-slate-900">Display Currency</h4>
+                  <p className="text-sm text-slate-600">
+                    This currency will be used for all monetary displays and inputs
+                  </p>
+                </div>
+                <CurrencySelector />
+              </div>
+              <div className="flex items-center justify-between p-4 border-t">
+                <div>
+                  <h4 className="font-medium text-slate-900">Advanced Currency Options</h4>
+                  <p className="text-sm text-slate-600">
+                    Access more currency settings and configuration options
+                  </p>
+                </div>
+                <Button variant="outline" asChild>
+                  <Link to="/dashboard/settings/currency">
+                    Advanced Settings
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         
         <Card className="max-w-2xl">
           <CardHeader>

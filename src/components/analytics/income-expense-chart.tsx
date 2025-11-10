@@ -42,7 +42,7 @@ export function IncomeExpenseChart({ transactions }: IncomeExpenseChartProps) {
         <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
-            <YAxis tickFormatter={(value) => formatCurrency(value as number).replace('MK ', '')} />
+            <YAxis tickFormatter={(value) => formatCurrency(value as number)} />
             <Tooltip 
                 formatter={(value) => formatCurrency(value as number)}
                 cursor={{fill: 'hsl(var(--muted))'}}

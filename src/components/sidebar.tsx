@@ -16,6 +16,7 @@ import {
   Users,
   ShoppingCart,
   FileText as FileInvoice,
+  Users as GroupUsers,
   X,
   Menu
 } from 'lucide-react';
@@ -68,6 +69,7 @@ const mainNavItems = [
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal'] },
   { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets', workspace: ['personal'] },
   { href: '/dashboard/goals', icon: Target, label: 'Goals', workspace: ['personal'] },
+  { href: '/dashboard/savings/groups', icon: GroupUsers, label: 'Group Savings', workspace: ['personal', 'business'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
   { href: '/dashboard/loans', icon: HandCoins, label: 'Loans', workspace: ['personal', 'business'] },
   { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']},
@@ -83,6 +85,7 @@ const mainNavItems = [
 
 const secondaryNavItems = [
   { href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics', workspace: ['personal', 'business'] },
+  { href: '/dashboard/settings/currency', icon: TrendingUp, label: 'Currency', workspace: ['personal', 'business'] },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings', workspace: ['personal', 'business'] },
 ];
 

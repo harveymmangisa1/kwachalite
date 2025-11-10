@@ -32,6 +32,7 @@ import { useAppStore } from '@/lib/data';
 import type { Loan } from '@/lib/types';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getCurrentCurrencySymbol } from '@/lib/utils';
 
 const formSchema = z.object({
   lender: z.string().min(1, 'Lender name is required'),
@@ -168,7 +169,7 @@ export function AddLoanSheet() {
                           <FormItem>
                             <FormLabel>Principal Amount *</FormLabel>
                             <FormControl>
-                              <Input type="number" placeholder="MK 5,000,000" {...field} />
+                              <Input type="number" placeholder={`${getCurrentCurrencySymbol()} 5,000,000`} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

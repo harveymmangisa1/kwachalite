@@ -15,14 +15,17 @@ import Clients from '@/app/dashboard/clients/page';
 import ClientDetail from '@/app/dashboard/clients/[id]/page';
 import Goals from '@/app/dashboard/goals/page';
 import Help from '@/app/dashboard/help/page';
+import GroupSavings from '@/app/dashboard/savings/groups/page';
 import Loans from '@/app/dashboard/loans/page';
 import Products from '@/app/dashboard/products/page';
 import Quotes from '@/app/dashboard/quotes/page';
 import QuoteDetail from '@/app/dashboard/quotes/[id]/page';
 import Settings from '@/app/dashboard/settings/page';
+import CurrencySettings from '@/app/dashboard/settings/currency/page';
 import Transactions from '@/app/dashboard/transactions/page';
 import About from '@/app/dashboard/about/page';
 import SignUp from '@/app/signup/page';
+import JoinGroup from '@/app/join-group/[token]/page';
 import Invoices from '@/app/dashboard/invoices/page';
 import InvoiceDetail from '@/app/dashboard/invoices/[id]/page';
 import Receipts from '@/app/dashboard/receipts/page';
@@ -48,6 +51,7 @@ function App() {
             <Route path="/" element={<LoginPage />} />
             <Route path="/landing" element={<LandingPage />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/join-group/:token" element={<JoinGroup />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="analytics" element={<Analytics />} />
@@ -57,6 +61,7 @@ function App() {
               <Route path="clients" element={<Clients />} />
               <Route path="clients/:id" element={<ClientDetail />} />
               <Route path="goals" element={<Goals />} />
+              <Route path="savings/groups" element={<GroupSavings />} />
               <Route path="help" element={<Help />} />
               <Route path="loans" element={<Loans />} />
               <Route path="products" element={<Products />} />
@@ -70,6 +75,7 @@ function App() {
               <Route path="business-budgets" element={<BusinessBudgets />} />
               <Route path="test-profile" element={<TestProfile />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="settings/currency" element={<CurrencySettings />} />
               <Route path="transactions" element={<Transactions />} />
               <Route path="about" element={<About />} />
             </Route>

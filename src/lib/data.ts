@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabaseSync } from './supabase-sync';
 import { appConfig } from './config';
-import type { Transaction, Bill, SavingsGoal, Client, Product, Quote, Loan, Category, SalesReceipt, DeliveryNote, BusinessBudget, BusinessRevenue, BusinessExpense } from './types';
+import type { Transaction, Bill, SavingsGoal, Client, Product, Quote, Loan, Category, SalesReceipt, DeliveryNote, BusinessBudget, BusinessRevenue, BusinessExpense, SavingsGroup, GroupMember, GroupInvitation, GroupContribution, GroupActivity } from './types';
 import {
   ShoppingBasket,
   Car,
@@ -78,6 +78,12 @@ interface AppState {
   businessBudgets: BusinessBudget[];
   businessRevenues: BusinessRevenue[];
   businessExpenses: BusinessExpense[];
+  // Group Savings
+  savingsGroups: SavingsGroup[];
+  groupMembers: GroupMember[];
+  groupInvitations: GroupInvitation[];
+  groupContributions: GroupContribution[];
+  groupActivities: GroupActivity[];
   // Transaction methods
   addTransaction: (transaction: Transaction) => void;
   updateTransaction: (transaction: Transaction) => void;
@@ -131,6 +137,20 @@ interface AppState {
   addBusinessExpense: (expense: BusinessExpense) => void;
   updateBusinessExpense: (expense: BusinessExpense) => void;
   deleteBusinessExpense: (expenseId: string) => void;
+  // Group Savings methods
+  addSavingsGroup: (group: SavingsGroup) => void;
+  updateSavingsGroup: (group: SavingsGroup) => void;
+  deleteSavingsGroup: (groupId: string) => void;
+  addGroupMember: (member: GroupMember) => void;
+  updateGroupMember: (member: GroupMember) => void;
+  removeGroupMember: (memberId: string) => void;
+  addGroupInvitation: (invitation: GroupInvitation) => void;
+  updateGroupInvitation: (invitation: GroupInvitation) => void;
+  deleteGroupInvitation: (invitationId: string) => void;
+  addGroupContribution: (contribution: GroupContribution) => void;
+  updateGroupContribution: (contribution: GroupContribution) => void;
+  deleteGroupContribution: (contributionId: string) => void;
+  addGroupActivity: (activity: GroupActivity) => void;
   // Sync methods
   setSyncData: (key: keyof AppState, data: any) => void;
   initializeSupabaseSync: () => void;
@@ -152,6 +172,12 @@ export const useAppStore = create<AppState>()(
       businessBudgets: [],
       businessRevenues: [],
       businessExpenses: [],
+      // Group Savings
+      savingsGroups: [],
+      groupMembers: [],
+      groupInvitations: [],
+      groupContributions: [],
+      groupActivities: [],
       // Transaction methods
       addTransaction: (transaction) => {
         set((state) => ({ transactions: [transaction, ...state.transactions] }));
@@ -414,6 +440,75 @@ export const useAppStore = create<AppState>()(
           deliveryNotes: state.deliveryNotes.filter(d => d.id !== deliveryNoteId)
         }));
         // TODO: Add supabase sync for delivery notes when implemented
+      },
+      // Group Savings methods
+      addSavingsGroup: (group) => {
+        set((state) => ({ savingsGroups: [group, ...state.savingsGroups] }));
+        // TODO: Add supabase sync for savings groups when implemented
+      },
+      updateSavingsGroup: (group) => {
+        set(state => ({
+          savingsGroups: state.savingsGroups.map(g => g.id === group.id ? group : g)
+        }));
+        // TODO: Add supabase sync for savings groups when implemented
+      },
+      deleteSavingsGroup: (groupId) => {
+        set(state => ({
+          savingsGroups: state.savingsGroups.filter(g => g.id !== groupId)
+        }));
+        // TODO: Add supabase sync for savings groups when implemented
+      },
+      addGroupMember: (member) => {
+        set((state) => ({ groupMembers: [member, ...state.groupMembers] }));
+        // TODO: Add supabase sync for group members when implemented
+      },
+      updateGroupMember: (member) => {
+        set(state => ({
+          groupMembers: state.groupMembers.map(m => m.id === member.id ? member : m)
+        }));
+        // TODO: Add supabase sync for group members when implemented
+      },
+      removeGroupMember: (memberId) => {
+        set(state => ({
+          groupMembers: state.groupMembers.filter(m => m.id !== memberId)
+        }));
+        // TODO: Add supabase sync for group members when implemented
+      },
+      addGroupInvitation: (invitation) => {
+        set((state) => ({ groupInvitations: [invitation, ...state.groupInvitations] }));
+        // TODO: Add supabase sync for group invitations when implemented
+      },
+      updateGroupInvitation: (invitation) => {
+        set(state => ({
+          groupInvitations: state.groupInvitations.map(i => i.id === invitation.id ? invitation : i)
+        }));
+        // TODO: Add supabase sync for group invitations when implemented
+      },
+      deleteGroupInvitation: (invitationId) => {
+        set(state => ({
+          groupInvitations: state.groupInvitations.filter(i => i.id !== invitationId)
+        }));
+        // TODO: Add supabase sync for group invitations when implemented
+      },
+      addGroupContribution: (contribution) => {
+        set((state) => ({ groupContributions: [contribution, ...state.groupContributions] }));
+        // TODO: Add supabase sync for group contributions when implemented
+      },
+      updateGroupContribution: (contribution) => {
+        set(state => ({
+          groupContributions: state.groupContributions.map(c => c.id === contribution.id ? contribution : c)
+        }));
+        // TODO: Add supabase sync for group contributions when implemented
+      },
+      deleteGroupContribution: (contributionId) => {
+        set(state => ({
+          groupContributions: state.groupContributions.filter(c => c.id !== contributionId)
+        }));
+        // TODO: Add supabase sync for group contributions when implemented
+      },
+      addGroupActivity: (activity) => {
+        set((state) => ({ groupActivities: [activity, ...state.groupActivities] }));
+        // TODO: Add supabase sync for group activities when implemented
       },
       // Sync methods
       setSyncData: (key, data) => {
