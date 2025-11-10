@@ -2,6 +2,17 @@
 
 import { supabase } from './supabase';
 import type { User } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
+import type { 
+  Transaction, 
+  Bill, 
+  SavingsGoal, 
+  Category, 
+  Client, 
+  Product, 
+  Quote, 
+  Loan 
+} from '@/lib/types';
 
 // Temporary type assertion to bypass TypeScript issues
 const db = supabase as any;
@@ -946,3 +957,4 @@ export class SupabaseSync {
 
 // Singleton instance
 export const dbSync = new SupabaseSync();
+export const supabaseSync = dbSync;
