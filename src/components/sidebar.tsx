@@ -12,6 +12,10 @@ import {
   TrendingUp,
   Receipt,
   Truck,
+  FileText,
+  Users,
+  ShoppingCart,
+  FileText as FileInvoice,
   X,
   Menu
 } from 'lucide-react';
@@ -71,6 +75,10 @@ const mainNavItems = [
   { href: '/dashboard/business-budgets', icon: Target, label: 'Budgets', workspace: ['business']},
   { href: '/dashboard/receipts', icon: Receipt, label: 'Receipts', workspace: ['business']},
   { href: '/dashboard/delivery-notes', icon: Truck, label: 'Delivery Notes', workspace: ['business']},
+  { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business']},
+  { href: '/dashboard/products', icon: ShoppingCart, label: 'Products', workspace: ['business']},
+  { href: '/dashboard/quotes', icon: FileText, label: 'Quotes', workspace: ['business']},
+  { href: '/dashboard/invoices', icon: FileInvoice, label: 'Invoices', workspace: ['business']},
 ];
 
 const secondaryNavItems = [
