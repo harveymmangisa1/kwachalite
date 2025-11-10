@@ -502,7 +502,7 @@ export class SupabaseSync {
     // Dispatch custom event to update the Zustand store
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
-        new CustomEvent('db-sync-update', {
+        new CustomEvent('supabase-sync-update', {
           detail: { key, data }
         })
       );
@@ -776,12 +776,14 @@ export class SupabaseSync {
         
         if (error) throw error;
       } else {
+        const totalAmount = quote.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const syncData = {
           id: quote.id,
           quote_number: quote.quoteNumber,
           client_id: quote.clientId,
           valid_until: quote.expiryDate,
           items: quote.items,
+          total_amount: totalAmount,
           status: quote.status,
           user_id: this.user.id,
         };
@@ -902,6 +904,8 @@ export class SupabaseSync {
           await this.syncTransaction(operation.data, operation.operation);
         } else if (operation.collection === 'bills') {
           await this.syncBill(operation.data, operation.operation);
+        } else if (operation.collection === 'quotes') {
+          await this.syncQuote(operation.data, operation.operation);
         }
         // Add other collection types as needed
       }
