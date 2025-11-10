@@ -343,7 +343,7 @@ export function MobileSidebarTrigger() {
       variant="ghost"
       size="icon"
       onClick={() => setIsOpen(true)}
-      className="h-9 w-9 sm:hidden text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+      className="h-9 w-9 sm:hidden text-muted-foreground hover:text-foreground hover:bg-muted"
     >
       <Menu className="h-5 w-5" />
     </Button>

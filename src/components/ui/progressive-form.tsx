@@ -50,7 +50,7 @@ export function ProgressiveForm({
   return (
     <div className={cn("flex flex-col h-full", className)}>
       {/* Progress Steps */}
-      <div className="px-4 sm:px-6 py-4 bg-slate-50 border-b border-slate-200">
+      <div className="px-4 sm:px-6 py-4 bg-muted border-b border-border">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => (
             <React.Fragment key={step.id}>
@@ -61,8 +61,8 @@ export function ProgressiveForm({
                     currentStep > step.id
                       ? "bg-emerald-500 border-emerald-500 text-white"
                       : currentStep === step.id
-                      ? "bg-slate-900 border-slate-900 text-white"
-                      : "bg-white border-slate-300 text-slate-400"
+                      ? "bg-primary border-primary text-primary-foreground"
+                      : "bg-background border-border text-muted-foreground"
                   )}
                 >
                   {currentStep > step.id ? (
@@ -74,14 +74,14 @@ export function ProgressiveForm({
                 <div className="mt-2 text-center hidden sm:block">
                   <p className={cn(
                     "text-xs font-medium",
-                    currentStep >= step.id ? "text-slate-900" : "text-slate-400"
+                    currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {step.name}
                   </p>
-                  <p className="text-xs text-slate-500 mt-0.5">{step.description}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
                 </div>
                 {currentStep === step.id && (
-                  <p className="text-xs font-medium text-slate-900 mt-2 sm:hidden">
+                  <p className="text-xs font-medium text-foreground mt-2 sm:hidden">
                     {step.name}
                   </p>
                 )}
@@ -89,7 +89,7 @@ export function ProgressiveForm({
               {index < steps.length - 1 && (
                 <div className={cn(
                   "h-0.5 flex-1 mx-2 transition-all duration-300",
-                  currentStep > step.id ? "bg-emerald-500" : "bg-slate-200"
+                  currentStep > step.id ? "bg-emerald-500" : "bg-muted"
                 )} />
               )}
             </React.Fragment>
@@ -123,7 +123,7 @@ export function ProgressiveForm({
               variant="ghost"
               onClick={() => {}}
               disabled={isSubmitting}
-              className="text-slate-600 h-10 sm:h-9 text-sm sm:text-base"
+              className="text-muted-foreground h-10 sm:h-9 text-sm sm:text-base"
             >
               Cancel
             </Button>
@@ -135,7 +135,7 @@ export function ProgressiveForm({
                 type="button"
                 onClick={nextStep}
                 disabled={!canProceed || isSubmitting}
-                className="gap-2 bg-slate-900 hover:bg-slate-800 h-10 sm:h-9 text-sm sm:text-base"
+                className="gap-2 bg-primary hover:bg-primary/90 h-10 sm:h-9 text-sm sm:text-base"
               >
                 <span className="hidden sm:inline">Continue</span>
                 <span className="sm:hidden">Next</span>

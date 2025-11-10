@@ -86,17 +86,17 @@ export default function LoginPage() {
 
   if (loading || user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-50">
-        <div className="text-slate-600">Loading...</div>
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="flex min-h-screen flex-col lg:flex-row">
         {/* Left Panel - Feature Showcase */}
-        <div className="hidden lg:flex lg:flex-1 relative bg-slate-900">
+        <div className="hidden lg:flex lg:flex-1 relative bg-card">
           {/* Subtle grid pattern */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
           
@@ -106,7 +106,7 @@ export default function LoginPage() {
             <div>
               <div className="flex items-center gap-3 mb-16">
                 <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                  <Wallet className="w-5 h-5 text-slate-900" />
+                  <Wallet className="w-5 h-5 text-foreground" />
                 </div>
                 <span className="text-xl font-semibold">KwachaLite</span>
               </div>
@@ -115,7 +115,7 @@ export default function LoginPage() {
                 <h1 className="text-4xl font-bold mb-4 leading-tight">
                   Welcome Back
                 </h1>
-                <p className="text-lg text-slate-400 mb-12">
+                <p className="text-lg text-muted-foreground mb-12">
                   Sign in to access your financial dashboard and continue managing your finances with confidence.
                 </p>
               </div>
@@ -124,39 +124,39 @@ export default function LoginPage() {
             {/* Features List */}
             <div className="max-w-md space-y-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0 border border-slate-700">
-                  <BarChart3 className="w-6 h-6 text-slate-300" />
+                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 border border-border">
+                  <BarChart3 className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Advanced Analytics</h3>
-                  <p className="text-sm text-slate-400">Track spending patterns with detailed charts and reports.</p>
+                  <p className="text-sm text-muted-foreground">Track spending patterns with detailed charts and reports.</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0 border border-slate-700">
-                  <Target className="w-6 h-6 text-slate-300" />
+                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 border border-border">
+                  <Target className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Goal Management</h3>
-                  <p className="text-sm text-slate-400">Set and track financial goals with real-time progress updates.</p>
+                  <p className="text-sm text-muted-foreground">Set and track financial goals with real-time progress updates.</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0 border border-slate-700">
-                  <Shield className="w-6 h-6 text-slate-300" />
+                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 border border-border">
+                  <Shield className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Secure Platform</h3>
-                  <p className="text-sm text-slate-400">Your data is protected with enterprise-grade encryption.</p>
+                  <p className="text-sm text-muted-foreground">Your data is protected with enterprise-grade encryption.</p>
                 </div>
               </div>
             </div>
             
             {/* Footer text */}
             <div className="max-w-md border-t border-slate-800 pt-8">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 Trusted by professionals to manage their financial future
               </p>
             </div>
@@ -169,21 +169,21 @@ export default function LoginPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-6 sm:mb-8">
               <div className="flex justify-center mb-3 sm:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-lg flex items-center justify-center">
                   <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <h1 className="text-lg sm:text-xl font-semibold text-slate-900">KwachaLite</h1>
+              <h1 className="text-lg sm:text-xl font-semibold text-foreground">KwachaLite</h1>
             </div>
             
             <div className="mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Sign In</h2>
-              <p className="text-sm sm:text-base text-slate-600">Enter your credentials to access your account</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Sign In</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Enter your credentials to access your account</p>
             </div>
             
             <form className="space-y-4 sm:space-y-5" onSubmit={handleLogin}>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">
                   Email Address
                 </Label>
                 <Input
@@ -200,12 +200,12 @@ export default function LoginPage() {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground">
                     Password
                   </Label>
                   <Link 
                     to="/forgot-password" 
-                    className="text-xs text-slate-600 hover:text-slate-900 hover:underline"
+                    className="text-xs text-muted-foreground hover:text-foreground hover:underline"
                   >
                     Forgot password?
                   </Link>
@@ -227,13 +227,13 @@ export default function LoginPage() {
                     variant="ghost"
                     size="icon"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 sm:h-9 sm:w-9 hover:bg-slate-100"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 sm:h-9 sm:w-9 hover:bg-muted"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     ) : (
-                      <Eye className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                      <Eye className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     )}
                   </Button>
                 </div>
@@ -241,7 +241,7 @@ export default function LoginPage() {
               
               <Button 
                 type="submit" 
-                className="w-full h-12 sm:h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium transition-colors disabled:opacity-70 text-base" 
+                className="w-full h-12 sm:h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors disabled:opacity-70 text-base" 
                 disabled={isSubmitting}
                 aria-busy={isSubmitting}
               >
@@ -256,9 +256,9 @@ export default function LoginPage() {
             )}
             
             <div className="mt-6 space-y-4">
-              <div className="text-center text-sm text-slate-600">
+              <div className="text-center text-sm text-muted-foreground">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-slate-900 hover:underline font-medium">
+                <Link to="/signup" className="text-foreground hover:underline font-medium">
                   Sign up
                 </Link>
               </div>

@@ -234,8 +234,8 @@ export function AddTransactionSheet() {
                   {/* Step 1: Type & Amount */}
                   <StepContent step={1} currentStep={currentStep}>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">Transaction Basics</h3>
-                      <p className="text-sm text-slate-600 mb-3 sm:mb-4">Select type and enter amount</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">Transaction Basics</h3>
+                      <p className="text-sm text-muted-foreground mb-3 sm:mb-4">Select type and enter amount</p>
                     </div>
                     <div className="space-y-3 sm:space-y-4">
                       <FormField
@@ -288,8 +288,8 @@ export function AddTransactionSheet() {
                   {/* Step 2: Details */}
                   <StepContent step={2} currentStep={currentStep}>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">Transaction Details</h3>
-                      <p className="text-sm text-slate-600 mb-3 sm:mb-4">Add description and category</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">Transaction Details</h3>
+                      <p className="text-sm text-muted-foreground mb-3 sm:mb-4">Add description and category</p>
                     </div>
                     <div className="space-y-3 sm:space-y-4">
                       <FormField
@@ -338,7 +338,7 @@ export function AddTransactionSheet() {
                   {/* Step 3: Date */}
                   <StepContent step={3} currentStep={currentStep}>
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">Transaction Date</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">Transaction Date</h3>
                       <p className="text-sm text-slate-600 mb-3 sm:mb-4">Select the transaction date</p>
                     </div>
                     <FormField

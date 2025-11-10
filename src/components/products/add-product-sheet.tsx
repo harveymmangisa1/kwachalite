@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,8 +20,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetClose,
-  SheetFooter,
 } from '@/components/ui/sheet';
 import { PlusCircle, Package, DollarSign, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -41,8 +38,8 @@ const formSchema = z.object({
 });
 
 const STEPS = [
-  { id: 1, name: 'Basic Info', icon: Package, description: 'Product name' },
-  { id: 2, name: 'Pricing', icon: DollarSign, description: 'Cost & selling price' },
+  { id: 1, name: 'Basic', icon: Package, description: 'Product name' },
+  { id: 2, name: 'Pricing', icon: DollarSign, description: 'Cost & price' },
   { id: 3, name: 'Details', icon: FileText, description: 'Description' },
 ];
 
@@ -67,7 +64,7 @@ export function AddProductSheet() {
   const canProceed = React.useMemo(() => {
     switch (currentStep) {
       case 1:
-        return !!watchedValues.name;
+        return !!watchedValues.name && watchedValues.name.trim().length > 0;
       case 2:
         return watchedValues.costPrice >= 0 && watchedValues.price > 0;
       case 3:
@@ -79,41 +76,51 @@ export function AddProductSheet() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const newProduct: Product = {
-        id: new Date().toISOString(),
-        ...values
+      id: new Date().toISOString(),
+      ...values,
     };
     addProduct(newProduct);
-    
+
     toast({
-      title: 'Product Added',
-      description: 'The new product/service has been successfully saved.',
+      title: 'Product added',
+      description: `${values.name} has been saved successfully.`,
     });
+    
     form.reset();
     setOpen(false);
     setCurrentStep(1);
   }
 
   return (
-    <Sheet open={open} onOpenChange={(isOpen) => {
-      setOpen(isOpen);
-      if (!isOpen) {
-        setCurrentStep(1);
-        form.reset();
-      }
-    }}>
+    <Sheet
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          setCurrentStep(1);
+          form.reset();
+        }
+      }}
+    >
       <SheetTrigger asChild>
-        <Button size="sm" className="gap-1">
+        <Button size="sm" className="gap-2">
           <PlusCircle className="h-4 w-4" />
-          Add Product
+          <span className="hidden sm:inline">Add Product</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
-        <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-slate-200">
-          <SheetTitle>Add a New Product or Service</SheetTitle>
-          <SheetDescription>
-            Enter the details of your product or service below.
+      
+      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 gap-0">
+        {/* Header */}
+        <SheetHeader className="px-6 pt-6 pb-4 space-y-2">
+          <SheetTitle className="text-xl">Add Product</SheetTitle>
+          <SheetDescription className="text-sm">
+            Fill in the details for your new product or service
           </SheetDescription>
         </SheetHeader>
+
+        {/* Divider */}
+        <div className="h-px bg-border" />
 
         <ProgressiveForm
           steps={STEPS}
@@ -124,85 +131,152 @@ export function AddProductSheet() {
           submitText="Save Product"
         >
           <Form {...form}>
-            <form className="flex-1 flex flex-col overflow-hidden">
-              <ScrollArea className="flex-1 px-4 sm:px-6">
-                <div className="py-6">
+            <form className="flex-1 flex flex-col min-h-0">
+              <ScrollArea className="flex-1">
+                <div className="px-6 py-6 space-y-8">
                   {/* Step 1: Basic Info */}
                   <StepContent step={1} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Basic Information</h3>
-                      <p className="text-sm text-slate-600 mb-4">Enter the product or service name</p>
+                    <div className="space-y-6">
+                      <div className="space-y-1">
+                        <h3 className="text-base font-medium">Basic Information</h3>
+                        <p className="text-sm text-muted-foreground">
+                          What are you selling?
+                        </p>
+                      </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product or Service Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., Website Design"
+                                className="h-11"
+                                autoFocus
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Product/Service Name *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g. Website Design Package" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </StepContent>
 
                   {/* Step 2: Pricing */}
                   <StepContent step={2} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Pricing Information</h3>
-                      <p className="text-sm text-slate-600 mb-4">Set the cost and selling prices</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="costPrice"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Cost Price *</FormLabel>
-                            <FormControl>
-                              <Input type="number" placeholder="MK 150,000" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+                    <div className="space-y-6">
+                      <div className="space-y-1">
+                        <h3 className="text-base font-medium">Pricing</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Set your cost and selling price
+                        </p>
+                      </div>
+
+                      <div className="grid gap-4">
+                        <FormField
+                          control={form.control}
+                          name="costPrice"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Cost Price</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                                    MK
+                                  </span>
+                                  <Input
+                                    type="number"
+                                    placeholder="0"
+                                    className="h-11 pl-12"
+                                    step="0.01"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="price"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Selling Price</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                                    MK
+                                  </span>
+                                  <Input
+                                    type="number"
+                                    placeholder="0"
+                                    className="h-11 pl-12"
+                                    step="0.01"
+                                    {...field}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Profit Indicator */}
+                        {watchedValues.price > 0 && watchedValues.costPrice >= 0 && (
+                          <div className="rounded-lg bg-muted p-3 space-y-1">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Profit Margin</span>
+                              <span className="font-medium">
+                                MK {(watchedValues.price - watchedValues.costPrice).toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">Percentage</span>
+                              <span className="font-medium">
+                                {watchedValues.price > 0
+                                  ? (((watchedValues.price - watchedValues.costPrice) / watchedValues.price) * 100).toFixed(1)
+                                  : '0'}%
+                              </span>
+                            </div>
+                          </div>
                         )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="price"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Selling Price *</FormLabel>
-                            <FormControl>
-                              <Input type="number" placeholder="MK 250,000" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      </div>
                     </div>
                   </StepContent>
 
                   {/* Step 3: Details */}
                   <StepContent step={3} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Additional Details</h3>
-                      <p className="text-sm text-slate-600 mb-4">Add a description (optional)</p>
+                    <div className="space-y-6">
+                      <div className="space-y-1">
+                        <h3 className="text-base font-medium">Additional Details</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Add notes or description (optional)
+                        </p>
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Add any additional details about this product or service..."
+                                className="min-h-[120px] resize-none"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description (Optional)</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Describe the product or service" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </StepContent>
                 </div>
               </ScrollArea>

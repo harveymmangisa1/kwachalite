@@ -53,7 +53,7 @@ export default function NotFoundPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(15,23,42,0.03),transparent_70%)]" />
       
@@ -61,11 +61,11 @@ export default function NotFoundPage() {
         
         {/* 404 Number with Animation */}
         <div className="mb-8 relative">
-          <div className="text-8xl sm:text-9xl font-bold text-slate-200 select-none">
+          <div className="text-8xl sm:text-9xl font-bold text-muted select-none">
             404
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-4xl sm:text-5xl font-bold text-slate-900 animate-bounce">
+            <div className="text-4xl sm:text-5xl font-bold text-foreground animate-bounce">
               😱
             </div>
           </div>
@@ -73,17 +73,17 @@ export default function NotFoundPage() {
 
         {/* Dynamic Joke Content */}
         <div className="mb-8 space-y-4 transition-all duration-500">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             {jokes[currentJoke].title}
           </h1>
-          <p className="text-lg text-slate-600 max-w-md mx-auto">
+          <p className="text-lg text-muted-foreground max-w-md mx-auto">
             {jokes[currentJoke].description}
           </p>
         </div>
 
         {/* Funny Finance Icons */}
         <div className="flex justify-center gap-4 mb-8">
-          <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center animate-pulse">
+          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center animate-pulse">
             <span className="text-xl">💰</span>
           </div>
           <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center animate-pulse delay-75">
@@ -97,7 +97,7 @@ export default function NotFoundPage() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
           <Link to="/" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white gap-2 h-12">
+            <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-12">
               <Home className="w-5 h-5" />
               Back to Safety
             </Button>
@@ -115,26 +115,26 @@ export default function NotFoundPage() {
         </div>
 
         {/* Additional Options */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-slate-500">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-muted-foreground">
           <Button 
             variant="ghost" 
             onClick={handleRefresh}
-            className="gap-2 text-slate-600 hover:text-slate-900"
+            className="gap-2 text-muted-foreground hover:text-foreground"
           >
             <RefreshCw className="w-4 h-4" />
             Try Again
           </Button>
           
-          <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 hover:underline">
+          <Link to="/dashboard" className="text-muted-foreground hover:text-foreground hover:underline">
             Go to Dashboard
           </Link>
         </div>
 
         {/* Fun Message */}
-        <div className="mt-12 p-4 bg-slate-100 rounded-lg border border-slate-200">
-          <p className="text-sm text-slate-600">
+        <div className="mt-12 p-4 bg-muted rounded-lg border border-border">
+          <p className="text-sm text-muted-foreground">
             <span className="font-semibold">Pro tip:</span> While you're here, maybe it's time to check your budget? 
-            <Link to="/dashboard/budgets" className="text-slate-900 hover:underline font-medium ml-1">
+            <Link to="/dashboard/budgets" className="text-foreground hover:underline font-medium ml-1">
               Let's check! →
             </Link>
           </p>
@@ -146,7 +146,7 @@ export default function NotFoundPage() {
             <div
               key={index}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentJoke ? 'bg-slate-900 w-8' : 'bg-slate-300'
+                index === currentJoke ? 'bg-primary w-8' : 'bg-muted'
               }`}
             />
           ))}
