@@ -72,18 +72,18 @@ export default function EmailVerificationPage() {
 
   if (isVerifying) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
-          <RefreshCw className="w-12 h-12 text-slate-400 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">Verifying your email...</h2>
-          <p className="text-slate-600">Please wait while we confirm your email address.</p>
+          <RefreshCw className="w-12 h-12 text-muted-foreground animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Verifying your email...</h2>
+          <p className="text-muted-foreground">Please wait while we confirm your email address.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
       
@@ -111,13 +111,13 @@ export default function EmailVerificationPage() {
         </div>
 
         {/* Main Card */}
-        <Card className="border border-slate-200 shadow-lg bg-white">
+        <Card className="border border-border shadow-lg bg-card">
           <CardContent className="p-8 sm:p-12">
             <div className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
                 {verificationStatus === 'success' ? 'Email Verified Successfully!' : 'Verification Failed'}
               </h1>
-              <p className="text-lg text-slate-600">
+              <p className="text-lg text-muted-foreground">
                 {verificationStatus === 'success' 
                   ? 'Your account is now active and ready to use'
                   : 'We could not verify your email. Please try again or contact support.'
@@ -127,41 +127,33 @@ export default function EmailVerificationPage() {
 
             {/* Progress Bar */}
             <div className="mb-8">
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                 <div 
                   className="h-full bg-emerald-500 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-slate-500 text-center mt-2">
+              <p className="text-xs text-muted-foreground text-center mt-2">
                 {progress < 100 ? 'Setting up your account...' : 'Ready to get started!'}
               </p>
             </div>
 
             {/* Feature Highlights */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-              <div className="flex flex-col items-center text-center p-4 bg-slate-50 rounded-lg border border-slate-100">
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-1">Secure</h3>
-                <p className="text-xs text-slate-600">Your data is protected</p>
+              <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg border border-border">
+                <Shield className="w-6 h-6 text-emerald-600 mb-2" />
+                <h3 className="text-sm font-semibold text-foreground mb-1">Secure</h3>
+                <p className="text-xs text-muted-foreground">Your data is protected</p>
               </div>
-
-              <div className="flex flex-col items-center text-center p-4 bg-slate-50 rounded-lg border border-slate-100">
-                <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center mb-3">
-                  <Zap className="w-5 h-5 text-emerald-600" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-1">Fast Setup</h3>
-                <p className="text-xs text-slate-600">Start in seconds</p>
+              <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg border border-border">
+                <Zap className="w-6 h-6 text-blue-600 mb-2" />
+                <h3 className="text-sm font-semibold text-foreground mb-1">Fast Setup</h3>
+                <p className="text-xs text-muted-foreground">Start in seconds</p>
               </div>
-
-              <div className="flex flex-col items-center text-center p-4 bg-slate-50 rounded-lg border border-slate-100">
-                <div className="w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center mb-3">
-                  <Mail className="w-5 h-5 text-violet-600" />
-                </div>
-                <h3 className="text-sm font-semibold text-slate-900 mb-1">Connected</h3>
-                <p className="text-xs text-slate-600">Email verified</p>
+              <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg border border-border">
+                <Mail className="w-6 h-6 text-purple-600 mb-2" />
+                <h3 className="text-sm font-semibold text-foreground mb-1">Connected</h3>
+                <p className="text-xs text-muted-foreground">Email verified</p>
               </div>
             </div>
 
@@ -169,7 +161,7 @@ export default function EmailVerificationPage() {
             <div className="space-y-4">
               <Button 
                 asChild
-                className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium transition-colors group"
+                className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors group"
                 size="lg"
               >
                 <Link to="/">
@@ -178,7 +170,7 @@ export default function EmailVerificationPage() {
                 </Link>
               </Button>
 
-              <p className="text-center text-xs text-slate-500">
+              <p className="text-center text-xs text-muted-foreground">
                 You'll be redirected to your personalized dashboard
               </p>
             </div>
@@ -187,46 +179,46 @@ export default function EmailVerificationPage() {
 
         {/* Welcome Message */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-slate-600">
-            Welcome to <span className="font-semibold text-slate-900">KwachaLite</span> 🎉
+          <p className="text-sm text-muted-foreground">
+            Welcome to <span className="font-semibold text-foreground">KwachaLite</span> 🎉
           </p>
-          <p className="text-xs text-slate-500 mt-1">
-            Need help? <button className="text-slate-900 hover:underline">Contact Support</button>
+          <p className="text-xs text-muted-foreground mt-1">
+            Need help? <button className="text-foreground hover:underline">Contact Support</button>
           </p>
         </div>
 
         {/* Next Steps Preview */}
-        <Card className="mt-6 border border-slate-200 bg-white/50 backdrop-blur-sm">
+        <Card className="mt-6 border border-border bg-card/50 backdrop-blur-sm">
           <CardContent className="p-6">
-            <h3 className="text-sm font-semibold text-slate-900 mb-4">What's Next?</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">What's Next?</h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-medium">1</span>
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-primary-foreground text-xs font-medium">1</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Complete your profile</p>
-                  <p className="text-xs text-slate-600">Add your financial preferences</p>
+                  <p className="text-sm font-medium text-foreground">Complete your profile</p>
+                  <p className="text-xs text-muted-foreground">Add your financial preferences</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-medium">2</span>
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-primary-foreground text-xs font-medium">2</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Link your accounts</p>
-                  <p className="text-xs text-slate-600">Connect banks and cards</p>
+                  <p className="text-sm font-medium text-foreground">Link your accounts</p>
+                  <p className="text-xs text-muted-foreground">Connect banks and cards</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-medium">3</span>
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-primary-foreground text-xs font-medium">3</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Set your goals</p>
-                  <p className="text-xs text-slate-600">Define financial objectives</p>
+                  <p className="text-sm font-medium text-foreground">Set your goals</p>
+                  <p className="text-xs text-muted-foreground">Define financial objectives</p>
                 </div>
               </div>
             </div>

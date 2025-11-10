@@ -94,10 +94,10 @@ export default function DashboardLayout() {
               <div className="flex items-center gap-3">
                 <MobileSidebarTrigger />
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-                    <Wallet className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                    <Wallet className="w-4 h-4 text-primary-foreground" />
                   </div>
-                  <span className="font-semibold text-slate-900">KwachaLite</span>
+                  <span className="font-semibold text-foreground">KwachaLite</span>
                 </div>
               </div>
             </header>

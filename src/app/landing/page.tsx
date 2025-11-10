@@ -31,22 +31,22 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Top Nav */}
-      <div className="border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div className="border-b bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto px-6 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-              <Wallet className="w-4 h-4 text-white" aria-hidden="true" />
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Wallet className="w-4 h-4 text-primary-foreground" aria-hidden="true" />
             </div>
-            <span className="font-semibold text-slate-900">KwachaLite</span>
+            <span className="font-semibold text-foreground">KwachaLite</span>
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/">
               <Button variant="ghost" className="h-9 text-sm px-3 sm:px-4">Sign in</Button>
             </Link>
             <Link to="/signup">
-              <Button className="h-9 bg-slate-900 text-white hover:bg-slate-800 text-sm px-3 sm:px-4">Get started</Button>
+              <Button className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 text-sm px-3 sm:px-4">Get started</Button>
             </Link>
           </div>
         </div>
@@ -60,13 +60,13 @@ export default function LandingPage() {
             {/* Logo and Title */}
             <div className="space-y-6">
               <div className="relative inline-block">
-                <div className="relative w-24 h-24 bg-slate-900 rounded-3xl flex items-center justify-center shadow-sm mx-auto ui-smooth hover:scale-[1.02]">
-                  <Wallet className="w-10 h-10 text-white" />
+                <div className="relative w-24 h-24 bg-primary rounded-3xl flex items-center justify-center shadow-sm mx-auto ui-smooth hover:scale-[1.02]">
+                  <Wallet className="w-10 h-10 text-primary-foreground" />
                 </div>
               </div>
               
               <div className="space-y-4">
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900">
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground">
                   <span>
                     Welcome to
                   </span>
@@ -75,7 +75,7 @@ export default function LandingPage() {
                     KwachaLite
                   </span>
                 </h1>
-                <p className="text-xl sm:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                <p className="text-xl sm:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
                   Your journey to financial freedom starts here. Track, analyze, and optimize your finances with beautiful, intelligent insights.
                 </p>
               </div>
@@ -84,13 +84,13 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-sm sm:max-w-none mx-auto">
               <Link to="/signup" className="w-full sm:w-auto">
-                <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-sm h-12 sm:h-11 ui-smooth hover:-translate-y-0.5 w-full">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-sm h-12 sm:h-11 ui-smooth hover:-translate-y-0.5 w-full">
                   <span className="truncate">Get Started</span>
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                 </Button>
               </Link>
               <Link to="/" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl border-2 h-12 sm:h-11 border-slate-300 hover:bg-slate-100 ui-smooth w-full">
+                <Button variant="outline" size="lg" className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl border-2 h-12 sm:h-11 border-border hover:bg-muted ui-smooth w-full">
                   Sign In
                 </Button>
               </Link>
@@ -102,91 +102,91 @@ export default function LandingPage() {
       </div>
 
       {/* Features Section */}
-      <div className="py-20 bg-white">
+      <div className="py-20 bg-background">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               Everything you need to manage your finances
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               KwachaLite provides all the tools you need to take control of your financial life with ease and intelligence.
             </p>
           </div>
 
           <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-1000 ${animateCards ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {/* Smart Analytics */}
-            <Card className="p-6 border border-slate-200 shadow-sm">
+            <Card className="p-6 border border-border shadow-sm">
               <CardContent className="p-0 text-center space-y-4">
                 <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto">
                   <TrendingUp className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900">Smart Analytics</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-foreground">Smart Analytics</h3>
+                <p className="text-muted-foreground">
                   Get intelligent insights into your spending patterns with beautiful charts and detailed analysis.
                 </p>
               </CardContent>
             </Card>
 
             {/* Goal Tracking */}
-            <Card className="p-6 border border-slate-200 shadow-sm">
+            <Card className="p-6 border border-border shadow-sm">
               <CardContent className="p-0 text-center space-y-4">
                 <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto">
                   <Target className="w-8 h-8 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900">Goal Tracking</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-foreground">Goal Tracking</h3>
+                <p className="text-muted-foreground">
                   Set financial goals and track your progress with visual indicators and milestone celebrations.
                 </p>
               </CardContent>
             </Card>
 
             {/* Budget Management */}
-            <Card className="p-6 border border-slate-200 shadow-sm">
+            <Card className="p-6 border border-border shadow-sm">
               <CardContent className="p-0 text-center space-y-4">
                 <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto">
                   <BarChart3 className="w-8 h-8 text-purple-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900">Budget Management</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-foreground">Budget Management</h3>
+                <p className="text-muted-foreground">
                   Create intelligent budgets and get alerts when you're approaching your spending limits.
                 </p>
               </CardContent>
             </Card>
 
             {/* Secure & Private */}
-            <Card className="p-6 border border-slate-200 shadow-sm">
+            <Card className="p-6 border border-border shadow-sm">
               <CardContent className="p-0 text-center space-y-4">
                 <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto">
                   <Shield className="w-8 h-8 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900">Secure & Private</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-foreground">Secure & Private</h3>
+                <p className="text-muted-foreground">
                   Your financial data is encrypted and protected with bank-level security protocols.
                 </p>
               </CardContent>
             </Card>
 
             {/* Quick Setup */}
-            <Card className="p-6 border border-slate-200 shadow-sm">
+            <Card className="p-6 border border-border shadow-sm">
               <CardContent className="p-0 text-center space-y-4">
                 <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto">
                   <Zap className="w-8 h-8 text-amber-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900">Quick Setup</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-foreground">Quick Setup</h3>
+                <p className="text-muted-foreground">
                   Get started in just 2 minutes with our intuitive onboarding and setup process.
                 </p>
               </CardContent>
             </Card>
 
             {/* Community */}
-            <Card className="p-6 border border-slate-200 shadow-sm">
+            <Card className="p-6 border border-border shadow-sm">
               <CardContent className="p-0 text-center space-y-4">
-                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto">
-                  <Users className="w-8 h-8 text-slate-600" />
+                <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto">
+                  <Users className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900">Trusted Community</h3>
-                <p className="text-slate-600">
+                <h3 className="text-xl font-semibold text-foreground">Trusted Community</h3>
+                <p className="text-muted-foreground">
                   Join thousands of users who have transformed their financial lives with KwachaLite.
                 </p>
               </CardContent>
@@ -196,20 +196,20 @@ export default function LandingPage() {
       </div>
 
       {/* Final CTA Section */}
-      <div className="py-20 bg-slate-900 text-white">
+      <div className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to transform your finances?</h2>
-          <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
             Take control of your financial future with KwachaLite's powerful tools and insights.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/signup">
-              <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-200 px-8 py-4 text-lg font-semibold rounded-xl shadow-sm h-11">
+              <Button size="lg" className="bg-background text-foreground hover:bg-muted px-8 py-4 text-lg font-semibold rounded-xl shadow-sm h-11">
                 Start Your Journey
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <p className="text-slate-400 text-sm">Free forever • No credit card required</p>
+            <p className="text-primary-foreground/60 text-sm">Free forever • No credit card required</p>
           </div>
         </div>
       </div>
