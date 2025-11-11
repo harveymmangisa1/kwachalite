@@ -37,7 +37,7 @@ import LandingPage from '@/app/landing/page';
 import NotFoundPage from '@/app/404/page';
 
 function App() {
-  const [showLoading, setShowLoading] = React.useState(true);
+  const [showLoading, setShowLoading] = React.useState(false);
 
   if (showLoading) {
     return <LoadingScreen onComplete={() => setShowLoading(false)} />;
