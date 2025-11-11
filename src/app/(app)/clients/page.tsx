@@ -1,5 +1,6 @@
-import { ClientsDataTable } from './_components/clients-data-table';
-import { columns } from './_components/columns';
+'use client';
+
+import { ClientsDataTable } from '@/components/clients/data-table';
 import { AddClientSheet } from '@/components/clients/add-client-sheet';
 import { useAppStore } from '@/lib/data';
 
@@ -12,7 +13,7 @@ export default function ClientsPage() {
         <h1 className="text-2xl font-bold">Clients</h1>
         <AddClientSheet />
       </div>
-      <ClientsDataTable columns={columns} data={clients} />
+      <ClientsDataTable data={clients} />
     </div>
   );
 }
