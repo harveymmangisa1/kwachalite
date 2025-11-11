@@ -49,6 +49,28 @@ CREATE TABLE public.project_milestones (
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Invoices table (created before client_payments to avoid reference error)
+CREATE TABLE public.invoices (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    invoice_number TEXT NOT NULL,
+    client_id UUID NOT NULL REFERENCES public.clients(id) ON DELETE CASCADE,
+    project_id UUID REFERENCES public.projects(id) ON DELETE SET NULL,
+    issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    due_date DATE NOT NULL,
+    status invoice_status NOT NULL DEFAULT 'draft',
+    subtotal DECIMAL(12,2) NOT NULL CHECK (subtotal >= 0),
+    tax_rate DECIMAL(5,4) DEFAULT 0,
+    tax_amount DECIMAL(12,2) DEFAULT 0,
+    total_amount DECIMAL(12,2) NOT NULL CHECK (total_amount >= 0),
+    paid_amount DECIMAL(12,2) DEFAULT 0,
+    notes TEXT,
+    items JSONB NOT NULL, -- Invoice line items
+    user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE(invoice_number, user_id)
+);
+
 -- Client Payments table
 CREATE TABLE public.client_payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -81,28 +103,6 @@ CREATE TABLE public.client_expenses (
     user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Invoices table
-CREATE TABLE public.invoices (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    invoice_number TEXT NOT NULL,
-    client_id UUID NOT NULL REFERENCES public.clients(id) ON DELETE CASCADE,
-    project_id UUID REFERENCES public.projects(id) ON DELETE SET NULL,
-    issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    due_date DATE NOT NULL,
-    status invoice_status NOT NULL DEFAULT 'draft',
-    subtotal DECIMAL(12,2) NOT NULL CHECK (subtotal >= 0),
-    tax_rate DECIMAL(5,4) DEFAULT 0,
-    tax_amount DECIMAL(12,2) DEFAULT 0,
-    total_amount DECIMAL(12,2) NOT NULL CHECK (total_amount >= 0),
-    paid_amount DECIMAL(12,2) DEFAULT 0,
-    notes TEXT,
-    items JSONB NOT NULL, -- Invoice line items
-    user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now(),
-    UNIQUE(invoice_number, user_id)
 );
 
 -- Communication Logs table

@@ -1,1049 +1,396 @@
-'use client';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose,
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from '@/components/ui/sheet';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { PlusCircle, Trash2, ChevronLeft, ChevronRight, Check, FileText, User, ShoppingCart, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { useAppStore } from '@/lib/data';
-import { ScrollArea } from '../ui/scroll-area';
-import type { Quote } from '@/lib/types';
-import React from 'react';
-import { cn, getCurrentCurrencySymbol } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+import { PlusCircle, XCircle } from 'lucide-react';
 
+// --- Zod Schema for Quote --- //
 const quoteItemSchema = z.object({
-  productId: z.string().min(1, 'Product is required'),
-  quantity: z.coerce.number().min(1, 'Quantity must be at least 1'),
-  price: z.coerce.number(),
+  product_id: z.number().optional(),
+  product_name: z.string().min(1, "Product name is required"),
+  quantity: z.number().min(1, "Quantity must be at least 1"),
+  price: z.number().min(0, "Price cannot be negative"),
 });
 
-const formSchema = z.object({
-  clientId: z.string().min(1, 'Client is required'),
-  date: z.string().min(1, 'Date is required'),
-  expiryDate: z.string().min(1, 'Expiry date is required'),
-  items: z.array(quoteItemSchema).min(1, 'At least one item is required'),
+const quoteSchema = z.object({
+  quote_date: z.string().min(1, "Quote date is required"),
+  expiry_date: z.string().min(1, "Expiry date is required"),
+  client_name: z.string().min(1, "Client name is required"),
+  client_email: z.string().email("Invalid email address"),
+  status: z.string().optional(),
+  line_items: z.array(quoteItemSchema).min(1, "At least one item is required"),
+  notes: z.string().optional(),
 });
 
-const STEPS = [
-  { id: 1, name: 'Client', icon: User, description: 'Select client' },
-  { id: 2, name: 'Dates', icon: Calendar, description: 'Set dates' },
-  { id: 3, name: 'Items', icon: ShoppingCart, description: 'Add items' },
-  { id: 4, name: 'Review', icon: FileText, description: 'Confirm' },
-];
+type QuoteFormValues = z.infer<typeof quoteSchema>;
 
+interface Client {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+}
+
+// --- AddQuoteSheet Component --- //
 export function AddQuoteSheet() {
   const { toast } = useToast();
-  const { clients, products, addQuote } = useAppStore();
-  const [open, setOpen] = React.useState(false);
-  const [currentStep, setCurrentStep] = React.useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<QuoteFormValues>({
+    resolver: zodResolver(quoteSchema),
     defaultValues: {
-      clientId: '',
-      date: new Date().toISOString().split('T')[0],
-      expiryDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0],
-      items: [{ productId: '', quantity: 1, price: 0 }],
+      quote_date: new Date().toISOString().split('T')[0],
+      expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      client_name: '',
+      client_email: '',
+      status: 'draft',
+      line_items: [{ product_name: '', quantity: 1, price: 0 }],
+      notes: '',
     },
   });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "items"
+    name: "line_items",
   });
 
-  const watchedValues = form.watch();
+  useEffect(() => {
+    const fetchClientsAndProducts = async () => {
+      const { data: clientsData, error: clientsError } = await supabase
+        .from('clients')
+        .select('id, name, email');
+      if (clientsError) {
+        console.error('Error fetching clients:', clientsError);
+      } else {
+        setClients(clientsData || []);
+      }
 
-  const canProceed = React.useMemo(() => {
-    switch (currentStep) {
-      case 1:
-        return !!watchedValues.clientId;
-      case 2:
-        return !!watchedValues.date && !!watchedValues.expiryDate;
-      case 3:
-        return watchedValues.items.length > 0 && watchedValues.items.every(item => item.productId && item.quantity > 0);
-      default:
-        return true;
-    }
-  }, [currentStep, watchedValues]);
-
-  const totalAmount = React.useMemo(() => {
-    return watchedValues.items.reduce((sum, item) => {
-      return sum + (item.price * item.quantity);
-    }, 0);
-  }, [watchedValues.items]);
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const newQuote: Quote = {
-      id: new Date().toISOString(),
-      quoteNumber: `Q-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-      status: 'draft',
-      ...values
+      const { data: productsData, error: productsError } = await supabase
+        .from('products')
+        .select('id, name, price');
+      if (productsError) {
+        console.error('Error fetching products:', productsError);
+      } else {
+        setProducts(productsData || []);
+      }
     };
-    addQuote(newQuote);
-    
-    const client = clients.find(c => c.id === values.clientId);
-    toast({
-      title: 'Quote created',
-      description: `Quote for ${client?.name} has been saved as draft.`,
-    });
-    
-    form.reset();
-    setOpen(false);
-    setCurrentStep(1);
-  }
+    fetchClientsAndProducts();
+  }, []);
 
-  const nextStep = () => {
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
+  const handleClientSelection = (client: Client) => {
+    setSelectedClient(client);
+    form.setValue('client_name', client.name);
+    form.setValue('client_email', client.email);
+    setSearchTerm('');
+  };
+
+  const handleProductSelection = (index: number, product: Product) => {
+    form.setValue(`line_items.${index}.product_id`, product.id);
+    form.setValue(`line_items.${index}.product_name`, product.name);
+    form.setValue(`line_items.${index}.price`, product.price);
+  };
+
+  const onSubmit = async (values: QuoteFormValues) => {
+    const { error } = await supabase.from('quotes').insert([
+      {
+        ...values,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+      },
+    ]);
+
+    if (error) {
+      toast({
+        title: 'Error creating quote',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Quote created successfully',
+        description: `Quote for ${values.client_name} has been created.`,
+      });
+      form.reset();
+      setIsOpen(false);
     }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const getSelectedClient = () => {
-    return clients.find(c => c.id === watchedValues.clientId);
-  };
-
-  const getSelectedProduct = (productId: string) => {
-    return products.find(p => p.id === productId);
   };
 
   return (
-    <Sheet open={open} onOpenChange={(isOpen) => {
-      setOpen(isOpen);
-      if (!isOpen) {
-        setCurrentStep(1);
-        form.reset();
-      }
-    }}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button size="sm" className="gap-2">
-          <PlusCircle className="h-4 w-4" />
-          <span className="hidden sm:inline">Create Quote</span>
-          <span className="sm:hidden">New</span>
-        </Button>
+        <Button>Add Quote</Button>
       </SheetTrigger>
-      
-      <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 gap-0">
-        {/* Header */}
-        <SheetHeader className="px-6 pt-6 pb-4 space-y-2">
-          <SheetTitle className="text-xl">Create Quote</SheetTitle>
-          <SheetDescription className="text-sm">
-            Step {currentStep} of {STEPS.length}: {STEPS[currentStep - 1].description}
-          </SheetDescription>
+      <SheetContent className="sm:max-w-2xl">
+        <SheetHeader>
+          <SheetTitle>Create New Quote</SheetTitle>
         </SheetHeader>
-
-        {/* Progress Bar */}
-        <div className="px-6 pb-4">
-          <div className="flex items-center gap-2">
-            {STEPS.map((step, index) => (
-              <React.Fragment key={step.id}>
-                <div className="flex items-center gap-2 flex-1">
-                  <div
-                    className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors",
-                      currentStep > step.id
-                        ? "bg-foreground text-background"
-                        : currentStep === step.id
-                        ? "bg-foreground text-background"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    {currentStep > step.id ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      step.id
-                    )}
-                  </div>
-                  <span className="text-xs font-medium hidden md:block">
-                    {step.name}
-                  </span>
-                </div>
-                {index < STEPS.length - 1 && (
-                  <div className={cn(
-                    "h-0.5 flex-1 transition-colors",
-                    currentStep > step.id ? "bg-foreground" : "bg-border"
-                  )} />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        <div className="h-px bg-border" />
-
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex-1 flex flex-col min-h-0"
-          >
-            <ScrollArea className="flex-1">
-              <div className="px-6 py-6 space-y-6">
-                {/* Step 1: Client */}
-                {currentStep === 1 && (
-                  <div className="space-y-6 animate-in fade-in duration-300">
-                    <div className="space-y-1">
-                      <h3 className="text-base font-medium">Client Information</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Who is this quote for?
-                      </p>
-                    </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="clientId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Client</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="h-11">
-                                <SelectValue placeholder="Select a client" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {clients.map(client => (
-                                <SelectItem key={client.id} value={client.id}>
-                                  <div className="flex flex-col">
-                                    <span className="font-medium">{client.name}</span>
-                                    {client.email && (
-                                      <span className="text-xs text-muted-foreground">{client.email}</span>
-                                    )}
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {watchedValues.clientId && (
-                      <div className="rounded-lg bg-muted p-4 space-y-1">
-                        <p className="text-xs text-muted-foreground">Selected client</p>
-                        <p className="font-medium">{getSelectedClient()?.name}</p>
-                        {getSelectedClient()?.email && (
-                          <p className="text-sm text-muted-foreground">{getSelectedClient()?.email}</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Step 2: Dates */}
-                {currentStep === 2 && (
-                  <div className="space-y-6 animate-in fade-in duration-300">
-                    <div className="space-y-1">
-                      <h3 className="text-base font-medium">Quote Dates</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Set the quote and expiry dates
-                      </p>
-                    </div>
-                    
-                    <div className="grid gap-4">
-                      <FormField
-                        control={form.control}
-                        name="date"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Quote Date</FormLabel>
-                            <FormControl>
-                              <Input type="date" className="h-11" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="expiryDate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Expiry Date</FormLabel>
-                            <FormControl>
-                              <Input type="date" className="h-11" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {watchedValues.date && watchedValues.expiryDate && (
-                      <div className="rounded-lg bg-muted p-3 text-sm">
-                        <p className="text-muted-foreground">
-                          Valid for {Math.ceil((new Date(watchedValues.expiryDate).getTime() - new Date(watchedValues.date).getTime()) / (1000 * 60 * 60 * 24))} days
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Step 3: Items */}
-                {currentStep === 3 && (
-                  <div className="space-y-6 animate-in fade-in duration-300">
-                    <div className="space-y-1">
-                      <h3 className="text-base font-medium">Quote Items</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Add products or services
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      {fields.map((field, index) => (
-                        <div key={field.id} className="rounded-lg border p-4 space-y-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Item {index + 1}</span>
-                            {fields.length > 1 && (
-                              <Button 
-                                type="button" 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => remove(index)}
-                                className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                          
-                          <FormField
-                            control={form.control}
-                            name={`items.${index}.productId`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Product/Service</FormLabel>
-                                <Select 
-                                  onValueChange={(value) => {
-                                    field.onChange(value);
-                                    const product = products.find(p => p.id === value);
-                                    form.setValue(`items.${index}.price`, product?.price || 0);
-                                  }} 
-                                  value={field.value}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger className="h-11">
-                                      <SelectValue placeholder="Select item" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {products.map(product => (
-                                      <SelectItem key={product.id} value={product.id}>
-                                        <div className="flex flex-col">
-                                          <span className="font-medium">{product.name}</span>
-                                          <span className="text-xs text-muted-foreground">
-                                            {getCurrentCurrencySymbol()} {product.price.toFixed(2)}
-                                          </span>
-                                        </div>
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <div className="grid grid-cols-2 gap-3">
-                            <FormField
-                              control={form.control}
-                              name={`items.${index}.quantity`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Quantity</FormLabel>
-                                  <FormControl>
-                                    <Input type="number" min="1" className="h-11" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <FormField
-                              control={form.control}
-                              name={`items.${index}.price`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Price</FormLabel>
-                                  <FormControl>
-                                    <div className="relative">
-                                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-{getCurrentCurrencySymbol()}
-                                      </span>
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        className="h-11 pl-12"
-                                        {...field}
-                                      />
-                                    </div>
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                          
-                          {watchedValues.items[index]?.productId && watchedValues.items[index]?.quantity > 0 && (
-                            <div className="pt-3 border-t">
-                              <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Subtotal</span>
-                                <span className="font-medium">
-                                  {getCurrentCurrencySymbol()} {(watchedValues.items[index].price * watchedValues.items[index].quantity).toFixed(2)}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full h-11 border-dashed"
-                      onClick={() => append({ productId: '', quantity: 1, price: 0 })}
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Add Item
-                    </Button>
-
-                    {totalAmount > 0 && (
-                      <div className="rounded-lg bg-muted p-4">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Total</span>
-                          <span className="text-xl font-semibold">
-                            {getCurrentCurrencySymbol()} {totalAmount.toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Step 4: Review */}
-                {currentStep === 4 && (
-                  <div className="space-y-6 animate-in fade-in duration-300">
-                    <div className="space-y-1">
-                      <h3 className="text-base font-medium">Review Quote</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Confirm all details before creating
-                      </p>
-                    </div>
-                    
-                    {/* Client */}
-                    <div className="rounded-lg bg-muted p-4 space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Client</p>
-                      <p className="font-medium">{getSelectedClient()?.name}</p>
-                      {getSelectedClient()?.email && (
-                        <p className="text-sm text-muted-foreground">{getSelectedClient()?.email}</p>
-                      )}
-                    </div>
-
-                    {/* Dates */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-lg bg-muted p-3 space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Quote Date</p>
-                        <p className="font-medium text-sm">
-                          {new Date(watchedValues.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="rounded-lg bg-muted p-3 space-y-1">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Expiry Date</p>
-                        <p className="font-medium text-sm">
-                          {new Date(watchedValues.expiryDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Items */}
-                    <div className="rounded-lg border overflow-hidden">
-                      <div className="bg-muted px-4 py-3">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Items</p>
-                      </div>
-                      <div className="divide-y">
-                        {watchedValues.items.map((item, index) => {
-                          const product = getSelectedProduct(item.productId);
-                          return (
-                            <div key={index} className="p-4 flex items-start justify-between gap-4">
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium truncate">{product?.name}</p>
-                                <p className="text-sm text-muted-foreground mt-0.5">
-                                  {item.quantity} × {getCurrentCurrencySymbol()} {item.price.toFixed(2)}
-                                </p>
-                              </div>
-                              <p className="font-medium whitespace-nowrap">
-                                {getCurrentCurrencySymbol()} {(item.quantity * item.price).toFixed(2)}
-                              </p>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="bg-muted px-4 py-4 border-t-2">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Total</span>
-                          <span className="text-xl font-semibold">
-                            {getCurrentCurrencySymbol()} {totalAmount.toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-
-            {/* Footer */}
-            <div className="px-6 py-4 border-t flex items-center justify-between gap-3">
-              <div className="flex gap-2">
-                {currentStep > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={prevStep}
-                    className="gap-1"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    <span className="hidden sm:inline">Back</span>
-                  </Button>
-                )}
-                <SheetClose asChild>
-                  <Button type="button" variant="ghost" size="sm">
-                    Cancel
-                  </Button>
-                </SheetClose>
-              </div>
-              
-              {currentStep < STEPS.length ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={nextStep}
-                  disabled={!canProceed}
-                  className="gap-1"
-                >supabase.ts:48 Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.
-                pc @ GoTrueClient.js:71
-                gc @ SupabaseAuthClient.js:4
-                _initSupabaseAuthClient @ SupabaseClient.js:187
-                vc @ SupabaseClient.js:64
-                xc @ index.js:11
-                (anonymous) @ supabase.ts:48
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                await in n
-                (anonymous) @ use-auth.ts:56
-                await in (anonymous)
-                (anonymous) @ use-auth.ts:103
-                iA @ react-dom.production.min.js:243
-                Bl @ react-dom.production.min.js:285
-                ll @ react-dom.production.min.js:272
-                Ki @ react-dom.production.min.js:127
-                (anonymous) @ react-dom.production.min.js:282
-                wl @ react-dom.production.min.js:280
-                sl @ react-dom.production.min.js:269
-                b @ scheduler.production.min.js:13
-                E @ scheduler.production.min.js:14
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
-                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                await in n
-                (anonymous) @ use-auth.ts:56
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
-                n @ use-auth.ts:77
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                use-business-profile-v2.ts:127 No business profile found in Supabase business_profiles table
-                use-business-profile-v2.ts:175 No business profile found in any storage
-                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
-                (anonymous) @ fetch.js:23
-                (anonymous) @ fetch.js:44
-                a @ fetch.js:4
-                Promise.then
-                A @ fetch.js:6
-                (anonymous) @ fetch.js:7
-                JA @ fetch.js:3
-                (anonymous) @ fetch.js:34
-                then @ PostgrestBuilder.js:65
-                use-business-profile-v2.ts:127 No business profile found in Supabase business_profiles table
-                use-business-profile-v2.ts:175 No business profile found in any storage
-                
-                  <span className="hidden sm:inline">Next</span>
-                  <span className="sm:hidden">Next</span>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button 
-                  type="submit"
-                  size="sm"
-                  className="gap-1"
-                >
-                  <Check className="h-4 w-4" />
-                  Create Quote
-                </Button>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          
+          {/* Client Information */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="quote_date">Quote Date</Label>
+              <Input id="quote_date" type="date" {...form.register('quote_date')} />
+              {form.formState.errors.quote_date && (
+                <p className="text-red-500 text-sm">{form.formState.errors.quote_date.message}</p>
               )}
             </div>
-          </form>
-        </Form>
+            <div>
+              <Label htmlFor="expiry_date">Expiry Date</Label>
+              <Input id="expiry_date" type="date" {...form.register('expiry_date')} />
+              {form.formState.errors.expiry_date && (
+                <p className="text-red-500 text-sm">{form.formState.errors.expiry_date.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="client_name">Client</Label>
+            <Input
+              id="client_name"
+              placeholder="Search for a client or type a new name"
+              {...form.register('client_name')}
+              value={searchTerm || form.getValues('client_name')}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                form.setValue('client_name', e.target.value);
+                setSelectedClient(null);
+              }}
+            />
+            {searchTerm && (
+              <div className="relative">
+                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto">
+                  {clients
+                    .filter((client) =>
+                      client.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((client) => (
+                      <li
+                        key={client.id}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleClientSelection(client)}
+                      >
+                        {client.name}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
+            {form.formState.errors.client_name && (
+              <p className="text-red-500 text-sm">{form.formState.errors.client_name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="client_email">Client Email</Label>
+            <Input id="client_email" placeholder="client@example.com" {...form.register('client_email')} />
+            {form.formState.errors.client_email && (
+              <p className="text-red-500 text-sm">{form.formState.errors.client_email.message}</p>
+            )}
+          </div>
+
+          {/* Line Items */}
+          <div className="space-y-4">
+            <Label>Line Items</Label>
+            {fields.map((field, index) => (
+              <div key={field.id} className="flex items-center gap-2">
+                <div className="grid grid-cols-3 gap-2 flex-grow">
+                  <div>
+                    <Label htmlFor={`line_items.${index}.product_name`} className="sr-only">Product</Label>
+                    <Input
+                      id={`line_items.${index}.product_name`}
+                      placeholder="Product or service"
+                      {...form.register(`line_items.${index}.product_name`)}
+                      onChange={(e) => {
+                        form.setValue(`line_items.${index}.product_name`, e.target.value);
+                        // Handle custom product entry if needed
+                      }}
+                    />
+                    {/* Add dropdown for product selection here */}
+                  </div>
+                  <div>
+                    <Label htmlFor={`line_items.${index}.quantity`} className="sr-only">Quantity</Label>
+                    <Input
+                      id={`line_items.${index}.quantity`}
+                      type="number"
+                      placeholder="Quantity"
+                      {...form.register(`line_items.${index}.quantity`, { valueAsNumber: true })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`line_items.${index}.price`} className="sr-only">Price</Label>
+                    <Input
+                      id={`line_items.${index}.price`}
+                      type="number"
+                      placeholder="Price"
+                      {...form.register(`line_items.${index}.price`, { valueAsNumber: true })}
+                    />
+                  </div>
+                </div>
+                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                  <XCircle className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => append({ product_name: '', quantity: 1, price: 0 })}
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Item
+            </Button>
+            {form.formState.errors.line_items && (
+              <p className="text-red-500 text-sm">{form.formState.errors.line_items.message}</p>
+            )}
+          </div>
+
+          {/* Notes */}
+          <div>
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea id="notes" placeholder="Add any relevant notes here" {...form.register('notes')} />
+          </div>
+
+          {/* Status (Hidden) */}
+          <Input type="hidden" {...form.register('status')} />
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Creating...' : 'Create Quote'}
+            </Button>
+          </div>
+        </form>
+        
+        {/* Debugging Toast - Remove if not needed */}
+        <Button
+            variant="outline"
+            onClick={() => {
+              toast({
+                title: "You submitted the following values:",
+                description: (
+                  <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+                    {JSON.stringify(form.getValues(), null, 2)}
+                  </pre>
+                ),
+              })
+            }}
+          >
+            Show Form State
+          </Button>
+
       </SheetContent>
     </Sheet>
   );
 }
+
+// --- Helper Functions and Error Display --- //
+function ErrorMessage({ message }: { message?: string }) {
+  return message ? <p className="text-sm text-red-600 mt-1">{message}</p> : null;
+}
+
+// This is a new helper component for displaying toast notifications related to form submission.
+// It centralizes the appearance of the toast for consistency.
+const FormSubmissionToast = ({ title, description, variant }: {
+  title: string;
+  description: string;
+  variant: 'default' | 'destructive';
+}) => {
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    toast({
+      title,
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{description}</code>
+        </pre>
+      ),
+      variant,
+    });
+  }, [title, description, variant, toast]);
+
+  return null;
+};
+
+// This is an example of how you might use the FormSubmissionToast component.
+// This is not a part of the AddQuoteSheet component, but is here for reference.
+const ExampleUsage = () => {
+  const [formValues, setFormValues] = useState<QuoteFormValues | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFormSubmit = (values: QuoteFormValues) => {
+    // In a real scenario, you would handle the submission here.
+    // For this example, we'll just set the values to display in the toast.
+    setFormValues(values);
+
+    // You can also simulate an error.
+    if (values.client_name.toLowerCase() === 'error') {
+      setError("This is a simulated error.");
+    } else {
+      setError(null);
+    }
+  };
+
+  return (
+    <div>
+      {formValues && !error && (
+        <FormSubmissionToast
+          title="Quote Submitted Successfully"
+          description={JSON.stringify(formValues, null, 2)}
+          variant="default"
+        />
+      )}
+      {error && (
+        <FormSubmissionToast
+          title="Submission Error"
+          description={`An error occurred: ${error}`}
+          variant="destructive"
+        />
+      )}
+      {/* Your form would go here, and its onSubmit would call handleFormSubmit */}
+      <Button onClick={() => handleFormSubmit({ 
+          quote_date: '2023-10-27', 
+          expiry_date: '2023-11-26', 
+          client_name: 'Test Client', 
+          client_email: 'test@example.com', 
+          status: 'draft', 
+          line_items: [{ product_name: 'Test Product', quantity: 1, price: 100 }], 
+          notes: 'Test notes' 
+        })}>
+        Simulate Successful Submission
+      </Button>
+      <Button onClick={() => handleFormSubmit({ 
+          quote_date: '2023-10-27', 
+          expiry_date: '2023-11-26', 
+          client_name: 'error', 
+          client_email: 'error@example.com', 
+          status: 'draft', 
+          line_items: [{ product_name: 'Error Product', quantity: 1, price: 0 }], 
+          notes: 'Error notes' 
+        })}>
+        Simulate Error Submission
+      </Button>
+    </div>
+  );
+};
