@@ -251,14 +251,14 @@ export function exportProducts(products: Product[], options: ExportOptions): voi
   const filename = `products_${new Date().toISOString().split('T')[0]}.${options.format}`;
   
   if (options.format === 'csv') {
-    const headers: (keyof Product)[] = ['name', 'description', 'price', 'costPrice'];
+    const headers: (keyof Product)[] = ['name', 'description', 'price', 'cost_price'];
     const headerLabels = ['Name', 'Description', 'Price', 'Cost Price'];
     
     const csvData = products.map(p => ({
       ...p,
       description: p.description || '',
       price: formatCurrency(p.price),
-      costPrice: formatCurrency(p.costPrice),
+      cost_price: formatCurrency(p.cost_price || 0),
     }));
     
     const csvContent = arrayToCSV(csvData, headers, headerLabels);

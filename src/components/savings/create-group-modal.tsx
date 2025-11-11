@@ -151,7 +151,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 form-scroll-container">
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium">Basic Information</h3>
@@ -165,6 +165,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                     <FormControl>
                       <Input 
                         placeholder="e.g., Family Vacation Fund" 
+                        className="input-transparent"
                         {...field} 
                       />
                     </FormControl>
@@ -182,7 +183,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                     <FormControl>
                       <Textarea 
                         placeholder="Describe the purpose of this savings group..."
-                        className="resize-none"
+                        className="resize-none input-transparent"
                         rows={3}
                         {...field} 
                       />
@@ -232,6 +233,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                         <Input 
                           type="number" 
                           placeholder="100000" 
+                          className="input-transparent"
                           {...field} 
                         />
                       </FormControl>
@@ -248,7 +250,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                       <FormLabel>Currency</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="input-transparent">
                             <SelectValue placeholder="Select currency" />
                           </SelectTrigger>
                         </FormControl>
@@ -277,7 +279,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal",
+                              "w-full pl-3 text-left font-normal input-transparent hover:bg-muted/50",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -323,6 +325,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                         <Input 
                           type="number" 
                           placeholder="0" 
+                          className="input-transparent"
                           {...field} 
                         />
                       </FormControl>
@@ -342,7 +345,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                       <FormLabel>Contribution Frequency</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="input-transparent">
                             <SelectValue placeholder="Select frequency" />
                           </SelectTrigger>
                         </FormControl>
@@ -368,7 +371,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                       <FormLabel>Monthly Contribution Day</FormLabel>
                       <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="input-transparent">
                             <SelectValue placeholder="Select day" />
                           </SelectTrigger>
                         </FormControl>

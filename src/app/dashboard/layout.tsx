@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { Sidebar, MobileNav, MobileSidebar, MobileSidebarProvider, MobileSidebarTrigger } from '@/components/sidebar';
+import { TourTrigger } from '@/components/tour-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
 import ErrorBoundary from '@/components/error-boundary';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
@@ -112,6 +113,9 @@ export default function DashboardLayout() {
               {/* Mobile Navigation - Only shown on mobile */}
               <MobileNav />
             </main>
+            
+            {/* Tour Trigger */}
+            <TourTrigger />
           </div>
         </div>
       </MobileSidebarProvider>

@@ -95,8 +95,7 @@ export function AddTransactionSheet() {
   // Create async operation for form submission
   const { execute: submitTransaction, isLoading, error } = useFormSubmission(
     async (values: TransactionFormInput) => {
-      console.log('Form submitted with values:', values);
-      console.log('Active workspace:', activeWorkspace);
+
       
       // Validate amount
       const numericAmount = typeof values.amount === 'string' ? parseFloat(values.amount) : values.amount;

@@ -193,7 +193,7 @@ export default function BusinessFinancialsPage() {
                     Add Revenue
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                   <form onSubmit={handleAddRevenue}>
                     <DialogHeader>
                       <DialogTitle>Add Business Revenue</DialogTitle>
@@ -288,7 +288,7 @@ export default function BusinessFinancialsPage() {
                     Add Expense
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                   <form onSubmit={handleAddExpense}>
                     <DialogHeader>
                       <DialogTitle>Add Business Expense</DialogTitle>

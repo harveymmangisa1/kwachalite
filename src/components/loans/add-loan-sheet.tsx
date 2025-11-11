@@ -114,7 +114,7 @@ export function AddLoanSheet() {
           Add Loan
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 overflow-y-auto">
         <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-slate-200">
           <SheetTitle>Add a New Loan</SheetTitle>
           <SheetDescription>

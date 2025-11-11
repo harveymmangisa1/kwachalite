@@ -5,7 +5,7 @@ import { ReceiptsDataTable } from '@/components/receipts/data-table';
 
 export default function ReceiptsPage() {
   return (
-    <div className="flex-1 space-y-4">
+    <div data-tour="receipts" className="flex-1 space-y-4">
       <PageHeader
         title="Sales Receipts"
         description="Track and manage payment receipts from your clients."

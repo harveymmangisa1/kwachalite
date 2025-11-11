@@ -10,7 +10,7 @@ import { ClientsDataTable } from '@/components/clients/data-table';
 export default function ClientsPage() {
     const { clients } = useAppStore();
     return (
-        <div className="flex-1 space-y-4">
+        <div data-tour="crm" className="flex-1 space-y-4">
             <PageHeader title="Clients" description="Manage your business clients.">
                 <AddClientSheet />
             </PageHeader>

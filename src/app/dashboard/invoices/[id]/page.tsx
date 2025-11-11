@@ -8,8 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Download, Mail } from 'lucide-react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+// import jsPDF from 'jspdf';
+// import html2canvas from 'html2canvas';
 import React from 'react';
 import Logo from '@/components/logo';
 import { BusinessHeader } from '@/components/documents/business-header';

@@ -75,6 +75,7 @@ export interface Client {
     created_source?: string;
     created_at?: string;
     updated_at?: string;
+    user_id?: string;
 }
 
 export interface Project {
@@ -203,7 +204,10 @@ export interface Product {
     name: string;
     description?: string;
     price: number;
-    costPrice: number;
+    cost_price?: number;
+    user_id?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface QuoteItem {
@@ -360,9 +364,12 @@ export interface GroupContribution {
     description?: string;
     contributedAt: string;
     method: 'cash' | 'bank_transfer' | 'mobile_money' | 'other';
-    status: 'confirmed' | 'pending';
+    status: 'confirmed' | 'pending' | 'rejected';
     confirmedBy?: string;
     confirmedAt?: string;
+    proofFile?: string;
+    proofUrl?: string;
+    rejectionReason?: string;
 }
 
 export interface GroupActivity {

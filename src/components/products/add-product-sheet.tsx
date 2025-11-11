@@ -111,7 +111,7 @@ export function AddProductSheet() {
         </Button>
       </SheetTrigger>
       
-      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 gap-0">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 gap-0 overflow-y-auto">
         {/* Header */}
         <SheetHeader className="px-6 pt-6 pb-4 space-y-2">
           <SheetTitle className="text-xl">Add Product</SheetTitle>

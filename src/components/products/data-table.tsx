@@ -59,7 +59,7 @@ export function ProductsDataTable({ data }: { data: Product[] }) {
                 {product.description}
               </TableCell>
               <TableCell className="text-right">
-                {formatCurrency(product.costPrice)}
+                {formatCurrency(product.cost_price || 0)}
               </TableCell>
               <TableCell className="text-right">
                 {formatCurrency(product.price)}

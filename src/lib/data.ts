@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabaseSync } from './supabase-sync';
 import { appConfig } from './config';
-import type { Transaction, Bill, SavingsGoal, Client, Product, Quote, Loan, Category, SalesReceipt, DeliveryNote, BusinessBudget, BusinessRevenue, BusinessExpense, SavingsGroup, GroupMember, GroupInvitation, GroupContribution, GroupActivity } from './types';
+import type { Transaction, Bill, SavingsGoal, Client, Product, Quote, Loan, Category, SalesReceipt, DeliveryNote, BusinessBudget, BusinessRevenue, BusinessExpense, SavingsGroup, GroupMember, GroupInvitation, GroupContribution, GroupActivity, Project, Invoice, ClientPayment, ClientExpense, CommunicationLog, TaskNote } from './types';
 import {
   ShoppingBasket,
   Car,
@@ -84,6 +84,13 @@ interface AppState {
   groupInvitations: GroupInvitation[];
   groupContributions: GroupContribution[];
   groupActivities: GroupActivity[];
+  // CRM Properties
+  projects: Project[];
+  invoices: Invoice[];
+  payments: ClientPayment[];
+  expenses: ClientExpense[];
+  communications: CommunicationLog[];
+  tasks: TaskNote[];
   // Transaction methods
   addTransaction: (transaction: Transaction) => void;
   updateTransaction: (transaction: Transaction) => void;
@@ -151,6 +158,25 @@ interface AppState {
   updateGroupContribution: (contribution: GroupContribution) => void;
   deleteGroupContribution: (contributionId: string) => void;
   addGroupActivity: (activity: GroupActivity) => void;
+  // CRM methods
+  addProject: (project: Project) => void;
+  updateProject: (project: Project) => void;
+  deleteProject: (projectId: string) => void;
+  addInvoice: (invoice: Invoice) => void;
+  updateInvoice: (invoice: Invoice) => void;
+  deleteInvoice: (invoiceId: string) => void;
+  addPayment: (payment: ClientPayment) => void;
+  updatePayment: (payment: ClientPayment) => void;
+  deletePayment: (paymentId: string) => void;
+  addExpense: (expense: ClientExpense) => void;
+  updateExpense: (expense: ClientExpense) => void;
+  deleteExpense: (expenseId: string) => void;
+  addCommunicationLog: (log: CommunicationLog) => void;
+  updateCommunicationLog: (log: CommunicationLog) => void;
+  deleteCommunicationLog: (logId: string) => void;
+  addTaskNote: (task: TaskNote) => void;
+  updateTaskNote: (task: TaskNote) => void;
+  deleteTaskNote: (taskId: string) => void;
   // Sync methods
   setSyncData: (key: keyof AppState, data: any) => void;
   initializeSupabaseSync: () => void;
@@ -178,6 +204,13 @@ export const useAppStore = create<AppState>()(
       groupInvitations: [],
       groupContributions: [],
       groupActivities: [],
+      // CRM Properties
+      projects: [],
+      invoices: [],
+      payments: [],
+      expenses: [],
+      communications: [],
+      tasks: [],
       // Transaction methods
       addTransaction: (transaction) => {
         set((state) => ({ transactions: [transaction, ...state.transactions] }));
@@ -509,6 +542,103 @@ export const useAppStore = create<AppState>()(
       addGroupActivity: (activity) => {
         set((state) => ({ groupActivities: [activity, ...state.groupActivities] }));
         // TODO: Add supabase sync for group activities when implemented
+      },
+      // CRM methods
+      addProject: (project) => {
+        set((state) => ({ projects: [project, ...state.projects] }));
+        // TODO: Add supabase sync for projects when implemented
+      },
+      updateProject: (project) => {
+        set(state => ({
+          projects: state.projects.map(p => p.id === project.id ? project : p)
+        }));
+        // TODO: Add supabase sync for projects when implemented
+      },
+      deleteProject: (projectId) => {
+        set(state => ({
+          projects: state.projects.filter(p => p.id !== projectId)
+        }));
+        // TODO: Add supabase sync for projects when implemented
+      },
+      addInvoice: (invoice) => {
+        set((state) => ({ invoices: [invoice, ...state.invoices] }));
+        // TODO: Add supabase sync for invoices when implemented
+      },
+      updateInvoice: (invoice) => {
+        set(state => ({
+          invoices: state.invoices.map(i => i.id === invoice.id ? invoice : i)
+        }));
+        // TODO: Add supabase sync for invoices when implemented
+      },
+      deleteInvoice: (invoiceId) => {
+        set(state => ({
+          invoices: state.invoices.filter(i => i.id !== invoiceId)
+        }));
+        // TODO: Add supabase sync for invoices when implemented
+      },
+      addPayment: (payment) => {
+        set((state) => ({ payments: [payment, ...state.payments] }));
+        // TODO: Add supabase sync for payments when implemented
+      },
+      updatePayment: (payment) => {
+        set(state => ({
+          payments: state.payments.map(p => p.id === payment.id ? payment : p)
+        }));
+        // TODO: Add supabase sync for payments when implemented
+      },
+      deletePayment: (paymentId) => {
+        set(state => ({
+          payments: state.payments.filter(p => p.id !== paymentId)
+        }));
+        // TODO: Add supabase sync for payments when implemented
+      },
+      addExpense: (expense) => {
+        set((state) => ({ expenses: [expense, ...state.expenses] }));
+        // TODO: Add supabase sync for expenses when implemented
+      },
+      updateExpense: (expense) => {
+        set(state => ({
+          expenses: state.expenses.map(e => e.id === expense.id ? expense : e)
+        }));
+        // TODO: Add supabase sync for expenses when implemented
+      },
+      deleteExpense: (expenseId) => {
+        set(state => ({
+          expenses: state.expenses.filter(e => e.id !== expenseId)
+        }));
+        // TODO: Add supabase sync for expenses when implemented
+      },
+      addCommunicationLog: (log) => {
+        set((state) => ({ communications: [log, ...state.communications] }));
+        // TODO: Add supabase sync for communications when implemented
+      },
+      updateCommunicationLog: (log) => {
+        set(state => ({
+          communications: state.communications.map(c => c.id === log.id ? log : c)
+        }));
+        // TODO: Add supabase sync for communications when implemented
+      },
+      deleteCommunicationLog: (logId) => {
+        set(state => ({
+          communications: state.communications.filter(c => c.id !== logId)
+        }));
+        // TODO: Add supabase sync for communications when implemented
+      },
+      addTaskNote: (task) => {
+        set((state) => ({ tasks: [task, ...state.tasks] }));
+        // TODO: Add supabase sync for tasks when implemented
+      },
+      updateTaskNote: (task) => {
+        set(state => ({
+          tasks: state.tasks.map(t => t.id === task.id ? task : t)
+        }));
+        // TODO: Add supabase sync for tasks when implemented
+      },
+      deleteTaskNote: (taskId) => {
+        set(state => ({
+          tasks: state.tasks.filter(t => t.id !== taskId)
+        }));
+        // TODO: Add supabase sync for tasks when implemented
       },
       // Sync methods
       setSyncData: (key, data) => {

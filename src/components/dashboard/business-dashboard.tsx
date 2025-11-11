@@ -85,7 +85,7 @@ export function BusinessDashboard({ transactions }: { transactions: Transaction[
   }
 
   return (
-    <div className="container-padding py-4 sm:py-8 space-y-6 sm:space-y-8">
+    <div data-tour="dashboard" className="container-padding py-4 sm:py-8 space-y-6 sm:space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold">{businessProfile?.name || 'Business Dashboard'}</h1>
         <p className="text-muted-foreground text-sm sm:text-base">

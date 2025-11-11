@@ -98,7 +98,7 @@ export function Sidebar() {
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
   return (
-    <aside className="hidden w-20 flex-col border-r border-border bg-card/50 backdrop-blur-sm sm:flex fixed h-full z-40">
+    <aside data-tour="sidebar" className="hidden w-20 flex-col border-r border-border bg-card/50 backdrop-blur-sm sm:flex fixed h-full z-40">
       <nav className="flex flex-col items-center gap-3 px-4 py-6">
         <Link
           to="/dashboard"
@@ -132,6 +132,7 @@ export function Sidebar() {
                         ? 'bg-primary text-primary-foreground shadow-md'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                     )}
+                    {...(item.label === 'Clients' ? { 'data-tour': 'crm' } : {})}
                   >
                     <item.icon className="h-5 w-5" />
                     <span className="sr-only">{item.label}</span>

@@ -142,7 +142,7 @@ export function EditQuoteSheet({ quote }: { quote: Quote }) {
             <span>Edit Quote</span>
         </div>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0">
+      <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 overflow-y-auto">
         <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-slate-200">
           <SheetTitle>Edit Quotation</SheetTitle>
           <SheetDescription>

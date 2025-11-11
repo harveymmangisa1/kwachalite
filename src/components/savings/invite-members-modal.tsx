@@ -272,7 +272,7 @@ export function InviteMembersModal({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 form-scroll-container">
             {/* Email Input */}
             <div className="space-y-3">
               <FormLabel>Email Addresses</FormLabel>
@@ -283,7 +283,7 @@ export function InviteMembersModal({
                   onChange={(e) => setEmailInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   onBlur={addEmail}
-                  className="flex-1"
+                  className="flex-1 input-transparent"
                 />
                 <Button 
                   type="button" 
@@ -325,7 +325,7 @@ export function InviteMembersModal({
                   <FormControl>
                     <Textarea 
                       placeholder="Add a personal message to the invitation..."
-                      className="resize-none"
+                      className="resize-none input-transparent"
                       rows={3}
                       {...field} 
                     />

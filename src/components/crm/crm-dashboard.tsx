@@ -80,8 +80,8 @@ export function CRMDashboard() {
     ...tasks.filter(t => t.due_date && new Date(t.due_date) > new Date())
   ]
     .sort((a, b) => {
-      const dateA = new Date('end_date' in a ? a.end_date! : a.due_date!);
-      const dateB = new Date('end_date' in b ? b.end_date! : b.due_date!);
+      const dateA = new Date('end_date' in a ? (a as any).end_date! : (a as any).due_date!);
+      const dateB = new Date('end_date' in b ? (b as any).end_date! : (b as any).due_date!);
       return dateA.getTime() - dateB.getTime();
     })
     .slice(0, 5);
@@ -97,7 +97,7 @@ export function CRMDashboard() {
     .slice(0, 5);
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div data-tour="crm" className="container mx-auto py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -242,7 +242,7 @@ export function CRMDashboard() {
                   <div className="space-y-3">
                     {upcomingDeadlines.map((item) => {
                       const isProject = 'end_date' in item;
-                      const date = isProject ? item.end_date! : item.due_date!;
+                      const date = isProject ? (item as any).end_date! : (item as any).due_date!;
                       const isOverdue = new Date(date) < new Date();
                       
                       return (
@@ -253,7 +253,7 @@ export function CRMDashboard() {
                                 {isProject ? 'Project' : 'Task'}
                               </Badge>
                               <span className="text-sm font-medium">
-                                {isProject ? item.name : item.title}
+                                {isProject ? (item as any).name : (item as any).title}
                               </span>
                             </div>
                             {isProject && item.description && (
@@ -510,7 +510,7 @@ export function CRMDashboard() {
                           </div>
                         </div>
                         <div className="text-xs text-gray-500">
-                          {format(new Date(issue_date), 'MMM dd')}
+                          {format(new Date(invoice.issue_date), 'MMM dd')}
                         </div>
                       </div>
                     ))}

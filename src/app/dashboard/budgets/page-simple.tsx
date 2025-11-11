@@ -283,7 +283,7 @@ export default function BudgetDashboard() {
       
       {/* Edit Budget Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingCategory ? `Edit ${editingCategory.name} Budget` : 'Edit Budget'}

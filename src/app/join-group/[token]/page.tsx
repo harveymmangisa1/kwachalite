@@ -97,6 +97,7 @@ export default function JoinGroupPage() {
         role: 'member' as const,
         joinedAt: new Date().toISOString(),
         totalContributed: 0,
+        contribution: 0,
         status: 'active' as const,
       };
 

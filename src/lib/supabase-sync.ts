@@ -732,7 +732,7 @@ export class SupabaseSync {
           name: product.name,
           description: product.description || null,
           price: product.price,
-          cost_price: product.costPrice,
+          cost_price: product.cost_price || 0,
           user_id: this.user.id,
         };
 

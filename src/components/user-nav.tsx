@@ -20,17 +20,21 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import React from 'react';
 import { Skeleton } from './ui/skeleton';
 import { Link } from 'react-router-dom';
-import { Briefcase, LogOut, Settings, User } from 'lucide-react';
+import { Briefcase, LogOut, Play, Settings, User } from 'lucide-react';
 import { useAppStore } from '@/lib/data';
-import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
+
 
 export function UserNav() {
   const { user, logout } = useAuth();
   const { activeWorkspace, setActiveWorkspace } = useActiveWorkspace();
   const [isClient, setIsClient] = React.useState(false);
+  const [tourCompleted, setTourCompleted] = React.useState(false);
   
   React.useEffect(() => {
     setIsClient(true);
+    // Check tour completion status
+    const tourStatus = localStorage.getItem('kwachalite-tour-completed');
+    setTourCompleted(tourStatus === 'true');
   }, []);
 
   if (!isClient || !user) {
@@ -93,9 +97,10 @@ src={avatarSrc || `https://placehold.co/100x100.png?text=${avatarFallback}`}
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <div className="px-2 py-1.5">
-            <DarkModeToggle />
-          </div>
+          <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent('start-tour'))}>
+            <Play className="mr-2 h-4 w-4" />
+            <span>{tourCompleted ? 'Restart Tour' : 'Quick Tour'}</span>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => logout()}>
             <LogOut className="mr-2 h-4 w-4" />

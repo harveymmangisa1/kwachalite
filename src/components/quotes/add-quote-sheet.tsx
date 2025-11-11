@@ -12,10 +12,11 @@ import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 import { PlusCircle, XCircle } from 'lucide-react';
+import type { Client, Product } from '@/lib/types';
 
 // --- Zod Schema for Quote --- //
 const quoteItemSchema = z.object({
-  product_id: z.number().optional(),
+  product_id: z.string().optional(),
   product_name: z.string().min(1, "Product name is required"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   price: z.number().min(0, "Price cannot be negative"),
@@ -33,17 +34,7 @@ const quoteSchema = z.object({
 
 type QuoteFormValues = z.infer<typeof quoteSchema>;
 
-interface Client {
-  id: number;
-  name: string;
-  email: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-}
+// Use the global types from lib/types.ts
 
 // --- AddQuoteSheet Component --- //
 export function AddQuoteSheet() {
@@ -109,12 +100,32 @@ export function AddQuoteSheet() {
   };
 
   const onSubmit = async (values: QuoteFormValues) => {
-    const { error } = await supabase.from('quotes').insert([
-      {
-        ...values,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-      },
-    ]);
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) {
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to create a quote',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Calculate total amount
+    const total_amount = values.line_items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Generate quote number
+    const quote_number = `Q-${Date.now()}`;
+
+    const { error } = await supabase.from('quotes').insert({
+      client_id: selectedClient?.id || '',
+      user_id: user.id,
+      quote_number,
+      total_amount,
+      valid_until: values.expiry_date,
+      items: values.line_items,
+      notes: values.notes,
+      status: 'draft' as const,
+    });
 
     if (error) {
       toast({
@@ -137,11 +148,11 @@ export function AddQuoteSheet() {
       <SheetTrigger asChild>
         <Button>Add Quote</Button>
       </SheetTrigger>
-      <SheetContent className="sm:max-w-2xl">
+      <SheetContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Create New Quote</SheetTitle>
         </SheetHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 form-scroll-container">
           
           {/* Client Information */}
           <div className="grid grid-cols-2 gap-4">

@@ -41,9 +41,11 @@ import { useAppStore } from '@/lib/data';
 import type { Invoice, InvoiceItem } from '@/lib/types';
 
 const invoiceItemSchema = z.object({
+  id: z.string().optional(),
   description: z.string().min(1, 'Description is required'),
   quantity: z.number().min(1, 'Quantity must be at least 1'),
   unit_price: z.number().min(0, 'Unit price must be positive'),
+  total: z.number().min(0, 'Total must be positive'),
 });
 
 const formSchema = z.object({
@@ -81,9 +83,11 @@ export function CreateInvoiceDialog({ clientId, projectId }: CreateInvoiceDialog
       notes: '',
       items: [
         {
+          id: '',
           description: '',
           quantity: 1,
           unit_price: 0,
+          total: 0,
         }
       ],
     },
@@ -112,9 +116,11 @@ export function CreateInvoiceDialog({ clientId, projectId }: CreateInvoiceDialog
     form.setValue('items', [
       ...currentItems,
       {
+        id: `item_${Date.now()}`,
         description: '',
         quantity: 1,
         unit_price: 0,
+        total: 0,
       }
     ]);
   };
@@ -128,8 +134,12 @@ export function CreateInvoiceDialog({ clientId, projectId }: CreateInvoiceDialog
 
   const updateItem = (index: number, field: keyof InvoiceItem, value: any) => {
     const currentItems = form.getValues('items');
-    currentItems[index][field] = value;
-    form.setValue('items', currentItems);
+    const updatedItems = [...currentItems];
+    updatedItems[index] = {
+      ...updatedItems[index],
+      [field]: value
+    };
+    form.setValue('items', updatedItems);
   };
 
   function onSubmit(values: z.infer<typeof formSchema>) {

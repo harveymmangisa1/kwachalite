@@ -59,7 +59,7 @@ export function EditProductSheet({ product }: { product: Product }) {
     defaultValues: {
       name: product.name,
       price: product.price,
-      costPrice: product.costPrice,
+      costPrice: product.cost_price || 0,
       description: product.description || '',
     },
   });

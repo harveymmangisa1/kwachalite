@@ -9,6 +9,8 @@ import { Users, Calendar, Plus, Eye, Settings, UserPlus } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { InviteMembersModal } from './invite-members-modal';
 import { ManageGroupMembersModal } from './manage-group-members-modal';
+import { ContributeModal } from './contribute-modal';
+import { PendingContributions } from './pending-contributions';
 import type { SavingsGroup } from '@/lib/types';
 
 interface GroupCardProps {
@@ -113,6 +115,7 @@ export function GroupCard({
           
           {userRole === 'admin' && (
             <>
+              <PendingContributions group={group} />
               <InviteMembersModal groupId={group.id} groupName={group.name} group={group}>
                 <Button 
                   variant="outline" 
@@ -133,14 +136,16 @@ export function GroupCard({
           )}
           
           {group.status === 'active' && !isCompleted && (
-            <Button 
-              size="sm" 
-              onClick={onContribute}
-              className="flex-1"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Contribute
-            </Button>
+            <ContributeModal group={group}>
+              <Button 
+                size="sm" 
+                className="flex-1"
+                data-tour="contributions"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Contribute
+              </Button>
+            </ContributeModal>
           )}
         </div>
       </CardContent>

@@ -22,7 +22,7 @@ import {
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
+const SIDEBAR_WIDTH_MOBILE = "85vw" // Changed: Use viewport width for better mobile responsiveness
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -112,6 +112,29 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
+    // NEW: Close sidebar when clicking outside on mobile
+    React.useEffect(() => {
+      if (!isMobile || !openMobile) return
+
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as HTMLElement
+        // Check if click is outside sidebar content
+        if (!target.closest('[data-sidebar="sidebar"]') && !target.closest('[data-sidebar="trigger"]')) {
+          setOpenMobile(false)
+        }
+      }
+
+      // Small delay to avoid immediate closure
+      const timer = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside)
+      }, 100)
+
+      return () => {
+        clearTimeout(timer)
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }, [isMobile, openMobile, setOpenMobile])
+
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed"
@@ -198,7 +221,11 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className={cn(
+              "w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
+              // NEW: Better mobile styles
+              "max-w-[85vw] overflow-y-auto overscroll-contain"
+            )}
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -206,7 +233,7 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
-            <div className="flex h-full w-full flex-col">{children}</div>
+            <div className="flex h-full w-full flex-col touch-pan-y">{children}</div>
           </SheetContent>
         </Sheet>
       )
@@ -271,7 +298,12 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn(
+        "h-7 w-7",
+        // NEW: Larger touch target on mobile
+        "md:h-7 md:w-7 h-9 w-9",
+        className
+      )}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -342,6 +374,8 @@ const SidebarInput = React.forwardRef<
       data-sidebar="input"
       className={cn(
         "h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+        // NEW: Better mobile input sizing
+        "md:h-8 h-10 text-base md:text-sm",
         className
       )}
       {...props}
@@ -358,7 +392,12 @@ const SidebarHeader = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn(
+        "flex flex-col gap-2 p-2",
+        // NEW: More padding on mobile for easier touch
+        "md:p-2 p-4",
+        className
+      )}
       {...props}
     />
   )
@@ -373,7 +412,12 @@ const SidebarFooter = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn(
+        "flex flex-col gap-2 p-2",
+        // NEW: More padding on mobile
+        "md:p-2 p-4",
+        className
+      )}
       {...props}
     />
   )
@@ -405,6 +449,8 @@ const SidebarContent = React.forwardRef<
       data-sidebar="content"
       className={cn(
         "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        // NEW: Better mobile scrolling
+        "overscroll-contain",
         className
       )}
       {...props}
@@ -421,7 +467,12 @@ const SidebarGroup = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      className={cn(
+        "relative flex w-full min-w-0 flex-col p-2",
+        // NEW: More padding on mobile
+        "md:p-2 p-3",
+        className
+      )}
       {...props}
     />
   )
@@ -441,6 +492,8 @@ const SidebarGroupLabel = React.forwardRef<
       className={cn(
         "duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
+        // NEW: Larger text on mobile
+        "md:text-xs text-sm md:h-8 h-10",
         className
       )}
       {...props}
@@ -464,6 +517,8 @@ const SidebarGroupAction = React.forwardRef<
         // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 after:md:hidden",
         "group-data-[collapsible=icon]:hidden",
+        // NEW: Larger touch target on mobile
+        "md:w-5 w-8 md:h-5 h-8 md:top-3.5 top-4",
         className
       )}
       {...props}
@@ -479,7 +534,12 @@ const SidebarGroupContent = React.forwardRef<
   <div
     ref={ref}
     data-sidebar="group-content"
-    className={cn("w-full text-sm", className)}
+    className={cn(
+      "w-full text-sm",
+      // NEW: Slightly larger text on mobile
+      "md:text-sm text-base",
+      className
+    )}
     {...props}
   />
 ))
@@ -492,7 +552,12 @@ const SidebarMenu = React.forwardRef<
   <ul
     ref={ref}
     data-sidebar="menu"
-    className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+    className={cn(
+      "flex w-full min-w-0 flex-col gap-1",
+      // NEW: More gap on mobile for easier tapping
+      "md:gap-1 gap-2",
+      className
+    )}
     {...props}
   />
 ))
@@ -521,9 +586,9 @@ const sidebarMenuButtonVariants = cva(
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
-        default: "h-8 text-sm",
-        sm: "h-7 text-xs",
-        lg: "h-12 text-sm group-data-[collapsible=icon]:!p-0",
+        default: "h-8 text-sm md:h-8 md:text-sm h-11 text-base", // NEW: Larger on mobile
+        sm: "h-7 text-xs md:h-7 md:text-xs h-9 text-sm", // NEW: Larger on mobile
+        lg: "h-12 text-sm group-data-[collapsible=icon]:!p-0 md:h-12 h-14", // NEW: Larger on mobile
       },
     },
     defaultVariants: {
@@ -613,6 +678,9 @@ const SidebarMenuAction = React.forwardRef<
         "peer-data-[size=default]/menu-button:top-1.5",
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
+        // NEW: Larger touch target on mobile
+        "md:w-5 md:h-5 w-8 h-8",
+        "md:peer-data-[size=default]/menu-button:top-1.5 peer-data-[size=default]/menu-button:top-[0.6rem]",
         showOnHover &&
           "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
         className
@@ -637,6 +705,8 @@ const SidebarMenuBadge = React.forwardRef<
       "peer-data-[size=default]/menu-button:top-1.5",
       "peer-data-[size=lg]/menu-button:top-2.5",
       "group-data-[collapsible=icon]:hidden",
+      // NEW: Adjust position on mobile
+      "md:peer-data-[size=default]/menu-button:top-1.5 peer-data-[size=default]/menu-button:top-3",
       className
     )}
     {...props}
@@ -659,12 +729,17 @@ const SidebarMenuSkeleton = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="menu-skeleton"
-      className={cn("rounded-md h-8 flex gap-2 px-2 items-center", className)}
+      className={cn(
+        "rounded-md h-8 flex gap-2 px-2 items-center",
+        // NEW: Larger on mobile
+        "md:h-8 h-11",
+        className
+      )}
       {...props}
     >
       {showIcon && (
         <Skeleton
-          className="size-4 rounded-md"
+          className="size-4 rounded-md md:size-4 size-5"
           data-sidebar="menu-skeleton-icon"
         />
       )}
@@ -692,6 +767,8 @@ const SidebarMenuSub = React.forwardRef<
     className={cn(
       "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5",
       "group-data-[collapsible=icon]:hidden",
+      // NEW: More spacing on mobile
+      "md:gap-1 gap-1.5",
       className
     )}
     {...props}
@@ -724,8 +801,8 @@ const SidebarMenuSubButton = React.forwardRef<
       className={cn(
         "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
         "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-        size === "sm" && "text-xs",
-        size === "md" && "text-sm",
+        size === "sm" && "text-xs md:h-7 md:text-xs h-9 text-sm", // NEW: Larger on mobile
+        size === "md" && "text-sm md:h-7 md:text-sm h-10 text-base", // NEW: Larger on mobile
         "group-data-[collapsible=icon]:hidden",
         className
       )}

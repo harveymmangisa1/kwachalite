@@ -112,7 +112,7 @@ export default function GroupSavingsPage() {
   }, [savingsGroups]);
 
   return (
-    <div className="flex-1 space-y-6">
+    <div data-tour="savings" className="flex-1 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -255,15 +255,7 @@ export default function GroupSavingsPage() {
                   userRole={getUserRole(group.id)}
                   onView={() => {
                     // TODO: Navigate to group detail page
-                    console.log('View group:', group.id);
-                  }}
-                  onManage={() => {
-                    // TODO: Open manage modal
-                    console.log('Manage group:', group.id);
-                  }}
-                  onContribute={() => {
-                    // TODO: Open contribution modal
-                    console.log('Contribute to group:', group.id);
+
                   }}
                 />
               ))}

@@ -1,9 +1,11 @@
-
 'use client';
 
+import { useState, useMemo, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { PlusCircle, User, Phone, Building, FileText } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -21,17 +23,12 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetClose,
-  SheetFooter,
 } from '@/components/ui/sheet';
-import { PlusCircle, User, Mail, Phone, MapPin, Building, FileText } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 import { useToast } from '@/hooks/use-toast';
-import { Textarea } from '../ui/textarea';
 import { useAppStore } from '@/lib/data';
 import type { Client } from '@/lib/types';
-import React from 'react';
-import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -43,21 +40,31 @@ const formSchema = z.object({
   notes: z.string().optional(),
 });
 
+type ClientFormValues = z.infer<typeof formSchema>;
+
 const STEPS = [
   { id: 1, name: 'Basic Info', icon: User, description: 'Name & email' },
   { id: 2, name: 'Contact', icon: Phone, description: 'Phone & address' },
-  { id: 3, name: 'Business', icon: MapPin, description: 'Company & website' },
-  { id: 4, name: 'Notes', icon: MapPin, description: 'Additional information' },
+  { id: 3, name: 'Business', icon: Building, description: 'Company & website' },
+  { id: 4, name: 'Notes', icon: FileText, description: 'Additional information' },
 ];
+
+const StepHeader = ({ title, description }: { title: string; description:string }) => (
+  <div className="mb-4">
+    <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+    <p className="text-sm text-muted-foreground">{description}</p>
+  </div>
+);
 
 export function AddClientSheet() {
   const { toast } = useToast();
   const { addClient } = useAppStore();
-  const [open, setOpen] = React.useState(false);
-  const [currentStep, setCurrentStep] = React.useState(1);
+  const [open, setOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ClientFormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onTouched', // Validate on blur
     defaultValues: {
       name: '',
       email: '',
@@ -71,57 +78,45 @@ export function AddClientSheet() {
 
   const watchedValues = form.watch();
 
-  const canProceed = React.useMemo(() => {
-    switch (currentStep) {
-      case 1:
-        return !!watchedValues.name && !!watchedValues.email;
-      case 2:
-        return true;
-      case 3:
-        return true;
-      case 4:
-        return true;
-      default:
-        return false;
+  const canProceed = useMemo(() => {
+    if (currentStep === 1) {
+      return !!watchedValues.name && !!watchedValues.email && !form.formState.errors.email;
     }
-  }, [currentStep, watchedValues]);
+    return true;
+  }, [currentStep, watchedValues, form.formState.errors.email]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const newClient: Client = {
-        id: new Date().toISOString(),
-        ...values
-    };
-    addClient(newClient);
+  useEffect(() => {
+    if (currentStep === 1 && canProceed) {
+      const timer = setTimeout(() => setCurrentStep(2), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [canProceed, currentStep]);
 
-    toast({
-      title: 'Client Added',
-      description: 'The new client has been successfully saved.',
-    });
+  function onSubmit(values: ClientFormValues) {
+    addClient({ id: crypto.randomUUID(), ...values });
+    toast({ title: 'Client Added', description: 'The new client has been successfully saved.' });
     form.reset();
     setOpen(false);
     setCurrentStep(1);
   }
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      setCurrentStep(1);
+      form.reset();
+    }
+  };
+
   return (
-    <Sheet open={open} onOpenChange={(isOpen) => {
-      setOpen(isOpen);
-      if (!isOpen) {
-        setCurrentStep(1);
-        form.reset();
-      }
-    }}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button size="sm" className="gap-1">
-          <PlusCircle className="h-4 w-4" />
-          Add Client
-        </Button>
+        <Button size="sm" className="gap-1"><PlusCircle className="h-4 w-4" /> Add Client</Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
-        <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-slate-200">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 h-screen sm:h-[90vh]">
+        <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b flex-shrink-0">
           <SheetTitle>Add a New Client</SheetTitle>
-          <SheetDescription>
-            Enter the details of your new client below.
-          </SheetDescription>
+          <SheetDescription>Enter the details of your new client below.</SheetDescription>
         </SheetHeader>
 
         <ProgressiveForm
@@ -129,149 +124,84 @@ export function AddClientSheet() {
           currentStep={currentStep}
           onStepChange={setCurrentStep}
           canProceed={canProceed}
-          onSubmit={() => form.handleSubmit(onSubmit)()}
+          onSubmit={form.handleSubmit(onSubmit)}
           submitText="Save Client"
+          className="flex-1 flex flex-col min-h-0"
         >
           <Form {...form}>
-            <form className="flex-1 flex flex-col overflow-hidden">
-              <ScrollArea className="flex-1 px-4 sm:px-6">
-                <div className="py-6">
-                  {/* Step 1: Basic Info */}
-                  <StepContent step={1} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Basic Information</h3>
-                      <p className="text-sm text-slate-600 mb-4">Enter the client's name and email</p>
-                    </div>
-                    <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Full Name / Company Name *</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. John Doe" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email *</FormLabel>
-                            <FormControl>
-                              <Input type="email" placeholder="client@example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </StepContent>
+            <form className="flex-1 overflow-y-auto form-scroll-container p-4 sm:p-6">
+              <div className="space-y-6">
+                <StepContent step={1} currentStep={currentStep}>
+                  <StepHeader title="Basic Information" description="Enter the client's name and email." />
+                  <div className="space-y-4">
+                    <FormField control={form.control} name="name" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name / Company Name *</FormLabel>
+                        <FormControl><Input placeholder="e.g. John Doe" {...field} autoComplete="name" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="email" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email *</FormLabel>
+                        <FormControl><Input type="email" placeholder="client@example.com" {...field} autoComplete="email" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                </StepContent>
 
-                  {/* Step 2: Contact */}
-                  <StepContent step={2} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Contact Information</h3>
-                      <p className="text-sm text-slate-600 mb-4">Add phone and address details (optional)</p>
-                    </div>
-                    <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Phone (Optional)</FormLabel>
-                            <FormControl>
-                              <Input type="tel" placeholder="+265 123 456 789" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="address"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Address (Optional)</FormLabel>
-                            <FormControl>
-                              <Textarea placeholder="Client's physical or mailing address" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </StepContent>
+                <StepContent step={2} currentStep={currentStep}>
+                  <StepHeader title="Contact Information" description="Add phone and address details." />
+                  <div className="space-y-4">
+                    <FormField control={form.control} name="phone" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone (Optional)</FormLabel>
+                        <FormControl><Input type="tel" placeholder="+265 123 456 789" {...field} autoComplete="tel" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="address" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address (Optional)</FormLabel>
+                        <FormControl><Textarea placeholder="Client's physical or mailing address" className="min-h-[80px]" {...field} autoComplete="street-address" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                </StepContent>
 
-                  {/* Step 3: Business Info */}
-                  <StepContent step={3} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Business Information</h3>
-                      <p className="text-sm text-slate-600 mb-4">Add company and website details (optional)</p>
-                    </div>
-                    <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="company"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Company Name (Optional)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. Acme Corporation" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="website"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Website (Optional)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="https://example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </StepContent>
+                <StepContent step={3} currentStep={currentStep}>
+                  <StepHeader title="Business Information" description="Add company and website details." />
+                  <div className="space-y-4">
+                    <FormField control={form.control} name="company" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company Name (Optional)</FormLabel>
+                        <FormControl><Input placeholder="e.g. Acme Corporation" {...field} autoComplete="organization" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="website" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Website (Optional)</FormLabel>
+                        <FormControl><Input placeholder="https://example.com" {...field} autoComplete="url" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                </StepContent>
 
-                  {/* Step 4: Notes */}
-                  <StepContent step={4} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Additional Notes</h3>
-                      <p className="text-sm text-slate-600 mb-4">Add any important information about this client</p>
-                    </div>
-                    <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="notes"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Notes (Optional)</FormLabel>
-                            <FormControl>
-                              <Textarea 
-                                placeholder="Important details, preferences, special requirements, etc." 
-                                className="min-h-[100px]"
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </StepContent>
-                </div>
-              </ScrollArea>
+                <StepContent step={4} currentStep={currentStep}>
+                  <StepHeader title="Additional Notes" description="Add any other important information." />
+                  <FormField control={form.control} name="notes" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes (Optional)</FormLabel>
+                      <FormControl><Textarea placeholder="Important details, preferences, etc." className="min-h-[120px]" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </StepContent>
+              </div>
             </form>
           </Form>
         </ProgressiveForm>

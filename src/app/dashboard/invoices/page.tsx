@@ -61,7 +61,7 @@ export default function InvoicesPage() {
     }
 
     return (
-        <div className="flex-1 space-y-4">
+        <div data-tour="invoices" className="flex-1 space-y-4">
             <PageHeader 
                 title="Invoices" 
                 description="Manage your business invoices. Accepted quotes can be converted to invoices."
