@@ -67,6 +67,135 @@ export interface Client {
     email: string;
     phone?: string;
     address?: string;
+    company?: string;
+    website?: string;
+    notes?: string;
+    status?: string;
+    total_revenue?: number;
+    created_source?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface Project {
+    id: string;
+    name: string;
+    description?: string;
+    client_id: string;
+    status: 'planning' | 'in_progress' | 'on_hold' | 'completed' | 'cancelled';
+    start_date?: string;
+    end_date?: string;
+    budget?: number;
+    actual_cost?: number;
+    priority?: string;
+    user_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ProjectMilestone {
+    id: string;
+    project_id: string;
+    name: string;
+    description?: string;
+    due_date: string;
+    status: 'pending' | 'in_progress' | 'completed' | 'overdue';
+    completed_date?: string;
+    deliverables?: string[];
+    user_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ClientPayment {
+    id: string;
+    client_id: string;
+    project_id?: string;
+    amount: number;
+    payment_date: string;
+    status: 'pending' | 'paid' | 'overdue' | 'cancelled';
+    payment_method?: string;
+    reference_number?: string;
+    description?: string;
+    invoice_id?: string;
+    user_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ClientExpense {
+    id: string;
+    client_id: string;
+    project_id?: string;
+    amount: number;
+    expense_date: string;
+    category: string;
+    description: string;
+    vendor?: string;
+    receipt_url?: string;
+    is_billable?: boolean;
+    user_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Invoice {
+    id: string;
+    invoice_number: string;
+    client_id: string;
+    project_id?: string;
+    issue_date: string;
+    due_date: string;
+    status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+    subtotal: number;
+    tax_rate?: number;
+    tax_amount?: number;
+    total_amount: number;
+    paid_amount?: number;
+    notes?: string;
+    items: InvoiceItem[];
+    user_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface InvoiceItem {
+    id?: string;
+    description: string;
+    quantity: number;
+    unit_price: number;
+    total: number;
+}
+
+export interface CommunicationLog {
+    id: string;
+    client_id: string;
+    project_id?: string;
+    type: 'email' | 'phone' | 'meeting' | 'note' | 'other';
+    subject?: string;
+    content: string;
+    communication_date: string;
+    direction?: string;
+    duration_minutes?: number;
+    next_follow_up?: string;
+    user_id: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface TaskNote {
+    id: string;
+    client_id: string;
+    project_id?: string;
+    title: string;
+    description?: string;
+    priority?: string;
+    status: 'open' | 'in_progress' | 'completed' | 'cancelled';
+    due_date?: string;
+    completed_date?: string;
+    user_id: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface Product {

@@ -24,7 +24,7 @@ import {
   SheetClose,
   SheetFooter,
 } from '@/components/ui/sheet';
-import { PlusCircle, User, Mail, Phone, MapPin } from 'lucide-react';
+import { PlusCircle, User, Mail, Phone, MapPin, Building, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '../ui/textarea';
 import { useAppStore } from '@/lib/data';
@@ -38,11 +38,16 @@ const formSchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string().optional(),
   address: z.string().optional(),
+  company: z.string().optional(),
+  website: z.string().url('Invalid website URL').optional().or(z.literal('')),
+  notes: z.string().optional(),
 });
 
 const STEPS = [
   { id: 1, name: 'Basic Info', icon: User, description: 'Name & email' },
   { id: 2, name: 'Contact', icon: Phone, description: 'Phone & address' },
+  { id: 3, name: 'Business', icon: MapPin, description: 'Company & website' },
+  { id: 4, name: 'Notes', icon: MapPin, description: 'Additional information' },
 ];
 
 export function AddClientSheet() {
@@ -58,6 +63,9 @@ export function AddClientSheet() {
       email: '',
       phone: '',
       address: '',
+      company: '',
+      website: '',
+      notes: '',
     },
   });
 
@@ -68,6 +76,10 @@ export function AddClientSheet() {
       case 1:
         return !!watchedValues.name && !!watchedValues.email;
       case 2:
+        return true;
+      case 3:
+        return true;
+      case 4:
         return true;
       default:
         return false;
@@ -188,6 +200,69 @@ export function AddClientSheet() {
                             <FormLabel>Address (Optional)</FormLabel>
                             <FormControl>
                               <Textarea placeholder="Client's physical or mailing address" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </StepContent>
+
+                  {/* Step 3: Business Info */}
+                  <StepContent step={3} currentStep={currentStep}>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Business Information</h3>
+                      <p className="text-sm text-slate-600 mb-4">Add company and website details (optional)</p>
+                    </div>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="company"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Company Name (Optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. Acme Corporation" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="website"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Website (Optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="https://example.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </StepContent>
+
+                  {/* Step 4: Notes */}
+                  <StepContent step={4} currentStep={currentStep}>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">Additional Notes</h3>
+                      <p className="text-sm text-slate-600 mb-4">Add any important information about this client</p>
+                    </div>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Notes (Optional)</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Important details, preferences, special requirements, etc." 
+                                className="min-h-[100px]"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

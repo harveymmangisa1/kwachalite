@@ -556,7 +556,476 @@ export function AddQuoteSheet() {
                   onClick={nextStep}
                   disabled={!canProceed}
                   className="gap-1"
-                >
+                >supabase.ts:48 Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.
+                pc @ GoTrueClient.js:71
+                gc @ SupabaseAuthClient.js:4
+                _initSupabaseAuthClient @ SupabaseClient.js:187
+                vc @ SupabaseClient.js:64
+                xc @ index.js:11
+                (anonymous) @ supabase.ts:48
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                await in n
+                (anonymous) @ use-auth.ts:56
+                await in (anonymous)
+                (anonymous) @ use-auth.ts:103
+                iA @ react-dom.production.min.js:243
+                Bl @ react-dom.production.min.js:285
+                ll @ react-dom.production.min.js:272
+                Ki @ react-dom.production.min.js:127
+                (anonymous) @ react-dom.production.min.js:282
+                wl @ react-dom.production.min.js:280
+                sl @ react-dom.production.min.js:269
+                b @ scheduler.production.min.js:13
+                E @ scheduler.production.min.js:14
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-auth.ts:109 Auth state change: INITIAL_SESSION de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                use-business-profile-v2.ts:89 Loading business profile for user: de2d9356-2085-4790-826f-c86f3e9fd65f
+                use-business-profile-v2.ts:111 Attempting to load from Supabase business_profiles table...
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                await in n
+                (anonymous) @ use-auth.ts:56
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                fetch.js:23  POST https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/rpc/user_exists 404 (Not Found)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                use-auth.ts:77 Error checking user profile: {code: 'PGRST202', details: 'Searched for the function public.user_exists with …r, but no matches were found in the schema cache.', hint: null, message: 'Could not find the function public.user_exists(user_id) in the schema cache'}
+                n @ use-auth.ts:77
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                use-business-profile-v2.ts:127 No business profile found in Supabase business_profiles table
+                use-business-profile-v2.ts:175 No business profile found in any storage
+                fetch.js:23  GET https://qdxodcdgogcdwvwjkhqj.supabase.co/rest/v1/business_profiles?select=*&user_id=eq.de2d9356-2085-4790-826f-c86f3e9fd65f 406 (Not Acceptable)
+                (anonymous) @ fetch.js:23
+                (anonymous) @ fetch.js:44
+                a @ fetch.js:4
+                Promise.then
+                A @ fetch.js:6
+                (anonymous) @ fetch.js:7
+                JA @ fetch.js:3
+                (anonymous) @ fetch.js:34
+                then @ PostgrestBuilder.js:65
+                use-business-profile-v2.ts:127 No business profile found in Supabase business_profiles table
+                use-business-profile-v2.ts:175 No business profile found in any storage
+                
                   <span className="hidden sm:inline">Next</span>
                   <span className="sm:hidden">Next</span>
                   <ChevronRight className="h-4 w-4" />
