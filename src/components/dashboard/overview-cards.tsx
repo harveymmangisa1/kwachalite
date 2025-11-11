@@ -69,12 +69,12 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
   } : undefined;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
       <StatCard
         title="Total Income"
         value={formatCurrency(totalIncome)}
         change={incomeChange}
-        icon={<ArrowUpCircle className="h-5 w-5 text-success" />}
+        icon={<ArrowUpCircle className="h-4 w-4 sm:h-5 sm:w-5 text-success" />}
         variant="success"
         description="Money coming in"
       />
@@ -83,7 +83,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
         title="Total Expenses"
         value={formatCurrency(totalExpenses)}
         change={expenseChange}
-        icon={<ArrowDownCircle className="h-5 w-5 text-error" />}
+        icon={<ArrowDownCircle className="h-4 w-4 sm:h-5 sm:w-5 text-error" />}
         variant="error"
         description="Money going out"
       />
@@ -92,7 +92,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
         title="Current Balance"
         value={formatCurrency(balance)}
         change={balanceChange}
-        icon={<Wallet className="h-5 w-5 text-primary" />}
+        icon={<Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />}
         variant="gradient"
         description="Available funds"
       />

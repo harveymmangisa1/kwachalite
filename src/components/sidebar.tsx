@@ -187,27 +187,34 @@ export function MobileNav() {
   const pathname = location.pathname;
   const { activeWorkspace } = useActiveWorkspace();
   
-  let navItemsToShow = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
+  // Core navigation items for mobile - keep it minimal
+  const coreNavItems = [
+    { href: '/dashboard', icon: LayoutDashboard, label: 'Home' },
+  ];
 
-  if (activeWorkspace === 'business') {
-    const businessHubIndex = navItemsToShow.findIndex(item => item.href.includes('business'));
-    if (businessHubIndex !== -1) {
-      navItemsToShow[businessHubIndex] = { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']};
-    }
+  // Workspace-specific core items
+  if (activeWorkspace === 'personal') {
+    coreNavItems.push(
+      { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions' },
+      { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets' },
+      { href: '/dashboard/goals', icon: Target, label: 'Goals' }
+    );
+  } else {
+    coreNavItems.push(
+      { href: '/dashboard/business', icon: Briefcase, label: 'Business' },
+      { href: '/dashboard/clients', icon: Users, label: 'Clients' },
+      { href: '/dashboard/invoices', icon: FileInvoice, label: 'Invoices' }
+    );
   }
-  
-  const analyticsItem = secondaryNavItems.find(item => item.href.includes('analytics'));
-  if (analyticsItem) {
-    navItemsToShow.push(analyticsItem);
-  }
-  
-  const uniqueNavItems = Array.from(new Map(navItemsToShow.map(item => [item.href, item])).values());
+
+  // Always include analytics
+  coreNavItems.push({ href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics' });
 
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
       <div className="bg-card/95 backdrop-blur-md border-t border-border/60 safe-area-bottom">
-        <nav className="flex items-center justify-around h-18 px-2 overflow-x-auto">
-          {uniqueNavItems.map((item) => {
+        <nav className="flex items-center justify-around h-16 px-1">
+          {coreNavItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             
             return (
@@ -217,18 +224,18 @@ export function MobileNav() {
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={item.label}
                 className={cn(
-                  'flex flex-col items-center justify-center min-w-0 flex-1 py-3 px-2 rounded-xl transition-all duration-200',
+                  'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200',
                   isActive ? 'text-primary' : 'text-muted-foreground'
                 )}
               >
                 <div className={cn(
-                  'flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200',
-                  isActive ? 'bg-primary text-primary-foreground shadow-md' : 'hover:bg-muted/50'
+                  'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200',
+                  isActive ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
                 )}>
-                  <item.icon className="w-5 h-5" aria-hidden="true" />
+                  <item.icon className="w-4.5 h-4.5" aria-hidden="true" />
                 </div>
                 <span className={cn(
-                  'text-[11px] font-semibold mt-2 truncate max-w-full',
+                  'text-[10px] font-medium mt-1 truncate w-full text-center',
                   isActive ? 'text-primary' : 'text-muted-foreground'
                 )}>
                   {item.label}

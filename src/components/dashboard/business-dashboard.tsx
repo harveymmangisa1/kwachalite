@@ -85,47 +85,47 @@ export function BusinessDashboard({ transactions }: { transactions: Transaction[
   }
 
   return (
-    <div className="container-padding py-8 space-y-8">
+    <div className="container-padding py-4 sm:py-8 space-y-6 sm:space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">{businessProfile?.name || 'Business Dashboard'}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">{businessProfile?.name || 'Business Dashboard'}</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           {greeting}, {displayName}
         </p>
       </div>
 
       <BusinessOverviewCards transactions={transactions} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
+        <div className="xl:col-span-2 space-y-6 sm:space-y-8">
           <Card className="card-minimal">
-            <CardHeader><CardTitle>Financial Performance</CardTitle></CardHeader>
-            <CardContent><IncomeExpenseChart transactions={transactions} /></CardContent>
+            <CardHeader><CardTitle className="text-lg sm:text-xl">Financial Performance</CardTitle></CardHeader>
+            <CardContent className="p-4 sm:p-6"><IncomeExpenseChart transactions={transactions} /></CardContent>
           </Card>
           <Card className="card-minimal">
-            <CardHeader><CardTitle>Recent Business Transactions</CardTitle></CardHeader>
-            <CardContent><RecentTransactions transactions={transactions} /></CardContent>
+            <CardHeader><CardTitle className="text-lg sm:text-xl">Recent Business Transactions</CardTitle></CardHeader>
+            <CardContent className="p-4 sm:p-6"><RecentTransactions transactions={transactions} /></CardContent>
           </Card>
         </div>
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           <Card className="card-minimal">
-            <CardHeader><CardTitle>Quick Actions</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              <Button asChild variant="outline" className="w-full justify-start gap-3"><Link to="/dashboard/quotes"><FileText className="h-4 w-4" />Create New Quote</Link></Button>
-              <Button asChild variant="outline" className="w-full justify-start gap-3"><Link to="/dashboard/clients"><Users className="h-4 w-4" />Add New Client</Link></Button>
-              <Button asChild variant="outline" className="w-full justify-start gap-3"><Link to="/dashboard/products"><Receipt className="h-4 w-4" />Add New Product</Link></Button>
-              <Button asChild variant="outline" className="w-full justify-start gap-3"><Link to="/dashboard/invoices"><Landmark className="h-4 w-4" />Manage Invoices</Link></Button>
+            <CardHeader><CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle></CardHeader>
+            <CardContent className="space-y-2 p-4 sm:p-6">
+              <Button asChild variant="outline" className="w-full justify-start gap-3 h-10 sm:h-11 text-sm"><Link to="/dashboard/quotes"><FileText className="h-4 w-4" />Create Quote</Link></Button>
+              <Button asChild variant="outline" className="w-full justify-start gap-3 h-10 sm:h-11 text-sm"><Link to="/dashboard/clients"><Users className="h-4 w-4" />Add Client</Link></Button>
+              <Button asChild variant="outline" className="w-full justify-start gap-3 h-10 sm:h-11 text-sm"><Link to="/dashboard/products"><Receipt className="h-4 w-4" />Add Product</Link></Button>
+              <Button asChild variant="outline" className="w-full justify-start gap-3 h-10 sm:h-11 text-sm"><Link to="/dashboard/invoices"><Landmark className="h-4 w-4" />Manage Invoices</Link></Button>
             </CardContent>
           </Card>
           <Card className="card-minimal">
-             <CardHeader><CardTitle>Recent Quotations</CardTitle></CardHeader>
-             <CardContent><RecentQuotes /></CardContent>
+             <CardHeader><CardTitle className="text-lg sm:text-xl">Recent Quotations</CardTitle></CardHeader>
+             <CardContent className="p-4 sm:p-6"><RecentQuotes /></CardContent>
           </Card>
           <Card className="card-minimal">
-            <CardHeader><CardTitle>Invoices Ready</CardTitle></CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{acceptedQuotes.length}</div>
-              <p className="text-xs text-muted-foreground">Ready to be invoiced</p>
-              <Link to="/dashboard/invoices"><Button className="mt-4 w-full">Create Invoices</Button></Link>
+            <CardHeader><CardTitle className="text-lg sm:text-xl">Invoices Ready</CardTitle></CardHeader>
+            <CardContent className="p-4 sm:p-6">
+              <div className="text-xl sm:text-2xl font-bold">{acceptedQuotes.length}</div>
+              <p className="text-xs sm:text-sm text-muted-foreground">Ready to be invoiced</p>
+              <Link to="/dashboard/invoices"><Button className="mt-3 sm:mt-4 w-full h-10 sm:h-11 text-sm">Create Invoices</Button></Link>
             </CardContent>
           </Card>
         </div>

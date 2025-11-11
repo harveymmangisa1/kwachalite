@@ -40,9 +40,9 @@ export function DashboardHeader() {
     }, [activeWorkspace, getDisplayName, user]);
 
     return (
-        <div className="container-padding pt-8 pb-6 sm:pt-10 sm:pb-8">
-            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
-                <div className="flex items-center gap-4 min-w-0 flex-1">
+        <div className="container-padding pt-6 pb-4 sm:pt-8 sm:pb-6">
+            <header className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                     {/* Modern workspace switcher */}
                     <div className="relative">
                         <details className="group">

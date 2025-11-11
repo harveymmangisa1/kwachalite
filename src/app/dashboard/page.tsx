@@ -42,8 +42,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container-padding py-8 space-y-8">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+    <div className="container-padding py-4 sm:py-8 space-y-6 sm:space-y-8">
+      <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
       {shouldShowDashboard ? (
           <OverviewCards transactions={personalTransactions} />
       ) : (
