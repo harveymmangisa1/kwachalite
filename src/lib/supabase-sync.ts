@@ -310,7 +310,7 @@ export class SupabaseSync {
       return;
     }
 
-    const bills: Bill[] = data.map(item => ({
+    const bills: Bill[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
       amount: item.amount,
@@ -339,7 +339,7 @@ export class SupabaseSync {
       return;
     }
 
-    const savingsGoals: SavingsGoal[] = data.map(item => ({
+    const savingsGoals: SavingsGoal[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
       targetAmount: item.target_amount,
@@ -369,7 +369,7 @@ export class SupabaseSync {
       return;
     }
 
-    const categories: Category[] = data.map(item => ({
+    const categories: Category[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
       icon: item.icon || 'folder',
@@ -398,7 +398,7 @@ export class SupabaseSync {
       return;
     }
 
-    const clients: Client[] = data.map(item => ({
+    const clients: Client[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
       email: item.email,
@@ -424,7 +424,7 @@ export class SupabaseSync {
       return;
     }
 
-    const products: Product[] = data.map(item => ({
+    const products: Product[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
       description: item.description || undefined,
@@ -450,7 +450,7 @@ export class SupabaseSync {
       return;
     }
 
-    const quotes: Quote[] = data.map(item => ({
+    const quotes: Quote[] = (data || []).map((item: any) => ({
       id: item.id,
       quoteNumber: item.quote_number,
       clientId: item.client_id,
@@ -478,7 +478,7 @@ export class SupabaseSync {
       return;
     }
 
-    const loans: Loan[] = data.map(item => ({
+    const loans: Loan[] = (data || []).map((item: any) => ({
       id: item.id,
       lender: item.name || 'Unknown Lender',
       principal: item.principal_amount || 0,
@@ -960,5 +960,12 @@ export class SupabaseSync {
 }
 
 // Singleton instance
-export const dbSync = new SupabaseSync();
-export const supabaseSync = dbSync;
+let supabaseSyncInstance: SupabaseSync | null = null;
+
+export const supabaseSync = (() => {
+  if (supabaseSyncInstance) return supabaseSyncInstance;
+  supabaseSyncInstance = new SupabaseSync();
+  return supabaseSyncInstance;
+})();
+
+export const dbSync = supabaseSync;

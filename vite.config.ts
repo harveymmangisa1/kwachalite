@@ -17,7 +17,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false, // Enable for debugging if needed
+    sourcemap: true, // Enable for debugging
+    minify: 'terser',
     rollupOptions: {
       output: {
         // This is to solve the jspdf issue
