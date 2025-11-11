@@ -110,7 +110,7 @@ export function useBusinessProfile() {
       try {
         console.log('Attempting to load from Supabase business_profiles table...');
         
-        const { data, error: queryError } = await (supabase as any)
+        const { data, error: queryError } = await supabase
           .from('business_profiles')
           .select('*')
           .eq('user_id', user.id)
@@ -139,18 +139,18 @@ export function useBusinessProfile() {
             email: data.email || '',
             phone: data.phone || '',
             address: data.address || '',
-            logo_url: data.logo_url,
-            website: data.website,
-            taxId: data.tax_id,
-            registrationNumber: data.registration_number,
-            termsAndConditions: data.terms_and_conditions,
-            paymentDetails: data.payment_details,
-            bankDetails: data.bank_details,
-            bankName: data.bank_name,
-            accountName: data.account_name,
-            accountNumber: data.account_number,
-            routingNumber: data.routing_number,
-            swiftCode: data.swift_code,
+            logo_url: data.logo_url || undefined,
+            website: data.website || undefined,
+            taxId: data.tax_id || undefined,
+            registrationNumber: data.registration_number || undefined,
+            termsAndConditions: data.terms_and_conditions || undefined,
+            paymentDetails: data.payment_details || undefined,
+            bankDetails: data.payment_details || undefined, // Note: bank_details field doesn't exist in schema
+            bankName: data.bank_name || undefined,
+            accountName: data.account_name || undefined,
+            accountNumber: data.account_number || undefined,
+            routingNumber: data.routing_number || undefined,
+            swiftCode: data.swift_code || undefined,
           };
           
           console.log('Business profile loaded successfully from Supabase');
@@ -227,7 +227,7 @@ export function useBusinessProfile() {
         console.log('Attempting to save to Supabase business_profiles table...');
         
         // Check if record exists first
-        const { data: existingData } = await (supabase as any)
+        const { data: existingData } = await supabase
           .from('business_profiles')
           .select('id')
           .eq('user_id', user.id)
@@ -239,30 +239,29 @@ export function useBusinessProfile() {
           email: updatedProfile.email,
           phone: updatedProfile.phone,
           address: updatedProfile.address,
-          logo_url: updatedProfile.logo_url,
-          website: updatedProfile.website,
-          tax_id: updatedProfile.taxId,
-          registration_number: updatedProfile.registrationNumber,
-          terms_and_conditions: updatedProfile.termsAndConditions,
-          payment_details: updatedProfile.paymentDetails,
-          bank_details: updatedProfile.bankDetails,
-          bank_name: updatedProfile.bankName,
-          account_name: updatedProfile.accountName,
-          account_number: updatedProfile.accountNumber,
-          routing_number: updatedProfile.routingNumber,
-          swift_code: updatedProfile.swiftCode,
+          logo_url: updatedProfile.logo_url || null,
+          website: updatedProfile.website || null,
+          tax_id: updatedProfile.taxId || null,
+          registration_number: updatedProfile.registrationNumber || null,
+          terms_and_conditions: updatedProfile.termsAndConditions || null,
+          payment_details: updatedProfile.paymentDetails || null,
+          bank_name: updatedProfile.bankName || null,
+          account_name: updatedProfile.accountName || null,
+          account_number: updatedProfile.accountNumber || null,
+          routing_number: updatedProfile.routingNumber || null,
+          swift_code: updatedProfile.swiftCode || null,
         };
         
         let result;
         if (existingData) {
           // Update existing record
-          result = await (supabase as any)
+          result = await supabase
             .from('business_profiles')
             .update(supabaseData)
             .eq('user_id', user.id);
         } else {
           // Insert new record
-          result = await (supabase as any)
+          result = await supabase
             .from('business_profiles')
             .insert(supabaseData);
         }

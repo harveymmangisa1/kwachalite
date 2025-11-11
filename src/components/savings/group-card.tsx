@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Users, Calendar, Plus, Eye, Settings } from 'lucide-react';
+import { Users, Calendar, Plus, Eye, Settings, UserPlus } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { InviteMembersModal } from './invite-members-modal';
+import { ManageGroupMembersModal } from './manage-group-members-modal';
 import type { SavingsGroup } from '@/lib/types';
 
 interface GroupCardProps {
@@ -16,6 +18,7 @@ interface GroupCardProps {
   onView?: () => void;
   onManage?: () => void;
   onContribute?: () => void;
+  onInviteMembers?: () => void;
 }
 
 export function GroupCard({ 
@@ -24,7 +27,8 @@ export function GroupCard({
   userRole = 'member',
   onView,
   onManage,
-  onContribute 
+  onContribute,
+  onInviteMembers 
 }: GroupCardProps) {
   const progressPercentage = group.targetAmount > 0 
     ? (group.currentAmount / group.targetAmount) * 100 
@@ -108,13 +112,24 @@ export function GroupCard({
           </Button>
           
           {userRole === 'admin' && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onManage}
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
+            <>
+              <InviteMembersModal groupId={group.id} groupName={group.name} group={group}>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                >
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+              </InviteMembersModal>
+              <ManageGroupMembersModal group={group}>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </ManageGroupMembersModal>
+            </>
           )}
           
           {group.status === 'active' && !isCompleted && (
