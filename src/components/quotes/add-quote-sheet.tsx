@@ -22,6 +22,7 @@ import { useAppStore } from '@/lib/data';
 import { useState, useEffect, useRef } from 'react';
 import { PlusCircle, XCircle } from 'lucide-react';
 import type { Client, Product } from '@/lib/types';
+import { getCurrentCurrencySymbol } from '@/lib/utils';
 
 // --- Zod Schema for Quote --- //
 const quoteItemSchema = z.object({
@@ -58,6 +59,10 @@ export function AddQuoteSheet() {
   // Fallback to direct Supabase fetch if store is empty
   const [fallbackClients, setFallbackClients] = useState<Client[]>([]);
   const [fallbackProducts, setFallbackProducts] = useState<Product[]>([]);
+  
+  // Product dropdown state
+  const [productDropdowns, setProductDropdowns] = useState<{[key: number]: boolean}>({});
+  const [productSearches, setProductSearches] = useState<{[key: number]: string}>({});
   
   const clients = storeClients.length > 0 ? storeClients : fallbackClients;
   const products = storeProducts.length > 0 ? storeProducts : fallbackProducts;
@@ -130,7 +135,7 @@ export function AddQuoteSheet() {
             id: item.id,
             name: item.name,
             price: item.price,
-            costPrice: item.cost_price,
+            cost_price: item.cost_price,
             description: item.description || undefined,
           }));
           setFallbackProducts(formattedProducts);
@@ -140,6 +145,61 @@ export function AddQuoteSheet() {
       fetchProducts();
     }
   }, [storeClients.length, storeProducts.length]);
+
+  // Helper functions for dynamic quote details
+  const calculateLineTotal = (index: number) => {
+    const lineItem = form.getValues(`line_items.${index}`);
+    const quantity = lineItem?.quantity || 0;
+    const price = lineItem?.price || 0;
+    return quantity * price;
+  };
+
+  const calculateTotal = () => {
+    const lineItems = form.getValues('line_items') || [];
+    return lineItems.reduce((total, item) => {
+      const quantity = item?.quantity || 0;
+      const price = item?.price || 0;
+      return total + (quantity * price);
+    }, 0);
+  };
+
+  const getFilteredProducts = (searchTerm: string) => {
+    if (!searchTerm) return products;
+    return products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  const handleProductSearch = (index: number, value: string) => {
+    setProductSearches(prev => ({ ...prev, [index]: value }));
+    setProductDropdowns(prev => ({ ...prev, [index]: true }));
+  };
+
+  const showProductDropdown = (index: number) => {
+    setProductDropdowns(prev => ({ ...prev, [index]: true }));
+  };
+
+  const selectProduct = (index: number, product: Product) => {
+    form.setValue(`line_items.${index}.product_name`, product.name);
+    form.setValue(`line_items.${index}.price`, product.price);
+    setProductDropdowns(prev => ({ ...prev, [index]: false }));
+    setProductSearches(prev => ({ ...prev, [index]: '' }));
+  };
+
+  // Close product dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.product-dropdown-container')) {
+        setProductDropdowns({});
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Debug: Log clients data
   useEffect(() => {
@@ -329,115 +389,163 @@ export function AddQuoteSheet() {
 
           {/* Line Items */}
           <div className="space-y-4">
-            <Label>Line Items</Label>
+            <div className="flex items-center justify-between">
+              <Label>Line Items</Label>
+              <div className="text-sm text-muted-foreground">
+                Total: {getCurrentCurrencySymbol()}{calculateTotal().toFixed(2)}
+              </div>
+            </div>
             {fields.map((field, index) => (
-              <div key={field.id} className="flex items-center gap-2">
-                <div className="grid grid-cols-3 gap-2 flex-grow">
-                  <div>
-                    <Label htmlFor={`line_items.${index}.product_name`} className="sr-only">Product</Label>
-                    <Input
-                      id={`line_items.${index}.product_name`}
-                      placeholder="Product or service"
-                      {...form.register(`line_items.${index}.product_name`)}
-                      onChange={(e) => {
-                        form.setValue(`line_items.${index}.product_name`, e.target.value);
-                        // Handle custom product entry if needed
-                      }}
-                    />
-                    {/* Add dropdown for product selection here */}
+              <div key={field.id} className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground">Item {index + 1}</span>
+                  <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                    <XCircle className="h-3 w-3 text-red-500" />
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  {/* Product Selection with Dropdown */}
+                  <div className="md:col-span-2 product-dropdown-container">
+                    <Label htmlFor={`line_items.${index}.product_name`}>Product/Service *</Label>
+                    <div className="relative">
+                      <Input
+                        id={`line_items.${index}.product_name`}
+                        placeholder="Search products or type custom item"
+                        {...form.register(`line_items.${index}.product_name`)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          form.setValue(`line_items.${index}.product_name`, value);
+                          handleProductSearch(index, value);
+                        }}
+                        onFocus={() => showProductDropdown(index)}
+                      />
+                      {/* Product Dropdown */}
+                      {productDropdowns[index] && (
+                        <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
+                          {getFilteredProducts(productSearches[index] || '').length > 0 ? (
+                            getFilteredProducts(productSearches[index] || '').map((product) => (
+                              <div
+                                key={product.id}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => selectProduct(index, product)}
+                              >
+                                <div className="font-medium">{product.name}</div>
+                                <div className="text-sm text-gray-500">
+                                  {getCurrentCurrencySymbol()}{product.price.toFixed(2)}
+                                  {product.cost_price && ` (Cost: ${getCurrentCurrencySymbol()}{product.cost_price.toFixed(2)})`}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="px-4 py-2 text-gray-500 text-sm">
+                              No products found. Type to add custom item.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {form.formState.errors.line_items?.[index]?.product_name && (
+                      <p className="text-red-500 text-sm">{form.formState.errors.line_items[index]?.product_name?.message}</p>
+                    )}
                   </div>
+                  
+                  {/* Quantity */}
                   <div>
-                    <Label htmlFor={`line_items.${index}.quantity`} className="sr-only">Quantity</Label>
+                    <Label htmlFor={`line_items.${index}.quantity`}>Quantity *</Label>
                     <Input
                       id={`line_items.${index}.quantity`}
                       type="number"
-                      placeholder="Quantity"
-                      {...form.register(`line_items.${index}.quantity`, { valueAsNumber: true })}
+                      min="1"
+                      placeholder="1"
+                      {...form.register(`line_items.${index}.quantity`, { 
+                        valueAsNumber: true,
+                        onChange: (e) => {
+                          form.setValue(`line_items.${index}.quantity`, parseInt(e.target.value) || 1);
+                        }
+                      })}
                     />
+                    {form.formState.errors.line_items?.[index]?.quantity && (
+                      <p className="text-red-500 text-sm">{form.formState.errors.line_items[index]?.quantity?.message}</p>
+                    )}
                   </div>
+                  
+                  {/* Price */}
                   <div>
-                    <Label htmlFor={`line_items.${index}.price`} className="sr-only">Price</Label>
+                    <Label htmlFor={`line_items.${index}.price`}>Price *</Label>
                     <Input
                       id={`line_items.${index}.price`}
                       type="number"
-                      placeholder="Price"
-                      {...form.register(`line_items.${index}.price`, { valueAsNumber: true })}
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      {...form.register(`line_items.${index}.price`, { 
+                        valueAsNumber: true,
+                        onChange: (e) => {
+                          form.setValue(`line_items.${index}.price`, parseFloat(e.target.value) || 0);
+                        }
+                      })}
                     />
+                    {form.formState.errors.line_items?.[index]?.price && (
+                      <p className="text-red-500 text-sm">{form.formState.errors.line_items[index]?.price?.message}</p>
+                    )}
                   </div>
                 </div>
-                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                  <XCircle className="h-3 w-3 text-red-500" />
-                </Button>
+                
+                {/* Line Total */}
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="text-sm text-muted-foreground">Line Total:</span>
+                  <span className="font-medium">
+                    {getCurrentCurrencySymbol()}{calculateLineTotal(index).toFixed(2)}
+                  </span>
+                </div>
               </div>
             ))}
+            
+            {/* Add Item Button */}
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={() => append({ product_name: '', quantity: 1, price: 0 })}
+              className="w-full"
             >
-              <PlusCircle className="mr-1 h-3 w-3" />
-              Add Item
+              <PlusCircle className="mr-2 h-3 w-3" />
+              Add Line Item
             </Button>
+            
             {form.formState.errors.line_items && (
               <p className="text-red-500 text-sm">{form.formState.errors.line_items.message}</p>
             )}
           </div>
 
+          {/* Quote Summary */}
+          <div className="border rounded-lg p-4 bg-gray-50">
+            <h3 className="font-semibold mb-3">Quote Summary</h3>
+            <div className="space-y-2">
+              {fields.map((field, index) => {
+                const lineItem = form.getValues(`line_items.${index}`);
+                if (!lineItem?.product_name) return null;
+                return (
+                  <div key={field.id} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {lineItem.product_name} (x{lineItem.quantity || 0})
+                    </span>
+                    <span>{getCurrentCurrencySymbol()}{calculateLineTotal(index).toFixed(2)}</span>
+                  </div>
+                );
+              })}
+              <div className="border-t pt-2 flex justify-between font-semibold">
+                <span>Total Amount:</span>
+                <span className="text-lg">{getCurrentCurrencySymbol()}{calculateTotal().toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
           {/* Notes */}
           <div>
-            <Label htmlFor="client_name">Client *</Label>
-            <div className="relative" ref={dropdownRef}>
-              <Input
-                id="client_name"
-                placeholder="Search for a client or type a new name"
-                {...form.register('client_name')}
-                value={searchTerm || form.getValues('client_name')}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setSearchTerm(value);
-                  form.setValue('client_name', value);
-                  setSelectedClient(null);
-                  setShowDropdown(true);
-                }}
-                onFocus={() => setShowDropdown(true)}
-              />
-              {/* Show dropdown when there's a search term or when focused with clients */}
-              {showDropdown && (
-                <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
-                  {clients.length > 0 ? (
-                    clients
-                      .filter((client) =>
-                        client.name.toLowerCase().includes((searchTerm || '').toLowerCase())
-                      )
-                      .map((client) => (
-                        <li
-                          key={client.id}
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer list-none flex items-center justify-between"
-                          onClick={() => handleClientSelection(client)}
-                        >
-                          <div>
-                            <div className="font-medium">{client.name}</div>
-                            <div className="text-sm text-gray-500">{client.email}</div>
-                          </div>
-                        </li>
-                      ))
-                  ) : (
-                    <li className="px-4 py-2 text-gray-500 list-none">
-                      No clients found. {searchTerm ? 'Try a different search term' : 'Add clients first'}
-                    </li>
-                  )}
-                </div>
-              )}
-            </div>
-            {selectedClient && (
-              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                <span className="text-sm text-green-700">Selected: {selectedClient.name}</span>
-              </div>
-            )}
-            {form.formState.errors.client_name && (
-              <p className="text-red-500 text-sm">{form.formState.errors.client_name.message}</p>
-            )}
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea id="notes" placeholder="Add any relevant notes here" {...form.register('notes')} />
           </div>
 
           {/* Status (Hidden) */}
