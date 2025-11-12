@@ -111,7 +111,7 @@ export function AddClientSheet() {
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <Button size="sm" className="gap-1"><PlusCircle className="h-4 w-4" /> Add Client</Button>
+        <Button size="sm" className="gap-1"><PlusCircle className="h-3 w-3" /> Add Client</Button>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 h-screen sm:h-[90vh]">
         <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b flex-shrink-0">

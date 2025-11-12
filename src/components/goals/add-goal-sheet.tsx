@@ -129,7 +129,7 @@ export function AddGoalSheet() {
     }}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3 w-3" />
           Add Goal
         </Button>
       </SheetTrigger>
@@ -218,7 +218,7 @@ export function AddGoalSheet() {
                             />
                             {fields.length > 1 && (
                               <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-3 w-3" />
                               </Button>
                             )}
                           </div>
@@ -231,7 +231,7 @@ export function AddGoalSheet() {
                         className="mt-4"
                         onClick={() => append({ id: `item-${new Date().toISOString()}`, name: '', price: 0, purchased: false })}
                       >
-                        <PlusCircle className="h-4 w-4 mr-2" />
+                        <PlusCircle className="h-3 w-3 mr-2" />
                         Add Item
                       </Button>
                     </div>

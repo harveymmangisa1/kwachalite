@@ -100,7 +100,7 @@ export function AddProjectSheet() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="outline">
-          <PlusCircle className="mr-2 h-4 w-4" />
+          <PlusCircle className="mr-2 h-3 w-3" />
           Add Project
         </Button>
       </SheetTrigger>

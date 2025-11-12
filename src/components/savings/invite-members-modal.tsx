@@ -245,13 +245,13 @@ export function InviteMembersModal({
   const getStatusIcon = (status: InvitationStatus['status']) => {
     switch (status) {
       case 'pending':
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
+        return <Clock className="h-3 w-3 text-muted-foreground" />;
       case 'sending':
-        return <Clock className="h-4 w-4 text-blue-500 animate-spin" />;
+        return <Clock className="h-3 w-3 text-blue-500 animate-spin" />;
       case 'sent':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-3 w-3 text-green-500" />;
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
+        return <AlertCircle className="h-3 w-3 text-red-500" />;
     }
   };
 
@@ -374,12 +374,12 @@ export function InviteMembersModal({
               >
                 {isSubmitting ? (
                   <>
-                    <Users className="h-4 w-4 mr-2 animate-spin" />
+                    <Users className="h-3 w-3 mr-2 animate-spin" />
                     Sending...
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4 mr-2" />
+                    <Send className="h-3 w-3 mr-2" />
                     Send Invitations
                   </>
                 )}

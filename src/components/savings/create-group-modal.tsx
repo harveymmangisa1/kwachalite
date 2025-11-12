@@ -218,7 +218,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
             {/* Goal Settings */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium flex items-center gap-2">
-                <Target className="h-4 w-4" />
+                <Target className="h-3 w-3" />
                 Goal Settings
               </h3>
 
@@ -288,7 +288,7 @@ export function CreateGroupModal({ children, open, onOpenChange }: CreateGroupMo
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            <CalendarIcon className="ml-auto h-3 w-3 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>

@@ -110,7 +110,7 @@ export function AddLoanSheet() {
     }}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3 w-3" />
           Add Loan
         </Button>
       </SheetTrigger>

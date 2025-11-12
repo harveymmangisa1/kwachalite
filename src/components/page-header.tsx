@@ -15,7 +15,7 @@ export function PageHeader({ title, description, children, icon }: PageHeaderPro
     <div className="flex flex-col gap-4 mb-6 px-4 pt-4 sm:px-6 sm:pt-0">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background sm:static sm:h-auto sm:border-0 sm:bg-transparent">
           <div className="relative flex-1 md:grow-0">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-2.5 h-3 w-3 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search..."

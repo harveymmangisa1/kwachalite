@@ -200,7 +200,7 @@ export function AddTransactionSheet() {
     }}>
       <SheetTrigger asChild>
         <AsyncButton size="sm" className="gap-1" loading={isLoading}>
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3 w-3" />
           Add Transaction
         </AsyncButton>
       </SheetTrigger>

@@ -177,7 +177,10 @@ export function AddQuoteSheet() {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button>Add Quote</Button>
+        <Button className="gap-1">
+          <PlusCircle className="h-3 w-3" />
+          Add Quote
+        </Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <SheetHeader>
@@ -287,7 +290,7 @@ export function AddQuoteSheet() {
                   </div>
                 </div>
                 <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                  <XCircle className="h-4 w-4 text-red-500" />
+                  <XCircle className="h-3 w-3 text-red-500" />
                 </Button>
               </div>
             ))}
@@ -297,7 +300,7 @@ export function AddQuoteSheet() {
               size="sm"
               onClick={() => append({ product_name: '', quantity: 1, price: 0 })}
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
+              <PlusCircle className="mr-1 h-3 w-3" />
               Add Item
             </Button>
             {form.formState.errors.line_items && (

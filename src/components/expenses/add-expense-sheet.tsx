@@ -121,7 +121,7 @@ export function AddExpenseSheet({ clientId, projectId }: AddExpenseSheetProps) {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1">
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3 w-3" />
           Add Expense
         </Button>
       </SheetTrigger>
@@ -227,7 +227,7 @@ export function AddExpenseSheet({ clientId, projectId }: AddExpenseSheetProps) {
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            <CalendarIcon className="ml-auto h-3 w-3 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
@@ -319,7 +319,7 @@ export function AddExpenseSheet({ clientId, projectId }: AddExpenseSheetProps) {
                         {...field} 
                       />
                       <Button type="button" variant="outline" size="sm">
-                        <Upload className="h-4 w-4" />
+                        <Upload className="h-3 w-3" />
                       </Button>
                     </div>
                   </FormControl>

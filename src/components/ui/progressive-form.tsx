@@ -50,14 +50,14 @@ export function ProgressiveForm({
   return (
     <div className={cn("flex flex-col h-full", className)}>
       {/* Progress Steps */}
-      <div className="px-4 sm:px-6 py-4 bg-muted border-b border-border">
+      <div className="px-4 sm:px-6 py-3 bg-muted/50 border-b border-border">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => (
             <React.Fragment key={step.id}>
               <div className="flex flex-col items-center flex-1">
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300",
+                    "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300",
                     currentStep > step.id
                       ? "bg-emerald-500 border-emerald-500 text-white"
                       : currentStep === step.id
@@ -66,12 +66,12 @@ export function ProgressiveForm({
                   )}
                 >
                   {currentStep > step.id ? (
-                    <Check className="w-5 h-5" />
+                    <Check className="w-3 h-3" />
                   ) : (
-                    <step.icon className="w-5 h-5" />
+                    <step.icon className="w-3 h-3" />
                   )}
                 </div>
-                <div className="mt-2 text-center hidden sm:block">
+                <div className="mt-1 text-center hidden sm:block">
                   <p className={cn(
                     "text-xs font-medium",
                     currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
@@ -81,7 +81,7 @@ export function ProgressiveForm({
                   <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
                 </div>
                 {currentStep === step.id && (
-                  <p className="text-xs font-medium text-foreground mt-2 sm:hidden">
+                  <p className="text-xs font-medium text-foreground mt-1 sm:hidden">
                     {step.name}
                   </p>
                 )}
@@ -103,7 +103,7 @@ export function ProgressiveForm({
       </div>
 
       {/* Navigation Footer */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 bg-white">
+      <div className="px-4 sm:px-6 py-2 sm:py-3 border-t border-border bg-background">
         <div className="flex items-center justify-between gap-2 sm:gap-3">
           <div className="flex gap-2">
             {currentStep > 1 && (
@@ -111,10 +111,10 @@ export function ProgressiveForm({
                 type="button"
                 variant="outline"
                 onClick={prevStep}
-                className="gap-2 h-10 sm:h-9 text-sm sm:text-base"
+                className="gap-1 h-9 sm:h-8 text-xs sm:text-sm"
                 disabled={isSubmitting}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3" />
                 <span className="hidden sm:inline">Back</span>
               </Button>
             )}
@@ -123,7 +123,7 @@ export function ProgressiveForm({
               variant="ghost"
               onClick={() => {}}
               disabled={isSubmitting}
-              className="text-muted-foreground h-10 sm:h-9 text-sm sm:text-base"
+              className="text-muted-foreground h-9 sm:h-8 text-xs sm:text-sm"
             >
               Cancel
             </Button>
@@ -135,20 +135,20 @@ export function ProgressiveForm({
                 type="button"
                 onClick={nextStep}
                 disabled={!canProceed || isSubmitting}
-                className="gap-2 bg-primary hover:bg-primary/90 h-10 sm:h-9 text-sm sm:text-base"
+                className="gap-1 bg-primary hover:bg-primary/90 h-9 sm:h-8 text-xs sm:text-sm"
               >
                 <span className="hidden sm:inline">Continue</span>
                 <span className="sm:hidden">Next</span>
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3" />
               </Button>
             ) : (
               <Button 
                 type="submit"
                 onClick={onSubmit}
                 disabled={!canProceed || isSubmitting}
-                className="gap-2 bg-emerald-600 hover:bg-emerald-700 h-10 sm:h-9 text-sm sm:text-base"
+                className="gap-1 bg-emerald-600 hover:bg-emerald-700 h-9 sm:h-8 text-xs sm:text-sm"
               >
-                <Check className="h-4 w-4" />
+                <Check className="h-3 w-3" />
                 {isSubmitting ? 'Submitting...' : submitText}
               </Button>
             )}

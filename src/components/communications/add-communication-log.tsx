@@ -110,7 +110,7 @@ export function AddCommunicationLog({ clientId, projectId }: AddCommunicationLog
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1">
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3 w-3" />
           Add Log
         </Button>
       </SheetTrigger>
@@ -278,7 +278,7 @@ export function AddCommunicationLog({ clientId, projectId }: AddCommunicationLog
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            <CalendarIcon className="ml-auto h-3 w-3 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
@@ -343,7 +343,7 @@ export function AddCommunicationLog({ clientId, projectId }: AddCommunicationLog
                           ) : (
                             <span>Pick a date</span>
                           )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          <CalendarIcon className="ml-auto h-3 w-3 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>

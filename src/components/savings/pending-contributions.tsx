@@ -150,7 +150,7 @@ export function PendingContributions({ group, trigger }: PendingContributionsPro
 
   const defaultTrigger = (
     <Button variant="outline" size="sm" className="relative">
-      <Clock className="h-4 w-4 mr-2" />
+      <Clock className="h-3 w-3 mr-2" />
       Pending Review
       {pendingContributions.length > 0 && (
         <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs">
@@ -215,7 +215,7 @@ export function PendingContributions({ group, trigger }: PendingContributionsPro
                     <Badge variant="secondary" className="capitalize">
                       {selectedContribution.status}
                     </Badge>
-                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <Clock className="h-3 w-3 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">Awaiting verification</span>
                   </div>
                 </CardContent>
@@ -238,7 +238,7 @@ export function PendingContributions({ group, trigger }: PendingContributionsPro
                           </div>
                         </div>
                         <Button variant="outline" size="sm">
-                          <Download className="h-4 w-4 mr-2" />
+                          <Download className="h-3 w-3 mr-2" />
                           View
                         </Button>
                       </div>
@@ -267,7 +267,7 @@ export function PendingContributions({ group, trigger }: PendingContributionsPro
                   className="flex-1"
                   disabled={isVerifying}
                 >
-                  <XCircle className="h-4 w-4 mr-2" />
+                  <XCircle className="h-3 w-3 mr-2" />
                   Reject
                 </Button>
                 <Button
@@ -275,7 +275,7 @@ export function PendingContributions({ group, trigger }: PendingContributionsPro
                   className="flex-1"
                   disabled={isVerifying}
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <CheckCircle className="h-3 w-3 mr-2" />
                   Approve
                 </Button>
               </div>

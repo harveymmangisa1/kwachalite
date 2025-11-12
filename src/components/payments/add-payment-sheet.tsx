@@ -108,7 +108,7 @@ export function AddPaymentSheet({ clientId, projectId }: AddPaymentSheetProps) {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3 w-3" />
           Add Payment
         </Button>
       </SheetTrigger>
@@ -214,7 +214,7 @@ export function AddPaymentSheet({ clientId, projectId }: AddPaymentSheetProps) {
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            <CalendarIcon className="ml-auto h-3 w-3 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>

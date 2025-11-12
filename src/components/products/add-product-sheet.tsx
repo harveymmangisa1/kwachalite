@@ -107,8 +107,8 @@ export function AddProductSheet() {
       }}
     >
       <SheetTrigger asChild>
-        <Button size="sm" className="gap-2">
-          <PlusCircle className="h-4 w-4" />
+        <Button size="sm" className="gap-1">
+          <PlusCircle className="h-3 w-3" />
           <span className="hidden sm:inline">Add Product</span>
           <span className="sm:hidden">Add</span>
         </Button>
@@ -180,55 +180,55 @@ export function AddProductSheet() {
                       </div>
 
                       <div className="grid gap-4">
-                        <FormField
-                          control={form.control}
-                          name="costPrice"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Cost Price</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                                    {getCurrentCurrencySymbol()}
-                                  </span>
-                                  <Input
-                                    type="number"
-                                    placeholder="0"
-                                    className="h-11 pl-12"
-                                    step="0.01"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                         <FormField
+                           control={form.control}
+                           name="costPrice"
+                           render={({ field }) => (
+                             <FormItem>
+                               <FormLabel>Cost Price</FormLabel>
+                               <FormControl>
+                                 <div className="relative">
+                                   <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">
+                                     {getCurrentCurrencySymbol()}
+                                   </span>
+                                   <Input
+                                     type="number"
+                                     placeholder="0"
+                                     className="h-9 pl-8"
+                                     step="0.01"
+                                     {...field}
+                                   />
+                                 </div>
+                               </FormControl>
+                               <FormMessage />
+                             </FormItem>
+                           )}
+                         />
 
-                        <FormField
-                          control={form.control}
-                          name="price"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Selling Price</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                                    {getCurrentCurrencySymbol()}
-                                  </span>
-                                  <Input
-                                    type="number"
-                                    placeholder="0"
-                                    className="h-11 pl-12"
-                                    step="0.01"
-                                    {...field}
-                                  />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                         <FormField
+                           control={form.control}
+                           name="price"
+                           render={({ field }) => (
+                             <FormItem>
+                               <FormLabel>Selling Price</FormLabel>
+                               <FormControl>
+                                 <div className="relative">
+                                   <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">
+                                     {getCurrentCurrencySymbol()}
+                                   </span>
+                                   <Input
+                                     type="number"
+                                     placeholder="0"
+                                     className="h-9 pl-8"
+                                     step="0.01"
+                                     {...field}
+                                   />
+                                 </div>
+                               </FormControl>
+                               <FormMessage />
+                             </FormItem>
+                           )}
+                         />
 
                         {/* Profit Indicator */}
                         {watchedValues.price > 0 && watchedValues.costPrice >= 0 && (

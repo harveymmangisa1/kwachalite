@@ -180,7 +180,7 @@ export function ContributeModal({
 
   const defaultTrigger = (
     <Button className="flex-1">
-      <Upload className="h-4 w-4 mr-2" />
+      <Upload className="h-3 w-3 mr-2" />
       Contribute
     </Button>
   );
@@ -338,7 +338,7 @@ export function ContributeModal({
                       onClick={removeFile}
                       className="text-destructive hover:text-destructive"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>

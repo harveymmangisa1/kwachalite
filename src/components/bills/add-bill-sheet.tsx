@@ -125,7 +125,7 @@ export function AddBillSheet() {
     }}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1">
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-3 w-3" />
           Add Bill
         </Button>
       </SheetTrigger>

@@ -87,13 +87,13 @@ export function GroupCard({
         {/* Group Info */}
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-3 w-3 text-muted-foreground" />
             <span>{memberCount} members</span>
           </div>
           
           {daysLeft !== null && (
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Calendar className="h-3 w-3 text-muted-foreground" />
               <span className={daysLeft < 7 ? "text-orange-600" : ""}>
                 {daysLeft > 0 ? `${daysLeft} days left` : 'Overdue'}
               </span>
@@ -109,7 +109,7 @@ export function GroupCard({
             onClick={onView}
             className="flex-1"
           >
-            <Eye className="h-4 w-4 mr-2" />
+            <Eye className="h-3 w-3 mr-2" />
             View
           </Button>
           
@@ -121,7 +121,7 @@ export function GroupCard({
                   variant="outline" 
                   size="sm"
                 >
-                  <UserPlus className="h-4 w-4" />
+                  <UserPlus className="h-3 w-3" />
                 </Button>
               </InviteMembersModal>
               <ManageGroupMembersModal group={group}>
@@ -129,7 +129,7 @@ export function GroupCard({
                   variant="outline" 
                   size="sm"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-3 w-3" />
                 </Button>
               </ManageGroupMembersModal>
             </>
@@ -142,7 +142,7 @@ export function GroupCard({
                 className="flex-1"
                 data-tour="contributions"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-3 w-3 mr-2" />
                 Contribute
               </Button>
             </ContributeModal>
