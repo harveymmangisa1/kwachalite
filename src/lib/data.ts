@@ -382,13 +382,26 @@ export const useAppStore = create<AppState>()(
         }
       },
       // Category methods
-      addCategory: (category) => set(state => ({ categories: [...state.categories, category] })),
-      updateCategory: (category) => set(state => ({
-        categories: state.categories.map(c => c.id === category.id ? category : c)
-      })),
-      deleteCategory: (categoryId: string) => set(state => ({
-        categories: state.categories.filter(c => c.id !== categoryId)
-      })),
+      addCategory: (category) => {
+        set((state) => ({ categories: [...state.categories, category] }));
+        supabaseSync.syncCategory(category, 'create');
+      },
+      updateCategory: (category) => {
+        set(state => ({
+          categories: state.categories.map(c => c.id === category.id ? category : c)
+        }));
+        supabaseSync.syncCategory(category, 'update');
+      },
+      deleteCategory: (categoryId: string) => {
+        const state = get();
+        const category = state.categories.find(c => c.id === categoryId);
+        if (category) {
+          set(state => ({
+            categories: state.categories.filter(c => c.id !== categoryId)
+          }));
+          supabaseSync.syncCategory(category, 'delete');
+        }
+      },
       // Sales Receipt methods
       addSalesReceipt: (receipt) => {
         set((state) => ({ salesReceipts: [receipt, ...state.salesReceipts] }));

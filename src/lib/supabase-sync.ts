@@ -13,6 +13,7 @@ import type {
   Quote, 
   Loan 
 } from '@/lib/types';
+import { Briefcase } from 'lucide-react';
 
 // Temporary type assertion to bypass TypeScript issues
 const db = supabase as any;
@@ -372,7 +373,7 @@ export class SupabaseSync {
     const categories: Category[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
-      icon: item.icon || 'folder',
+      icon: Briefcase, // Default icon - in a real app, you'd map icon names to components
       color: item.color || '#0066cc',
       type: (item.type as 'income' | 'expense') || 'expense',
       workspace: (item.workspace as 'personal' | 'business') || 'personal',
@@ -869,6 +870,58 @@ export class SupabaseSync {
     }
   }
 
+  async syncCategory(category: Category, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('categories', category.id, category, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('categories')
+          .delete()
+          .eq('id', category.id)
+          .eq('user_id', this.user.id);
+        
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: category.id,
+          name: category.name,
+          icon: 'folder', // Store default icon name as string
+          color: category.color,
+          type: category.type,
+          workspace: category.workspace,
+          budget: category.budget || null,
+          budget_frequency: category.budgetFrequency || 'monthly',
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('categories')
+          .upsert(syncData, { onConflict: 'id' });
+        
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} category:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('categories', category.id, category, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
   // Offline support
   private offlineQueue: Array<{
     collection: string;
@@ -912,6 +965,8 @@ export class SupabaseSync {
           await this.syncBill(operation.data, operation.operation);
         } else if (operation.collection === 'quotes') {
           await this.syncQuote(operation.data, operation.operation);
+        } else if (operation.collection === 'categories') {
+          await this.syncCategory(operation.data, operation.operation);
         }
         // Add other collection types as needed
       }

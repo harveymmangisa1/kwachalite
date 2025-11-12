@@ -262,42 +262,7 @@ export function BudgetManager() {
         </Card>
       </div>
 
-      {/* Add New Category */}
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-blue-600" />
-            Add New Category
-          </CardTitle>
-        </CardHeader>
-        <CardFooter className="flex flex-col items-stretch gap-4">
-          <div>
-            <Label className="text-sm font-medium">Create Category</Label>
-            <div className="flex w-full items-center gap-2 mt-2">
-                <Input
-                    type="text"
-                    placeholder="New category name"
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                    className="flex-1"
-                />
-                <Select value={newCategoryType} onValueChange={(v) => setNewCategoryType(v as any)}>
-                    <SelectTrigger className="w-[120px]">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="expense">Expense</SelectItem>
-                        <SelectItem value="income">Income</SelectItem>
-                    </SelectContent>
-                </Select>
-                <Button onClick={handleAddCategory} className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add
-                </Button>
-            </div>
-          </div>
-        </CardFooter>
-      </Card>
+
     </div>
   );
 }

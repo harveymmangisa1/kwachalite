@@ -14,6 +14,7 @@ import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BudgetAdjustModal } from '@/components/budgets/budget-adjust-modal';
+import { AddCategorySheet } from '@/components/budgets/add-category-sheet';
 
 const BudgetDashboard = () => {
   const { activeWorkspace } = useActiveWorkspace();
@@ -31,6 +32,7 @@ const BudgetDashboard = () => {
   // State for the budget adjustment modal
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddCategorySheetOpen, setIsAddCategorySheetOpen] = useState(false);
 
   // Filter data for active workspace
   const workspaceTransactions = useMemo(() => 
@@ -382,7 +384,7 @@ const BudgetDashboard = () => {
         <div className="card-elevated mb-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold text-foreground">Budget Categories</h3>
-            <Button className="flex items-center space-x-2">
+            <Button className="flex items-center space-x-2" onClick={() => setIsAddCategorySheetOpen(true)}>
               <Plus className="w-4 h-4" />
               <span>Add Category</span>
             </Button>
@@ -542,6 +544,12 @@ const BudgetDashboard = () => {
           transactions={workspaceTransactions}
         />
       )}
+
+      {/* Add Category Sheet */}
+      <AddCategorySheet
+        open={isAddCategorySheetOpen}
+        onOpenChange={setIsAddCategorySheetOpen}
+      />
     </div>
   );
 };
