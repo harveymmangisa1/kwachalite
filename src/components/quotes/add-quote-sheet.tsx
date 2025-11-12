@@ -18,7 +18,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { useState, useEffect } from 'react';
+import { useAppStore } from '@/lib/data';
+import { useState, useEffect, useRef } from 'react';
 import { PlusCircle, XCircle } from 'lucide-react';
 import type { Client, Product } from '@/lib/types';
 
@@ -47,11 +48,19 @@ type QuoteFormValues = z.infer<typeof quoteSchema>;
 // --- AddQuoteSheet Component --- //
 export function AddQuoteSheet() {
   const { toast } = useToast();
+  const { clients: storeClients, products: storeProducts } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Fallback to direct Supabase fetch if store is empty
+  const [fallbackClients, setFallbackClients] = useState<Client[]>([]);
+  const [fallbackProducts, setFallbackProducts] = useState<Product[]>([]);
+  
+  const clients = storeClients.length > 0 ? storeClients : fallbackClients;
+  const products = storeProducts.length > 0 ? storeProducts : fallbackProducts;
 
   const form = useForm<QuoteFormValues>({
     resolver: zodResolver(quoteSchema),
@@ -71,34 +80,79 @@ export function AddQuoteSheet() {
     name: "line_items",
   });
 
+  // Close dropdown when clicking outside
   useEffect(() => {
-    const fetchClientsAndProducts = async () => {
-      const { data: clientsData, error: clientsError } = await supabase
-        .from('clients')
-        .select('id, name, email');
-      if (clientsError) {
-        console.error('Error fetching clients:', clientsError);
-      } else {
-        setClients(clientsData || []);
-      }
-
-      const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select('id, name, price');
-      if (productsError) {
-        console.error('Error fetching products:', productsError);
-      } else {
-        setProducts(productsData || []);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
       }
     };
-    fetchClientsAndProducts();
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
+
+  // Fetch from Supabase if store is empty
+  useEffect(() => {
+    if (storeClients.length === 0) {
+      const fetchClients = async () => {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('id, name, email, phone, address')
+          .order('name');
+        
+        if (!error && data) {
+          const formattedClients: Client[] = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            email: item.email,
+            phone: item.phone || undefined,
+            address: item.address || undefined,
+          }));
+          setFallbackClients(formattedClients);
+          console.log('Fetched fallback clients:', formattedClients);
+        }
+      };
+      fetchClients();
+    }
+    
+    if (storeProducts.length === 0) {
+      const fetchProducts = async () => {
+        const { data, error } = await supabase
+          .from('products')
+          .select('id, name, price, cost_price, description')
+          .order('name');
+        
+        if (!error && data) {
+          const formattedProducts: Product[] = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            costPrice: item.cost_price,
+            description: item.description || undefined,
+          }));
+          setFallbackProducts(formattedProducts);
+          console.log('Fetched fallback products:', formattedProducts);
+        }
+      };
+      fetchProducts();
+    }
+  }, [storeClients.length, storeProducts.length]);
+
+  // Debug: Log clients data
+  useEffect(() => {
+    console.log('Final clients data:', clients);
+    console.log('Final products data:', products);
+  }, [clients, products]);
 
   const handleClientSelection = (client: Client) => {
     setSelectedClient(client);
     form.setValue('client_name', client.name);
     form.setValue('client_email', client.email);
     setSearchTerm('');
+    setShowDropdown(false);
   };
 
   const handleProductSelection = (index: number, product: Product) => {
@@ -207,35 +261,57 @@ export function AddQuoteSheet() {
           </div>
 
           <div>
-            <Label htmlFor="client_name">Client</Label>
-            <Input
-              id="client_name"
-              placeholder="Search for a client or type a new name"
-              {...form.register('client_name')}
-              value={searchTerm || form.getValues('client_name')}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                form.setValue('client_name', e.target.value);
-                setSelectedClient(null);
-              }}
-            />
-            {searchTerm && (
-              <div className="relative">
-                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto">
-                  {clients
-                    .filter((client) =>
-                      client.name.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                    .map((client) => (
-                      <li
-                        key={client.id}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleClientSelection(client)}
-                      >
-                        {client.name}
-                      </li>
-                    ))}
-                </ul>
+            <Label htmlFor="client_name">Client *</Label>
+            <div className="relative">
+              <Input
+                id="client_name"
+                placeholder="Search for a client or type a new name"
+                {...form.register('client_name')}
+                value={searchTerm || form.getValues('client_name')}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchTerm(value);
+                  form.setValue('client_name', value);
+                  setSelectedClient(null);
+                }}
+                onFocus={() => {
+                  // Show dropdown when input is focused if there are clients
+                  if (clients.length > 0 && !searchTerm) {
+                    setSearchTerm('');
+                  }
+                }}
+              />
+              {/* Show dropdown when there's a search term or when focused with clients */}
+              {(searchTerm || (document.activeElement?.id === 'client_name' && clients.length > 0)) && (
+                <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
+                  {clients.length > 0 ? (
+                    clients
+                      .filter((client) =>
+                        client.name.toLowerCase().includes((searchTerm || '').toLowerCase())
+                      )
+                      .map((client) => (
+                        <li
+                          key={client.id}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer list-none flex items-center justify-between"
+                          onClick={() => handleClientSelection(client)}
+                        >
+                          <div>
+                            <div className="font-medium">{client.name}</div>
+                            <div className="text-sm text-gray-500">{client.email}</div>
+                          </div>
+                        </li>
+                      ))
+                  ) : (
+                    <li className="px-4 py-2 text-gray-500 list-none">
+                      No clients found. {searchTerm ? 'Try a different search term' : 'Add clients first'}
+                    </li>
+                  )}
+                </div>
+              )}
+            </div>
+            {selectedClient && (
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                <span className="text-sm text-green-700">Selected: {selectedClient.name}</span>
               </div>
             )}
             {form.formState.errors.client_name && (
@@ -310,8 +386,58 @@ export function AddQuoteSheet() {
 
           {/* Notes */}
           <div>
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" placeholder="Add any relevant notes here" {...form.register('notes')} />
+            <Label htmlFor="client_name">Client *</Label>
+            <div className="relative" ref={dropdownRef}>
+              <Input
+                id="client_name"
+                placeholder="Search for a client or type a new name"
+                {...form.register('client_name')}
+                value={searchTerm || form.getValues('client_name')}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchTerm(value);
+                  form.setValue('client_name', value);
+                  setSelectedClient(null);
+                  setShowDropdown(true);
+                }}
+                onFocus={() => setShowDropdown(true)}
+              />
+              {/* Show dropdown when there's a search term or when focused with clients */}
+              {showDropdown && (
+                <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
+                  {clients.length > 0 ? (
+                    clients
+                      .filter((client) =>
+                        client.name.toLowerCase().includes((searchTerm || '').toLowerCase())
+                      )
+                      .map((client) => (
+                        <li
+                          key={client.id}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer list-none flex items-center justify-between"
+                          onClick={() => handleClientSelection(client)}
+                        >
+                          <div>
+                            <div className="font-medium">{client.name}</div>
+                            <div className="text-sm text-gray-500">{client.email}</div>
+                          </div>
+                        </li>
+                      ))
+                  ) : (
+                    <li className="px-4 py-2 text-gray-500 list-none">
+                      No clients found. {searchTerm ? 'Try a different search term' : 'Add clients first'}
+                    </li>
+                  )}
+                </div>
+              )}
+            </div>
+            {selectedClient && (
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                <span className="text-sm text-green-700">Selected: {selectedClient.name}</span>
+              </div>
+            )}
+            {form.formState.errors.client_name && (
+              <p className="text-red-500 text-sm">{form.formState.errors.client_name.message}</p>
+            )}
           </div>
 
           {/* Status (Hidden) */}
@@ -327,22 +453,48 @@ export function AddQuoteSheet() {
           </div>
         </form>
         
-        {/* Debugging Toast - Remove if not needed */}
-        <Button
-            variant="outline"
-            onClick={() => {
-              toast({
-                title: "You submitted the following values:",
-                description: (
-                  <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                    {JSON.stringify(form.getValues(), null, 2)}
-                  </pre>
-                ),
-              })
-            }}
-          >
-            Show Form State
+        {/* Debugging Buttons - Remove if not needed */}
+        <div className="flex gap-2 mt-4">
+          <Button
+              variant="outline"
+              onClick={() => {
+                toast({
+                  title: "Form State:",
+                  description: (
+                    <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+                      {JSON.stringify(form.getValues(), null, 2)}
+                    </pre>
+                  ),
+                })
+              }}
+            >
+              Show Form State
           </Button>
+          <Button
+              variant="outline"
+              onClick={() => {
+                toast({
+                  title: "Data Sources:",
+                  description: (
+                    <pre className="mt-2 w-[400px] rounded-md bg-slate-950 p-4 text-xs">
+                      {JSON.stringify({ 
+                        storeClients: storeClients.length,
+                        fallbackClients: fallbackClients.length,
+                        finalClients: clients.length,
+                        storeProducts: storeProducts.length,
+                        fallbackProducts: fallbackProducts.length,
+                        finalProducts: products.length,
+                        sampleClients: clients.slice(0, 2),
+                        selectedClient: selectedClient?.name || 'None'
+                      }, null, 2)}
+                    </pre>
+                  ),
+                })
+              }}
+            >
+              Debug Data (C:{clients.length} P:{products.length})
+          </Button>
+        </div>
 
       </SheetContent>
     </Sheet>
