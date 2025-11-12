@@ -14,8 +14,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetFooter,
-  SheetClose,
 } from '@/components/ui/sheet';
 import {
   Form,
@@ -26,13 +24,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import type { Client } from '@/lib/types';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Edit, User, Mail, MapPin } from 'lucide-react';
+import { Edit, User, Mail } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -96,7 +93,7 @@ export function EditClientSheet({ client }: { client: Client }) {
       form.reset();
       setCurrentStep(1);
       setOpen(false);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to update client. Please try again.',

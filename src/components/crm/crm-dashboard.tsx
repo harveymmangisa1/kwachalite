@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,15 +17,11 @@ import {
 } from '@/components/ui/table';
 import {
   Users,
-  TrendingUp,
   DollarSign,
   Calendar,
   CheckSquare,
   AlertCircle,
-  PlusCircle,
   Eye,
-  ArrowUpRight,
-  ArrowDownRight,
   FileText,
   MessageSquare,
   Clock,
@@ -42,10 +38,8 @@ import { AddTaskNote } from '@/components/tasks/add-task-note';
 export function CRMDashboard() {
   const { 
     clients, 
-    transactions, 
     projects = [], 
     payments = [], 
-    expenses = [], 
     invoices = [], 
     communications = [], 
     tasks = [] 
@@ -58,18 +52,11 @@ export function CRMDashboard() {
     .filter(p => p.status === 'paid')
     .reduce((sum, p) => sum + p.amount, 0);
 
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-
   const outstandingInvoices = invoices
     .filter(inv => inv.status !== 'paid' && inv.status !== 'cancelled')
     .reduce((sum, inv) => sum + (inv.total_amount - (inv.paid_amount || 0)), 0);
 
   const activeProjects = projects.filter(p => p.status === 'in_progress').length;
-  const overdueTasks = tasks.filter(t => 
-    t.status !== 'completed' && 
-    t.due_date && 
-    new Date(t.due_date) < new Date()
-  ).length;
 
   const recentCommunications = communications
     .sort((a, b) => new Date(b.communication_date).getTime() - new Date(a.communication_date).getTime())

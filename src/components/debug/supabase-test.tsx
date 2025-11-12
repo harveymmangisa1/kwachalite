@@ -15,7 +15,7 @@ export function SupabaseTest() {
 
     try {
       // Test 1: Basic connection
-      const { data: connectionTest, error: connectionError } = await supabase
+      const { error: connectionError } = await supabase
         .from('users')
         .select('id')
         .limit(1);

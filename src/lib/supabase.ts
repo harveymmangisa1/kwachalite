@@ -8,23 +8,50 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-// Singleton pattern to prevent multiple instances
-let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
+// Global singleton to prevent multiple instances
+declare global {
+  interface Window {
+    __KWACHALITE_SUPABASE_INSTANCE__?: ReturnType<typeof createClient<Database>>;
+  }
+}
 
 export const supabase = (() => {
-  if (supabaseInstance) return supabaseInstance;
+  // Check for existing instance in global scope
+  if (typeof window !== 'undefined' && window.__KWACHALITE_SUPABASE_INSTANCE__) {
+    return window.__KWACHALITE_SUPABASE_INSTANCE__;
+  }
   
-  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  const instance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
       storage: typeof window !== 'undefined' ? window.localStorage : undefined,
       storageKey: 'kwachalite-auth',
+      flowType: 'pkce', // Use PKCE flow for better security
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 2, // Reduce to prevent connection issues
+      },
+    },
+    db: {
+      schema: 'public',
+    },
+    global: {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
     },
   });
   
-  return supabaseInstance;
+  // Store in global scope
+  if (typeof window !== 'undefined') {
+    window.__KWACHALITE_SUPABASE_INSTANCE__ = instance;
+  }
+  
+  return instance;
 })();
 
 // Prevent multiple instances warning in development

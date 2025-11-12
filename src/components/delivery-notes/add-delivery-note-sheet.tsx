@@ -28,7 +28,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import type { DeliveryNote, QuoteItem } from '@/lib/types';
@@ -154,7 +153,7 @@ export function AddDeliveryNoteSheet({
       form.reset();
       setCurrentStep(1);
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to create delivery note. Please try again.',

@@ -30,12 +30,24 @@ const useAuthStore = create<AuthState>((set) => ({
   setInitialized: (initialized) => set({ isInitialized: initialized }),
 }));
 
+// Global tracking to prevent duplicate profile creation attempts
+declare global {
+  interface Window {
+    __PROFILE_CREATION_IN_PROGRESS__?: Set<string>;
+  }
+}
+
 export const useAuth = () => {
   const { user, loading, session, isInitialized, setUser, setLoading, setSession, setInitialized } = useAuthStore();
 
   useEffect(() => {
     let isMounted = true;
     let subscription: any = null;
+    
+    // Initialize global tracking
+    if (typeof window !== 'undefined' && !window.__PROFILE_CREATION_IN_PROGRESS__) {
+      window.__PROFILE_CREATION_IN_PROGRESS__ = new Set();
+    }
 
     // Get initial session
     const getInitialSession = async () => {
@@ -84,26 +96,27 @@ export const useAuth = () => {
 
     // Ensure user profile exists
     const ensureUserProfile = async (user: User) => {
+      // Prevent duplicate profile creation attempts
+      if (typeof window !== 'undefined' && window.__PROFILE_CREATION_IN_PROGRESS__?.has(user.id)) {
+        console.log('Profile creation already in progress for user:', user.id);
+        return;
+      }
+
       try {
+        // Mark as in progress
+        if (typeof window !== 'undefined') {
+          window.__PROFILE_CREATION_IN_PROGRESS__?.add(user.id);
+        }
+
         // First try to check if user exists using direct query
         const { data: existingUser, error: checkError } = await supabase
           .from('users')
           .select('id')
           .eq('id', user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle to avoid 406 errors
 
         if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found" error
           console.error('Error checking user profile:', checkError);
-          // Try RPC as fallback
-          const { data: rpcResult, error: rpcError } = await supabase.rpc('user_exists', { user_id: user.id });
-          if (rpcError) {
-            console.error('RPC also failed:', rpcError);
-            return;
-          }
-          
-          if (!rpcResult) {
-            await createUserProfile(user);
-          }
           return;
         }
 
@@ -114,6 +127,11 @@ export const useAuth = () => {
         }
       } catch (error) {
         console.error('Error in ensureUserProfile:', error);
+      } finally {
+        // Clear progress flag
+        if (typeof window !== 'undefined') {
+          window.__PROFILE_CREATION_IN_PROGRESS__?.delete(user.id);
+        }
       }
     };
 

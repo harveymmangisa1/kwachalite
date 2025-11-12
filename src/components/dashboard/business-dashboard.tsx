@@ -8,21 +8,14 @@ import { RecentTransactions } from './recent-transactions';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { IncomeExpenseChart } from '../analytics/income-expense-chart';
 import { Button } from '../ui/button';
-import { FileText, Receipt, TrendingUp, Users, DollarSign, ArrowUp, ArrowDown, Activity, BarChart3, PieChart, Landmark, Search, Bell, Wallet, Calendar, Filter } from 'lucide-react';
+import { FileText, Receipt, Users, Landmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/hooks/use-auth';
 import { useBusinessProfile } from '@/hooks/use-business-profile-v2';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatCurrency } from '@/lib/utils';
 import React from 'react';
 import { LoadingState, ErrorState } from '@/components/ui/loading';
-import ErrorBoundary from '@/components/error-boundary';
-import { MobileSidebarTrigger } from '@/components/sidebar';
-import { Badge } from '@/components/ui/badge';
 
 export function BusinessDashboard({ transactions }: { transactions: Transaction[] }) {
   const { quotes } = useAppStore();
-  const { user } = useAuth();
   const { 
     businessProfile, 
     isLoading: profileLoading, 
@@ -32,7 +25,6 @@ export function BusinessDashboard({ transactions }: { transactions: Transaction[
   } = useBusinessProfile();
   
   const [greeting, setGreeting] = React.useState('');
-  const [currentTime, setCurrentTime] = React.useState(new Date());
   const [showFallback, setShowFallback] = React.useState(false);
 
   React.useEffect(() => {
@@ -58,11 +50,6 @@ export function BusinessDashboard({ transactions }: { transactions: Transaction[
 
   const acceptedQuotes = React.useMemo(() => quotes.filter(quote => quote.status === 'accepted'), [quotes]);
   
-  const totalRevenue = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-  const netProfit = totalRevenue - totalExpenses;
-  const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
-
   if (profileLoading && !showFallback) {
     return (
       <div className="min-h-screen container-padding py-8">

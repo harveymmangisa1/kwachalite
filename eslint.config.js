@@ -4,9 +4,13 @@ import typescriptParser from '@typescript-eslint/parser';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
+  {
+    ignores: ['**/__tests__/**'],
+  },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -17,6 +21,10 @@ export default [
         },
         ecmaVersion: 'latest',
         sourceType: 'module',
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
       },
     },
     plugins: {
@@ -40,6 +48,9 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      'react/react-in-jsx-scope': 'off',
+      'no-undef': 'off',
+      'react/no-unescaped-entities': 'off',
     },
     settings: {
       react: {

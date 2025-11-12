@@ -18,7 +18,7 @@ import {
   FileText as FileInvoice,
   Users as GroupUsers,
   X,
-  Menu
+  Menu,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -69,6 +69,7 @@ const mainNavItems = [
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal'] },
   { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets', workspace: ['personal'] },
   { href: '/dashboard/goals', icon: Target, label: 'Goals', workspace: ['personal'] },
+  { href: '/dashboard/savings', icon: Wallet, label: 'Savings', workspace: ['personal', 'business'] },
   { href: '/dashboard/savings/groups', icon: GroupUsers, label: 'Group Savings', workspace: ['personal', 'business'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
   { href: '/dashboard/loans', icon: HandCoins, label: 'Loans', workspace: ['personal', 'business'] },
@@ -198,7 +199,8 @@ export function MobileNav() {
     coreNavItems.push(
       { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions' },
       { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets' },
-      { href: '/dashboard/goals', icon: Target, label: 'Goals' }
+      { href: '/dashboard/goals', icon: Target, label: 'Goals' },
+      { href: '/dashboard/savings', icon: Wallet, label: 'Savings' }
     );
   } else {
     coreNavItems.push(

@@ -738,7 +738,10 @@ export class SupabaseSync {
 
         const { error } = await db
           .from('products')
-          .upsert(syncData, { onConflict: 'id' });
+          .upsert(syncData, { 
+            onConflict: 'id',
+            ignoreDuplicates: false 
+          });
         
         if (error) throw error;
       }
@@ -790,7 +793,10 @@ export class SupabaseSync {
 
         const { error } = await db
           .from('quotes')
-          .upsert(syncData, { onConflict: 'id' });
+          .upsert(syncData, { 
+            onConflict: 'id',
+            ignoreDuplicates: false 
+          });
         
         if (error) throw error;
       }

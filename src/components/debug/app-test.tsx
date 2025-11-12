@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 
 export function AppTest() {
-  const { user, loading, login } = useAuth();
+  const { user, loading } = useAuth();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {

@@ -5,6 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -100,46 +108,69 @@ export function AddQuoteSheet() {
   };
 
   const onSubmit = async (values: QuoteFormValues) => {
-    const user = (await supabase.auth.getUser()).data.user;
-    if (!user) {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        toast({
+          title: 'Error',
+          description: 'You must be logged in to create a quote',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Validate that a client is selected
+      if (!selectedClient) {
+        toast({
+          title: 'Error',
+          description: 'Please select a client from the dropdown',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Calculate total amount
+      const total_amount = values.line_items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      // Generate quote number
+      const quote_number = `Q-${Date.now()}`;
+
+      const { data, error } = await supabase.from('quotes').insert({
+        client_id: selectedClient.id,
+        user_id: user.id,
+        quote_number,
+        total_amount,
+        valid_until: values.expiry_date,
+        items: values.line_items,
+        notes: values.notes || null,
+        status: 'draft' as const,
+      }).select();
+
+      if (error) {
+        console.error('Quote creation error:', error);
+        toast({
+          title: 'Error creating quote',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else {
+        console.log('Quote created successfully:', data);
+        toast({
+          title: 'Quote created successfully',
+          description: `Quote for ${values.client_name} has been created.`,
+        });
+        form.reset();
+        setIsOpen(false);
+        setSelectedClient(null);
+        setSearchTerm('');
+      }
+    } catch (error) {
+      console.error('Unexpected error in quote submission:', error);
       toast({
-        title: 'Error',
-        description: 'You must be logged in to create a quote',
+        title: 'Unexpected error',
+        description: 'An unexpected error occurred while creating quote.',
         variant: 'destructive',
       });
-      return;
-    }
-
-    // Calculate total amount
-    const total_amount = values.line_items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    // Generate quote number
-    const quote_number = `Q-${Date.now()}`;
-
-    const { error } = await supabase.from('quotes').insert({
-      client_id: selectedClient?.id || '',
-      user_id: user.id,
-      quote_number,
-      total_amount,
-      valid_until: values.expiry_date,
-      items: values.line_items,
-      notes: values.notes,
-      status: 'draft' as const,
-    });
-
-    if (error) {
-      toast({
-        title: 'Error creating quote',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } else {
-      toast({
-        title: 'Quote created successfully',
-        description: `Quote for ${values.client_name} has been created.`,
-      });
-      form.reset();
-      setIsOpen(false);
     }
   };
 

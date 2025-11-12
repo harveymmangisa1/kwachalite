@@ -8,16 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { 
   ArrowLeft, 
-  User, 
   Mail, 
   Phone, 
   MapPin, 
-  Building, 
   Globe, 
   FileText,
   DollarSign,
   Calendar,
-  MessageSquare,
   CheckSquare,
   PlusCircle,
   Edit
@@ -30,7 +27,6 @@ import type {
   ClientExpense, 
   Invoice, 
   CommunicationLog, 
-  TaskNote 
 } from '@/lib/types';
 
 export function ClientDetailPage() {
@@ -42,7 +38,6 @@ export function ClientDetailPage() {
   const [expenses, setExpenses] = useState<ClientExpense[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [communications, setCommunications] = useState<CommunicationLog[]>([]);
-  const [tasks, setTasks] = useState<TaskNote[]>([]);
 
   useEffect(() => {
     if (clientId) {
@@ -56,7 +51,6 @@ export function ClientDetailPage() {
       setExpenses([]);
       setInvoices([]);
       setCommunications([]);
-      setTasks([]);
     }
   }, [clientId, clients]);
 

@@ -78,7 +78,10 @@ export function AddProductSheet() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     const newProduct: Product = {
       id: new Date().toISOString(),
-      ...values,
+      name: values.name,
+      price: values.price,
+      cost_price: values.costPrice,
+      description: values.description,
     };
     addProduct(newProduct);
 

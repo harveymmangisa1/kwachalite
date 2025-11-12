@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -25,7 +24,7 @@ interface CategoryPieChartProps {
   isLoading?: boolean;
 }
 
-const CustomTooltip = React.memo(({ active, payload }: any) => {
+const CustomTooltip = React.memo(({ active, payload }: { active?: boolean, payload?: any[] }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (

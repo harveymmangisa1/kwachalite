@@ -16,14 +16,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, View, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, View, Trash2 } from 'lucide-react';
 import type { Client } from '@/lib/types';
 import { Link } from 'react-router-dom';
 import { EditClientSheet } from './edit-client-sheet';
-import { useAppStore } from '@/lib/data';
 
 export function ClientsDataTable({ data }: { data: Client[] }) {
-  const { clients } = useAppStore();
   
   return (
     <Table>

@@ -7,7 +7,7 @@ import { LoadingState, ErrorState } from '@/components/ui/loading';
 import { useAuth } from '@/hooks/use-auth';
 
 export function BusinessProfileTest() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { 
     businessProfile, 
     isLoading, 
@@ -81,7 +81,7 @@ export function BusinessProfileTest() {
         
         <div className="mt-4 p-4 bg-blue-50 rounded-md">
           <h3 className="font-semibold mb-2">Debug Info:</h3>
-          <p><strong>Auth Loading:</strong> {useAuth().loading ? 'Yes' : 'No'}</p>
+          <p><strong>Auth Loading:</strong> {authLoading ? 'Yes' : 'No'}</p>
           <p><strong>Profile Error:</strong> {error || 'None'}</p>
           <p><strong>Current Time:</strong> {new Date().toLocaleString()}</p>
         </div>

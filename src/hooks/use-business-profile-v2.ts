@@ -27,7 +27,7 @@ export interface BusinessProfile {
 const TIMEOUT_MS = 10000;
 
 // Create a promise that rejects after timeout
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+function withTimeout<T>(promise: Promise<T> | any, ms: number): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) => {
@@ -114,7 +114,7 @@ export function useBusinessProfile() {
           .from('business_profiles')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid 406
         
         // Check if component is still mounted and request wasn't aborted
         if (!mounted.current || currentController.signal.aborted) {
