@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import React from 'react';
-import Logo from '@/components/logo';
+import { BusinessHeader } from '@/components/documents/business-header';
 import type { Quote, Client, Product } from '@/lib/types';
 
 export default function InvoicesPage() {
@@ -153,13 +153,13 @@ export default function InvoicesPage() {
                                     >
                                         <CardHeader className="p-0 mb-8">
                                             <div className="flex justify-between items-start">
-                                                <div>
-                                                    <Logo />
-                                                    <p className="text-muted-foreground text-sm mt-2">
-                                                        My Business Inc.<br />
-                                                        123 Business Rd, Commerce City, 12345<br/>
-                                                        contact@mybusiness.com
-                                                    </p>
+                                                <div className="flex-1">
+                                                    <BusinessHeader 
+                                                        fallbackName="My Business Inc."
+                                                        fallbackAddress="123 Business Rd, Commerce City, 12345"
+                                                        fallbackEmail="contact@mybusiness.com"
+                                                        compact={true}
+                                                    />
                                                 </div>
                                                 <div className="text-right">
                                                     <CardTitle className="text-4xl mb-2">INVOICE</CardTitle>

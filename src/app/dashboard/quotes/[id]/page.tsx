@@ -174,11 +174,12 @@ export default function QuotePage() {
                 <Card ref={quoteRef} className="p-8 card-minimal">
                     <CardHeader className="p-0 mb-8">
                         <div className="flex justify-between items-start">
-                            <div>
+                            <div className="flex-1">
                                 <BusinessHeader 
                                     fallbackName="My Business Inc."
                                     fallbackAddress="123 Business Rd, Commerce City, 12345"
                                     fallbackEmail="contact@mybusiness.com"
+                                    compact={true}
                                 />
                             </div>
                             <div className="text-right">

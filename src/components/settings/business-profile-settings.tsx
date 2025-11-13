@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { useBusinessProfile, type BusinessProfile } from '@/hooks/use-business-profile-v2';
 import { useToast } from '@/hooks/use-toast';
+import { SyncStatus } from '@/components/sync-status';
 
 export function BusinessProfileSettings() {
   const { user } = useAuth();
@@ -151,10 +152,15 @@ export function BusinessProfileSettings() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Business Profile</CardTitle>
-        <CardDescription>
-          Update your business information and logo.
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Business Profile</CardTitle>
+            <CardDescription>
+              Update your business information and logo.
+            </CardDescription>
+          </div>
+          <SyncStatus />
+        </div>
       </CardHeader>
       <CardContent>
         {saveError && (

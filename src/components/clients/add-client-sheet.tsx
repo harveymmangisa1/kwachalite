@@ -28,6 +28,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 import { useToast } from '@/hooks/use-toast';
 import { useAppStore } from '@/lib/data';
+import { supabase } from '@/lib/supabase';
+import { SyncStatus } from '@/components/sync-status';
 import type { Client } from '@/lib/types';
 
 const formSchema = z.object({
@@ -61,6 +63,7 @@ export function AddClientSheet() {
   const { addClient } = useAppStore();
   const [open, setOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<ClientFormValues>({
@@ -102,16 +105,88 @@ export function AddClientSheet() {
     }
   }, [currentStep, open]);
 
-  function onSubmit(values: ClientFormValues) {
-    addClient({ id: crypto.randomUUID(), ...values });
-    toast({ 
-      title: 'Client Added', 
-      description: 'The new client has been successfully saved.',
-      duration: 3000 
-    });
-    form.reset();
-    setOpen(false);
-    setCurrentStep(1);
+  async function onSubmit(values: ClientFormValues) {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: 'Error',
+          description: 'You must be logged in to add a client',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Prepare client data for database
+      const clientData = {
+        name: values.name,
+        email: values.email,
+        phone: values.phone || null,
+        address: values.address || null,
+        user_id: user.id,
+      };
+
+      console.log('Submitting client data:', clientData);
+
+      // Insert into database
+      const { data, error } = await supabase
+        .from('clients')
+        .insert(clientData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Client creation error:', error);
+        let errorMessage = error.message;
+        
+        if (error.code === '23505') {
+          errorMessage = 'A client with this email already exists.';
+        } else if (error.code === '23514') {
+          errorMessage = 'Invalid data provided. Please check all fields.';
+        }
+        
+        toast({
+          title: 'Error creating client',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      } else {
+        console.log('Client created successfully:', data);
+        
+        // Add to local store for immediate UI update
+        const newClient: Client = {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          phone: data.phone || undefined,
+          address: data.address || undefined,
+        };
+        
+        addClient(newClient);
+        
+        toast({ 
+          title: 'Client Added', 
+          description: `${values.name} has been successfully saved.`,
+          duration: 3000 
+        });
+        form.reset();
+        setOpen(false);
+        setCurrentStep(1);
+      }
+    } catch (error) {
+      console.error('Unexpected error in client submission:', error);
+      toast({
+        title: 'Unexpected error',
+        description: error instanceof Error ? error.message : 'Failed to create client. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -139,10 +214,15 @@ export function AddClientSheet() {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 h-screen sm:h-[85vh] rounded-t-lg sm:rounded-lg">
         <SheetHeader className="px-6 pt-6 pb-4 border-b flex-shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <SheetTitle className="text-xl">Add a New Client</SheetTitle>
-          <SheetDescription>
-            Enter the details of your new client below. Fields marked with * are required.
-          </SheetDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <SheetTitle className="text-xl">Add a New Client</SheetTitle>
+              <SheetDescription>
+                Enter the details of your new client below. Fields marked with * are required.
+              </SheetDescription>
+            </div>
+            <SyncStatus />
+          </div>
         </SheetHeader>
 
         <ProgressiveForm

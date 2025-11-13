@@ -7,12 +7,14 @@ interface BusinessHeaderProps {
   fallbackName?: string;
   fallbackAddress?: string;
   fallbackEmail?: string;
+  compact?: boolean; // New prop for documents
 }
 
 export function BusinessHeader({ 
   fallbackName = "My Business Inc.", 
   fallbackAddress = "123 Business Rd, Commerce City, 12345",
-  fallbackEmail = "contact@mybusiness.com"
+  fallbackEmail = "contact@mybusiness.com",
+  compact = false
 }: BusinessHeaderProps) {
   const { businessProfile, isLoading } = useBusinessProfile();
 
@@ -32,17 +34,26 @@ export function BusinessHeader({
   const displayWebsite = businessProfile?.website;
 
   return (
-    <div>
-      <Logo />
-      <div className="text-muted-foreground text-sm mt-2">
-        <div className="font-semibold text-foreground">{displayName}</div>
-        {displayAddress && (
+    <div className={compact ? "flex items-start gap-3" : ""}>
+      <Logo 
+        size={compact ? "sm" : "md"} 
+        logoUrl={businessProfile?.logo_url}
+        fallbackText={displayName}
+        showText={!compact}
+        className={compact ? "mt-1" : ""}
+      />
+      <div className={`text-muted-foreground ${compact ? "text-xs" : "text-sm"} ${compact ? "" : "mt-2"}`}>
+        <div className={`font-semibold text-foreground ${compact ? "text-sm" : ""}`}>
+          {compact ? displayName : ""}
+        </div>
+        {!compact && displayAddress && (
           <div className="mt-1">{displayAddress}</div>
         )}
-        <div className="flex flex-col gap-1 mt-1">
-          {displayEmail && <div>Email: {displayEmail}</div>}
-          {displayPhone && <div>Phone: {displayPhone}</div>}
-          {displayWebsite && <div>Web: {displayWebsite}</div>}
+        <div className={`flex flex-col ${compact ? "gap-0.5" : "gap-1"} ${compact ? "mt-1" : ""}`}>
+          {compact && displayAddress && <div>{displayAddress}</div>}
+          {displayEmail && <div>{displayEmail}</div>}
+          {displayPhone && <div>{displayPhone}</div>}
+          {displayWebsite && <div>{displayWebsite}</div>}
           {businessProfile?.taxId && (
             <div>Tax ID: {businessProfile.taxId}</div>
           )}

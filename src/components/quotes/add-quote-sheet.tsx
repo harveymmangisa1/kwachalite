@@ -23,10 +23,11 @@ import { useState, useEffect, useRef } from 'react';
 import { PlusCircle, XCircle } from 'lucide-react';
 import type { Client, Product } from '@/lib/types';
 import { getCurrentCurrencySymbol } from '@/lib/utils';
+import { SyncStatus } from '@/components/sync-status';
 
 // --- Zod Schema for Quote --- //
 const quoteItemSchema = z.object({
-  product_id: z.string().optional(),
+  product_id: z.string().nullable().optional(),
   product_name: z.string().min(1, "Product name is required"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   price: z.number().min(0, "Price cannot be negative"),
@@ -49,16 +50,19 @@ type QuoteFormValues = z.infer<typeof quoteSchema>;
 // --- AddQuoteSheet Component --- //
 export function AddQuoteSheet() {
   const { toast } = useToast();
-  const { clients: storeClients, products: storeProducts } = useAppStore();
+  const { clients: storeClients, products: storeProducts, addQuote } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   // Fallback to direct Supabase fetch if store is empty
   const [fallbackClients, setFallbackClients] = useState<Client[]>([]);
   const [fallbackProducts, setFallbackProducts] = useState<Product[]>([]);
+  const [isLoadingClients, setIsLoadingClients] = useState(false);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   
   // Product dropdown state
   const [productDropdowns, setProductDropdowns] = useState<{[key: number]: boolean}>({});
@@ -101,50 +105,78 @@ export function AddQuoteSheet() {
 
   // Fetch from Supabase if store is empty
   useEffect(() => {
-    if (storeClients.length === 0) {
+    if (storeClients.length === 0 && !isLoadingClients) {
+      setIsLoadingClients(true);
       const fetchClients = async () => {
-        const { data, error } = await supabase
-          .from('clients')
-          .select('id, name, email, phone, address')
-          .order('name');
-        
-        if (!error && data) {
-          const formattedClients: Client[] = data.map(item => ({
-            id: item.id,
-            name: item.name,
-            email: item.email,
-            phone: item.phone || undefined,
-            address: item.address || undefined,
-          }));
-          setFallbackClients(formattedClients);
-          console.log('Fetched fallback clients:', formattedClients);
+        try {
+          const { data, error } = await supabase
+            .from('clients')
+            .select('id, name, email, phone, address')
+            .order('name');
+          
+          if (!error && data) {
+            const formattedClients: Client[] = data.map(item => ({
+              id: item.id,
+              name: item.name,
+              email: item.email,
+              phone: item.phone || undefined,
+              address: item.address || undefined,
+            }));
+            setFallbackClients(formattedClients);
+            console.log('Fetched fallback clients:', formattedClients);
+          } else if (error) {
+            console.error('Error fetching clients:', error);
+            toast({
+              title: 'Error loading clients',
+              description: 'Failed to load clients. Please refresh the page.',
+              variant: 'destructive',
+            });
+          }
+        } catch (error) {
+          console.error('Unexpected error fetching clients:', error);
+        } finally {
+          setIsLoadingClients(false);
         }
       };
       fetchClients();
     }
     
-    if (storeProducts.length === 0) {
+    if (storeProducts.length === 0 && !isLoadingProducts) {
+      setIsLoadingProducts(true);
       const fetchProducts = async () => {
-        const { data, error } = await supabase
-          .from('products')
-          .select('id, name, price, cost_price, description')
-          .order('name');
-        
-        if (!error && data) {
-          const formattedProducts: Product[] = data.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            cost_price: item.cost_price,
-            description: item.description || undefined,
-          }));
-          setFallbackProducts(formattedProducts);
-          console.log('Fetched fallback products:', formattedProducts);
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select('id, name, price, cost_price, description')
+            .order('name');
+          
+          if (!error && data) {
+            const formattedProducts: Product[] = data.map(item => ({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              cost_price: item.cost_price,
+              description: item.description || undefined,
+            }));
+            setFallbackProducts(formattedProducts);
+            console.log('Fetched fallback products:', formattedProducts);
+          } else if (error) {
+            console.error('Error fetching products:', error);
+            toast({
+              title: 'Error loading products',
+              description: 'Failed to load products. Please refresh the page.',
+              variant: 'destructive',
+            });
+          }
+        } catch (error) {
+          console.error('Unexpected error fetching products:', error);
+        } finally {
+          setIsLoadingProducts(false);
         }
       };
       fetchProducts();
     }
-  }, [storeClients.length, storeProducts.length]);
+  }, [storeClients.length, storeProducts.length, isLoadingClients, isLoadingProducts, toast]);
 
   // Helper functions for dynamic quote details
   const calculateLineTotal = (index: number) => {
@@ -221,7 +253,26 @@ export function AddQuoteSheet() {
     form.setValue(`line_items.${index}.price`, product.price);
   };
 
+  // Check if quote_date field exists in database
+  const checkIfQuoteDateExists = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('quotes')
+        .select('quote_date')
+        .limit(1);
+      
+      // If no error, field exists
+      return !error;
+    } catch {
+      // If error, field doesn't exist
+      return false;
+    }
+  };
+
   const onSubmit = async (values: QuoteFormValues) => {
+    if (isSubmitting) return; // Prevent double submission
+    
+    setIsSubmitting(true);
     try {
       const user = (await supabase.auth.getUser()).data.user;
       if (!user) {
@@ -236,11 +287,54 @@ export function AddQuoteSheet() {
       // Validate that a client is selected
       if (!selectedClient) {
         toast({
-          title: 'Error',
+          title: 'Validation Error',
           description: 'Please select a client from the dropdown',
           variant: 'destructive',
         });
+        setIsSubmitting(false);
         return;
+      }
+
+      // Validate line items
+      if (!values.line_items || values.line_items.length === 0) {
+        toast({
+          title: 'Validation Error',
+          description: 'Please add at least one item to the quote',
+          variant: 'destructive',
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate each line item
+      for (const item of values.line_items) {
+        if (!item.product_name || item.product_name.trim() === '') {
+          toast({
+            title: 'Validation Error',
+            description: 'All items must have a product name',
+            variant: 'destructive',
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        if (item.quantity <= 0) {
+          toast({
+            title: 'Validation Error',
+            description: 'All quantities must be greater than 0',
+            variant: 'destructive',
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        if (item.price < 0) {
+          toast({
+            title: 'Validation Error',
+            description: 'All prices must be 0 or greater',
+            variant: 'destructive',
+          });
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       // Calculate total amount
@@ -249,30 +343,70 @@ export function AddQuoteSheet() {
       // Generate quote number
       const quote_number = `Q-${Date.now()}`;
 
-      const { data, error } = await supabase.from('quotes').insert({
+      // Prepare line items with all required fields
+      const processedLineItems = values.line_items.map(item => ({
+        productId: item.product_id || `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      const quoteData = {
         client_id: selectedClient.id,
         user_id: user.id,
         quote_number,
         total_amount,
         valid_until: values.expiry_date,
-        items: values.line_items,
+        items: processedLineItems,
         notes: values.notes || null,
         status: 'draft' as const,
-      }).select();
+        // Only include quote_date if the field exists in database
+        ...(await checkIfQuoteDateExists() && { quote_date: values.quote_date }),
+      };
+
+      console.log('Submitting quote data:', quoteData);
+
+      const { data, error } = await supabase.from('quotes').insert(quoteData).select();
 
       if (error) {
         console.error('Quote creation error:', error);
+        let errorMessage = error.message;
+        
+        // Handle specific error cases
+        if (error.code === '23505') {
+          errorMessage = 'A quote with this number already exists. Please try again.';
+        } else if (error.code === '23503') {
+          errorMessage = 'Invalid client selected. Please choose a valid client.';
+        } else if (error.code === '23514') {
+          errorMessage = 'Invalid data provided. Please check all fields and try again.';
+        } else if (!error.message) {
+          errorMessage = 'Failed to create quote. Please check your connection and try again.';
+        }
+        
         toast({
           title: 'Error creating quote',
-          description: error.message,
+          description: errorMessage,
           variant: 'destructive',
         });
       } else {
         console.log('Quote created successfully:', data);
         toast({
           title: 'Quote created successfully',
-          description: `Quote for ${values.client_name} has been created.`,
+          description: `Quote ${quote_number} for ${values.client_name} has been created.`,
         });
+        
+        // Update local store to ensure immediate UI update
+        const { addQuote } = useAppStore.getState();
+        const newQuote = {
+          id: data?.[0]?.id || quote_number,
+          quoteNumber: quote_number,
+          clientId: selectedClient.id,
+          date: values.quote_date,
+          expiryDate: values.expiry_date,
+          items: values.line_items,
+          status: 'draft' as const,
+        };
+        addQuote(newQuote);
+        
         form.reset();
         setIsOpen(false);
         setSelectedClient(null);
@@ -282,9 +416,11 @@ export function AddQuoteSheet() {
       console.error('Unexpected error in quote submission:', error);
       toast({
         title: 'Unexpected error',
-        description: 'An unexpected error occurred while creating quote.',
+        description: error instanceof Error ? error.message : 'An unexpected error occurred while creating quote.',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -298,7 +434,10 @@ export function AddQuoteSheet() {
       </SheetTrigger>
       <SheetContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Create New Quote</SheetTitle>
+          <div className="flex items-center justify-between">
+            <SheetTitle>Create New Quote</SheetTitle>
+            <SyncStatus />
+          </div>
         </SheetHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 form-scroll-container">
           
@@ -342,9 +481,13 @@ export function AddQuoteSheet() {
                 }}
               />
               {/* Show dropdown when there's a search term or when focused with clients */}
-              {(searchTerm || (document.activeElement?.id === 'client_name' && clients.length > 0)) && (
+              {(searchTerm || (document.activeElement?.id === 'client_name' && (clients.length > 0 || isLoadingClients))) && (
                 <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
-                  {clients.length > 0 ? (
+                  {isLoadingClients ? (
+                    <li className="px-4 py-4 text-gray-500 list-none text-center">
+                      Loading clients...
+                    </li>
+                  ) : clients.length > 0 ? (
                     clients
                       .filter((client) =>
                         client.name.toLowerCase().includes((searchTerm || '').toLowerCase())
@@ -423,7 +566,11 @@ export function AddQuoteSheet() {
                       {/* Product Dropdown */}
                       {productDropdowns[index] && (
                         <div className="absolute z-50 w-full bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
-                          {getFilteredProducts(productSearches[index] || '').length > 0 ? (
+                          {isLoadingProducts ? (
+                            <div className="px-4 py-4 text-gray-500 text-center">
+                              Loading products...
+                            </div>
+                          ) : getFilteredProducts(productSearches[index] || '').length > 0 ? (
                             getFilteredProducts(productSearches[index] || '').map((product) => (
                               <div
                                 key={product.id}
@@ -555,8 +702,8 @@ export function AddQuoteSheet() {
             <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? 'Creating...' : 'Create Quote'}
+            <Button type="submit" disabled={form.formState.isSubmitting || isSubmitting}>
+              {form.formState.isSubmitting || isSubmitting ? 'Creating...' : 'Create Quote'}
             </Button>
           </div>
         </form>

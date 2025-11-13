@@ -13,8 +13,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetFooter,
-  SheetClose,
 } from '@/components/ui/sheet';
 import {
   Form,
@@ -37,7 +35,8 @@ import { useToast } from '@/hooks/use-toast';
 import type { Quote } from '@/lib/types';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Edit, Trash2, PlusCircle, FileText, Users, Calendar, Package } from 'lucide-react';
+import { Edit, Trash2, PlusCircle, FileText, Calendar, Package } from 'lucide-react';
+import { SyncStatus } from '@/components/sync-status';
 
 const quoteItemSchema = z.object({
   productId: z.string().min(1, 'Product is required'),
@@ -100,8 +99,52 @@ export function EditQuoteSheet({ quote }: { quote: Quote }) {
   }, [currentStep, watchedValues]);
 
   const onSubmit = async (data: FormData) => {
+    if (isLoading) return; // Prevent double submission
+    
     setIsLoading(true);
     try {
+      // Validate line items
+      if (!data.items || data.items.length === 0) {
+        toast({
+          title: 'Validation Error',
+          description: 'Please add at least one item to the quote',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Validate each line item
+      for (const item of data.items) {
+        if (!item.productId || item.productId.trim() === '') {
+          toast({
+            title: 'Validation Error',
+            description: 'All items must have a product selected',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+        if (item.quantity <= 0) {
+          toast({
+            title: 'Validation Error',
+            description: 'All quantities must be greater than 0',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+        if (item.price < 0) {
+          toast({
+            title: 'Validation Error',
+            description: 'All prices must be 0 or greater',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const updatedQuote: Quote = {
         ...quote,
         ...data,
@@ -111,16 +154,17 @@ export function EditQuoteSheet({ quote }: { quote: Quote }) {
       
       toast({
         title: 'Quotation Updated',
-        description: 'The quotation has been successfully updated.',
+        description: `Quotation ${quote.quoteNumber} has been successfully updated.`,
       });
       
       form.reset();
       setCurrentStep(1);
       setOpen(false);
     } catch (error) {
+      console.error('Error updating quote:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update quotation. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to update quotation. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -144,10 +188,15 @@ export function EditQuoteSheet({ quote }: { quote: Quote }) {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 overflow-y-auto">
         <SheetHeader className="px-4 sm:px-6 pt-6 pb-4 border-b border-slate-200">
-          <SheetTitle>Edit Quotation</SheetTitle>
-          <SheetDescription>
-            Update the details for quotation {quote.quoteNumber}.
-          </SheetDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <SheetTitle>Edit Quotation</SheetTitle>
+              <SheetDescription>
+                Update the details for quotation {quote.quoteNumber}.
+              </SheetDescription>
+            </div>
+            <SyncStatus />
+          </div>
         </SheetHeader>
 
         <ProgressiveForm

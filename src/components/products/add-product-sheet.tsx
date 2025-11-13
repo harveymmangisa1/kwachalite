@@ -25,6 +25,8 @@ import { PlusCircle, Package, DollarSign, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '../ui/textarea';
 import { useAppStore } from '@/lib/data';
+import { supabase } from '@/lib/supabase';
+import { SyncStatus } from '@/components/sync-status';
 import type { Product } from '@/lib/types';
 import React from 'react';
 import { getCurrentCurrencySymbol } from '@/lib/utils';
@@ -49,6 +51,7 @@ export function AddProductSheet() {
   const { addProduct } = useAppStore();
   const [open, setOpen] = React.useState(false);
   const [currentStep, setCurrentStep] = React.useState(1);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,24 +78,86 @@ export function AddProductSheet() {
     }
   }, [currentStep, watchedValues]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const newProduct: Product = {
-      id: new Date().toISOString(),
-      name: values.name,
-      price: values.price,
-      cost_price: values.costPrice,
-      description: values.description,
-    };
-    addProduct(newProduct);
-
-    toast({
-      title: 'Product added',
-      description: `${values.name} has been saved successfully.`,
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (isSubmitting) return;
     
-    form.reset();
-    setOpen(false);
-    setCurrentStep(1);
+    setIsSubmitting(true);
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: 'Error',
+          description: 'You must be logged in to add a product',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Prepare product data for database
+      const productData = {
+        name: values.name,
+        price: values.price,
+        cost_price: values.costPrice || 0,
+        description: values.description || null,
+        user_id: user.id,
+      };
+
+      console.log('Submitting product data:', productData);
+
+      // Insert into database
+      const { data, error } = await supabase
+        .from('products')
+        .insert(productData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Product creation error:', error);
+        let errorMessage = error.message;
+        
+        if (error.code === '23514') {
+          errorMessage = 'Invalid data provided. Please check all fields.';
+        }
+        
+        toast({
+          title: 'Error creating product',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      } else {
+        console.log('Product created successfully:', data);
+        
+        // Add to local store for immediate UI update
+        const newProduct: Product = {
+          id: data.id,
+          name: data.name,
+          price: data.price,
+          cost_price: data.cost_price,
+          description: data.description || undefined,
+        };
+        
+        addProduct(newProduct);
+
+        toast({
+          title: 'Product added',
+          description: `${values.name} has been saved successfully.`,
+        });
+        
+        form.reset();
+        setOpen(false);
+        setCurrentStep(1);
+      }
+    } catch (error) {
+      console.error('Unexpected error in product submission:', error);
+      toast({
+        title: 'Unexpected error',
+        description: error instanceof Error ? error.message : 'Failed to create product. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -117,10 +182,15 @@ export function AddProductSheet() {
       <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 gap-0 overflow-y-auto">
         {/* Header */}
         <SheetHeader className="px-6 pt-6 pb-4 space-y-2">
-          <SheetTitle className="text-xl">Add Product</SheetTitle>
-          <SheetDescription className="text-sm">
-            Fill in the details for your new product or service
-          </SheetDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <SheetTitle className="text-xl">Add Product</SheetTitle>
+              <SheetDescription className="text-sm">
+                Fill in the details for your new product or service
+              </SheetDescription>
+            </div>
+            <SyncStatus />
+          </div>
         </SheetHeader>
 
         {/* Divider */}
