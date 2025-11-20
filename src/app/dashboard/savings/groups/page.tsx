@@ -113,6 +113,16 @@ export default function GroupSavingsPage() {
 
   return (
     <div data-tour="savings" className="flex-1 space-y-6">
+      {/* Coming Soon Banner */}
+      <Card className="bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800">
+        <CardHeader>
+          <CardTitle className="text-yellow-800 dark:text-yellow-300">Feature Under Development</CardTitle>
+          <CardDescription className="text-yellow-700 dark:text-yellow-400">
+            The Group Savings feature is currently being built. You can preview the progress, but some functionality may be incomplete.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

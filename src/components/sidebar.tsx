@@ -19,6 +19,9 @@ import {
   Users as GroupUsers,
   X,
   Menu,
+  CreditCard,
+  ScanLine,
+  LineChart,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -32,6 +35,7 @@ import {
 import { UserNav } from './user-nav';
 import React, { useState, useEffect } from 'react';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
+import { useToast } from '@/hooks/use-toast';
 
 // Mobile sidebar state context
 interface MobileSidebarContextType {
@@ -82,6 +86,9 @@ const mainNavItems = [
   { href: '/dashboard/products', icon: ShoppingCart, label: 'Products', workspace: ['business']},
   { href: '/dashboard/quotes', icon: FileText, label: 'Quotes', workspace: ['business']},
   { href: '/dashboard/invoices', icon: FileInvoice, label: 'Invoices', workspace: ['business']},
+  { href: '#', icon: CreditCard, label: 'Bank Integration', workspace: ['personal', 'business'], isComingSoon: true },
+  { href: '#', icon: ScanLine, label: 'Receipt Processing', workspace: ['personal', 'business'], isComingSoon: true },
+  { href: '#', icon: LineChart, label: 'Investment Tracking', workspace: ['personal'], isComingSoon: true },
 ];
 
 const secondaryNavItems = [
@@ -94,9 +101,17 @@ export function Sidebar() {
   const location = useLocation();
   const pathname = location.pathname;
   const { activeWorkspace } = useActiveWorkspace();
+  const { toast } = useToast();
 
   const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
+
+  const handleComingSoonClick = (label: string) => {
+    toast({
+      title: 'Coming Soon!',
+      description: `The ${label} feature is under development and will be available soon.`,
+    });
+  };
 
   return (
     <aside data-tour="sidebar" className="hidden w-20 flex-col border-r border-border bg-card/50 backdrop-blur-sm sm:flex fixed h-full z-40">
@@ -121,26 +136,40 @@ export function Sidebar() {
         <TooltipProvider>
           {filteredMainNav.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            
+            const NavItemContent = () => (
+              <div
+                className={cn(
+                  'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
+                  isActive && !item.isComingSoon
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                  item.isComingSoon && 'cursor-pointer opacity-50'
+                )}
+                {...(item.label === 'Clients' ? { 'data-tour': 'crm' } : {})}
+                onClick={() => item.isComingSoon && handleComingSoonClick(item.label)}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="sr-only">{item.label}</span>
+              </div>
+            );
+
             return (
               <Tooltip key={item.href}>
                 <TooltipTrigger asChild>
-                  <Link
-                    to={item.href}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={cn(
-                      'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
-                      isActive
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                    )}
-                    {...(item.label === 'Clients' ? { 'data-tour': 'crm' } : {})}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="sr-only">{item.label}</span>
-                  </Link>
+                  {item.isComingSoon ? (
+                    <NavItemContent />
+                  ) : (
+                    <Link
+                      to={item.href}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      <NavItemContent />
+                    </Link>
+                  )}
                 </TooltipTrigger>
                 <TooltipContent side="right" className="font-medium bg-popover text-popover-foreground border-border shadow-lg">
-                  {item.label}
+                  {item.label} {item.isComingSoon && '(Coming Soon)'}
                 </TooltipContent>
               </Tooltip>
             );
@@ -257,9 +286,18 @@ export function MobileSidebar() {
   const location = useLocation();
   const pathname = location.pathname;
   const { activeWorkspace } = useActiveWorkspace();
+  const { toast } = useToast();
 
   const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
+
+  const handleComingSoonClick = (label: string) => {
+    toast({
+      title: 'Coming Soon!',
+      description: `The ${label} feature is under development and will be available soon.`,
+    });
+    setIsOpen(false);
+  };
 
   if (!isOpen) return null;
 
@@ -301,6 +339,21 @@ export function MobileSidebar() {
             <p className="text-xs font-semibold text-muted-foreground px-4 mb-3 uppercase tracking-wider">Main Menu</p>
             {filteredMainNav.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+              
+              if (item.isComingSoon) {
+                return (
+                  <div
+                    key={item.href}
+                    onClick={() => handleComingSoonClick(item.label)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer opacity-50"
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.label}</span>
+                    <Badge variant="outline" className="ml-auto text-xs">Soon</Badge>
+                  </div>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}
