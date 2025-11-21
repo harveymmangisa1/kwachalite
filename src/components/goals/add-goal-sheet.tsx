@@ -35,7 +35,7 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 
 const goalItemSchema = z.object({
-  id: z.string().default(() => `item-${new Date().toISOString()}`),
+  id: z.string().default(() => `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`),
   name: z.string().min(1, "Item name is required"),
   price: z.coerce.number().min(0, "Price can't be negative"),
   purchased: z.boolean().default(false),
@@ -102,7 +102,7 @@ export function AddGoalSheet() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const newGoal: SavingsGoal = {
-        id: new Date().toISOString(),
+        id: `goal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         currentAmount: 0,
         type: 'individual',
         workspace: activeWorkspace,
@@ -229,7 +229,7 @@ export function AddGoalSheet() {
                         variant="outline"
                         size="sm"
                         className="mt-4"
-                        onClick={() => append({ id: `item-${new Date().toISOString()}`, name: '', price: 0, purchased: false })}
+                        onClick={() => append({ id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, name: '', price: 0, purchased: false })}
                       >
                         <PlusCircle className="h-3 w-3 mr-2" />
                         Add Item

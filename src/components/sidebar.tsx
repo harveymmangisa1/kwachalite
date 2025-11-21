@@ -1,5 +1,8 @@
+'use client';
+
 import { Link, useLocation } from 'react-router-dom';
 import {
+  Home,
   ArrowRightLeft,
   Settings,
   Wallet,
@@ -15,29 +18,26 @@ import {
   FileText,
   Users,
   ShoppingCart,
-  FileText as FileInvoice,
-  Users as GroupUsers,
-  X,
-  Menu,
   CreditCard,
   ScanLine,
   LineChart,
+  ChevronDown,
+  X,
+  Menu,
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react';
-
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { UserNav } from './user-nav';
 import React, { useState, useEffect } from 'react';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { useToast } from '@/hooks/use-toast';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
-// Mobile sidebar state context
+// Mobile sidebar context
 interface MobileSidebarContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -47,19 +47,15 @@ const MobileSidebarContext = React.createContext<MobileSidebarContextType | null
 
 export function useMobileSidebar() {
   const context = React.useContext(MobileSidebarContext);
-  if (!context) {
-    throw new Error('useMobileSidebar must be used within MobileSidebarProvider');
-  }
+  if (!context) throw new Error('useMobileSidebar must be used within MobileSidebarProvider');
   return context;
 }
 
 export function MobileSidebarProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  
   const location = useLocation();
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
+  
+  useEffect(() => { setIsOpen(false); }, [location.pathname]);
   
   return (
     <MobileSidebarContext.Provider value={{ isOpen, setIsOpen }}>
@@ -68,34 +64,69 @@ export function MobileSidebarProvider({ children }: { children: React.ReactNode 
   );
 }
 
+// Navigation items
 const mainNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', workspace: ['personal', 'business'] },
   { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions', workspace: ['personal'] },
   { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets', workspace: ['personal'] },
   { href: '/dashboard/goals', icon: Target, label: 'Goals', workspace: ['personal'] },
-  { href: '/dashboard/savings', icon: Wallet, label: 'Savings', workspace: ['personal', 'business'] },
-  { href: '/dashboard/savings/groups', icon: GroupUsers, label: 'Group Savings', workspace: ['personal', 'business'] },
+  { href: '/dashboard/savings/groups', icon: Users, label: 'Group Savings', workspace: ['personal', 'business'] },
   { href: '/dashboard/bills', icon: ReceiptText, label: 'Bills', workspace: ['personal'] },
   { href: '/dashboard/loans', icon: HandCoins, label: 'Loans', workspace: ['personal', 'business'] },
-  { href: '/dashboard/business', icon: Briefcase, label: 'Business', workspace: ['business']},
-  { href: '/dashboard/business-financials', icon: TrendingUp, label: 'Financials', workspace: ['business']},
-  { href: '/dashboard/business-budgets', icon: Target, label: 'Budgets', workspace: ['business']},
-  { href: '/dashboard/receipts', icon: Receipt, label: 'Receipts', workspace: ['business']},
-  { href: '/dashboard/delivery-notes', icon: Truck, label: 'Delivery Notes', workspace: ['business']},
-  { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business']},
-  { href: '/dashboard/products', icon: ShoppingCart, label: 'Products', workspace: ['business']},
-  { href: '/dashboard/quotes', icon: FileText, label: 'Quotes', workspace: ['business']},
-  { href: '/dashboard/invoices', icon: FileInvoice, label: 'Invoices', workspace: ['business']},
-  { href: '#', icon: CreditCard, label: 'Bank Integration', workspace: ['personal', 'business'], isComingSoon: true },
-  { href: '#', icon: ScanLine, label: 'Receipt Processing', workspace: ['personal', 'business'], isComingSoon: true },
-  { href: '#', icon: LineChart, label: 'Investment Tracking', workspace: ['personal'], isComingSoon: true },
+  { href: '/dashboard/business', icon: Briefcase, label: 'Business Home', workspace: ['business'] },
+  { href: '/dashboard/business-financials', icon: TrendingUp, label: 'Financials', workspace: ['business'] },
+  { href: '/dashboard/business-budgets', icon: Target, label: 'Budgets', workspace: ['business'] },
+  { href: '/dashboard/receipts', icon: Receipt, label: 'Receipts', workspace: ['business'] },
+  { href: '/dashboard/delivery-notes', icon: Truck, label: 'Delivery Notes', workspace: ['business'] },
+  { href: '/dashboard/clients', icon: Users, label: 'Clients', workspace: ['business'] },
+  { href: '/dashboard/products', icon: ShoppingCart, label: 'Products', workspace: ['business'] },
+  { href: '/dashboard/quotes', icon: FileText, label: 'Quotes', workspace: ['business'] },
+  { href: '/dashboard/invoices', icon: FileText, label: 'Invoices', workspace: ['business'] },
 ];
 
 const secondaryNavItems = [
   { href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics', workspace: ['personal', 'business'] },
-  { href: '/dashboard/settings/currency', icon: TrendingUp, label: 'Currency', workspace: ['personal', 'business'] },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings', workspace: ['personal', 'business'] },
 ];
+
+const NavLink = ({ item, pathname, handleComingSoonClick }: { item: any, pathname: string, handleComingSoonClick: (label: string) => void }) => {
+  const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+
+  if (item.isComingSoon) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            onClick={() => handleComingSoonClick(item.label)}
+            className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-muted-foreground/50 transition-colors"
+          >
+            <item.icon className="h-4 w-4" />
+            <Badge variant="destructive" className="absolute -top-1 -right-2 text-[8px] p-0.5 h-auto leading-none">Soon</Badge>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="right">{item.label}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Link
+          to={item.href}
+          aria-current={isActive ? 'page' : undefined}
+          className={cn(
+            "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
+            isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted/60"
+          )}
+        >
+          <item.icon className="h-4 w-4" />
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent side="right">{item.label}</TooltipContent>
+    </Tooltip>
+  );
+};
 
 export function Sidebar() {
   const location = useLocation();
@@ -103,139 +134,70 @@ export function Sidebar() {
   const { activeWorkspace } = useActiveWorkspace();
   const { toast } = useToast();
 
-  const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
-  const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
-
   const handleComingSoonClick = (label: string) => {
     toast({
       title: 'Coming Soon!',
-      description: `The ${label} feature is under development and will be available soon.`,
+      description: `${label} is under development and will be available soon.`,
     });
   };
 
-  return (
-    <aside data-tour="sidebar" className="hidden w-20 flex-col border-r border-border bg-card/50 backdrop-blur-sm sm:flex fixed h-full z-40">
-      <nav className="flex flex-col items-center gap-3 px-4 py-6">
-        <Link
-          to="/dashboard"
-          className="group flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105 shadow-lg"
-        >
-          <Wallet className="h-6 w-6" />
-          <span className="sr-only">KwachaLite</span>
-        </Link>
-        
-        {/* Workspace indicator */}
-        <div className="mt-3 mb-2">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20">
-            {activeWorkspace === 'business' ? 'B' : 'P'}
-          </span>
-        </div>
-        
-        <div className="w-10 h-px bg-border/60 my-3" />
-        
-        <TooltipProvider>
-          {filteredMainNav.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
-            
-            const NavItemContent = () => (
-              <div
-                className={cn(
-                  'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
-                  isActive && !item.isComingSoon
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
-                  item.isComingSoon && 'cursor-pointer opacity-50'
-                )}
-                {...(item.label === 'Clients' ? { 'data-tour': 'crm' } : {})}
-                onClick={() => item.isComingSoon && handleComingSoonClick(item.label)}
-              >
-                <item.icon className="h-5 w-5" />
-                <span className="sr-only">{item.label}</span>
-              </div>
-            );
+  const filteredMainNav = mainNavItems.filter(item => item.workspace.includes(activeWorkspace));
+  const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
-            return (
-              <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                  {item.isComingSoon ? (
-                    <NavItemContent />
-                  ) : (
-                    <Link
-                      to={item.href}
-                      aria-current={isActive ? 'page' : undefined}
-                    >
-                      <NavItemContent />
-                    </Link>
-                  )}
-                </TooltipTrigger>
-                <TooltipContent side="right" className="font-medium bg-popover text-popover-foreground border-border shadow-lg">
-                  {item.label} {item.isComingSoon && '(Coming Soon)'}
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
-        </TooltipProvider>
-      </nav>
-      
-      <nav className="mt-auto flex flex-col items-center gap-3 px-4 py-6 border-t border-border/60">
-        <TooltipProvider>
-          {filteredSecondaryNav.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Tooltip key={item.href}>
-                <TooltipTrigger asChild>
-                  <Link
-                    to={item.href}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={cn(
-                      'flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105',
-                      isActive
-                        ? 'bg-muted text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="sr-only">{item.label}</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="font-medium bg-popover text-popover-foreground border-border shadow-lg">
-                  {item.label}
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
-        </TooltipProvider>
-        
-        <div className="w-10 h-px bg-border/60 my-3" />
-        <UserNav />
-      </nav>
-    </aside>
+  return (
+    <TooltipProvider>
+      <aside className="hidden sm:flex w-16 flex-col border-r bg-background fixed h-full z-40">
+        {/* Logo */}
+        <div className="flex h-16 items-center justify-center border-b">
+          <Link to="/dashboard" className="flex items-center justify-center">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+              <Wallet className="h-4 w-4 text-primary-foreground" />
+            </div>
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-1 flex-col items-center gap-2 py-4">
+          {filteredMainNav.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} handleComingSoonClick={handleComingSoonClick} />
+          ))}
+        </nav>
+
+        {/* Bottom section */}
+        <nav className="mt-auto flex flex-col items-center gap-2 py-4">
+          {filteredSecondaryNav.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} handleComingSoonClick={handleComingSoonClick} />
+          ))}
+          <div className="border-t w-full my-2"></div>
+          <UserNav />
+        </nav>
+      </aside>
+    </TooltipProvider>
   );
 }
 
+// Add the missing MobileNav component
 export function MobileNav() {
   const location = useLocation();
-  const pathname = location.pathname;
   const { activeWorkspace } = useActiveWorkspace();
   
-  // Core navigation items for mobile - keep it minimal
+  // Core navigation items for mobile
   const coreNavItems = [
-    { href: '/dashboard', icon: LayoutDashboard, label: 'Home' },
+    { href: '/dashboard', icon: Home, label: 'Home' },
   ];
 
-  // Workspace-specific core items
+  // Workspace-specific items
   if (activeWorkspace === 'personal') {
     coreNavItems.push(
       { href: '/dashboard/transactions', icon: ArrowRightLeft, label: 'Transactions' },
       { href: '/dashboard/budgets', icon: Landmark, label: 'Budgets' },
       { href: '/dashboard/goals', icon: Target, label: 'Goals' },
-      { href: '/dashboard/savings', icon: Wallet, label: 'Savings' }
     );
   } else {
     coreNavItems.push(
       { href: '/dashboard/business', icon: Briefcase, label: 'Business' },
       { href: '/dashboard/clients', icon: Users, label: 'Clients' },
-      { href: '/dashboard/invoices', icon: FileInvoice, label: 'Invoices' }
+      { href: '/dashboard/invoices', icon: FileText, label: 'Invoices' },
     );
   }
 
@@ -244,34 +206,33 @@ export function MobileNav() {
 
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
-      <div className="bg-card/95 backdrop-blur-md border-t border-border/60 safe-area-bottom">
-        <nav className="flex items-center justify-around h-16 px-1">
+      <div className="bg-background/95 backdrop-blur-md border-t border-border/60 safe-area-bottom">
+        <nav className="flex items-center justify-around h-16 px-2">
           {coreNavItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            const isActive = location.pathname === item.href || 
+              (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
             
             return (
               <Link
                 key={item.href}
                 to={item.href}
                 aria-current={isActive ? 'page' : undefined}
-                aria-label={item.label}
                 className={cn(
-                  'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200',
-                  isActive ? 'text-primary' : 'text-muted-foreground'
+                  "flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200",
+                  isActive 
+                    ? "text-primary bg-primary/10" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/10"
                 )}
               >
                 <div className={cn(
-                  'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200',
-                  isActive ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted/50'
+                  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200",
+                  isActive 
+                    ? "bg-primary text-primary-foreground" 
+                    : "text-muted-foreground"
                 )}>
-                  <item.icon className="w-4.5 h-4.5" aria-hidden="true" />
+                  <item.icon className="w-4 h-4" strokeWidth={1.5} />
                 </div>
-                <span className={cn(
-                  'text-[10px] font-medium mt-1 truncate w-full text-center',
-                  isActive ? 'text-primary' : 'text-muted-foreground'
-                )}>
-                  {item.label}
-                </span>
+                <span className="text-[10px] font-medium mt-1">{item.label}</span>
               </Link>
             );
           })}
@@ -292,134 +253,115 @@ export function MobileSidebar() {
   const filteredSecondaryNav = secondaryNavItems.filter(item => item.workspace.includes(activeWorkspace));
 
   const handleComingSoonClick = (label: string) => {
-    toast({
-      title: 'Coming Soon!',
-      description: `The ${label} feature is under development and will be available soon.`,
-    });
+    toast({ title: 'Coming Soon!', description: `${label} is under development.` });
     setIsOpen(false);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <>
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 sm:hidden animate-in fade-in duration-200" 
-        onClick={() => setIsOpen(false)}
-      />
-      
-      {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-80 bg-card/95 backdrop-blur-md border-r border-border/60 z-50 sm:hidden animate-in slide-in-from-left duration-300 shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border/60">
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-3"
-            onClick={() => setIsOpen(false)}
-          >
-            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-              <Wallet className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl text-foreground">KwachaLite</span>
-          </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsOpen(false)}
-            className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        {/* Navigation */}
-        <div className="flex flex-col h-[calc(100%-88px)]">
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            <p className="text-xs font-semibold text-muted-foreground px-4 mb-3 uppercase tracking-wider">Main Menu</p>
-            {filteredMainNav.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
-              
-              if (item.isComingSoon) {
-                return (
-                  <div
-                    key={item.href}
-                    onClick={() => handleComingSoonClick(item.label)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer opacity-50"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.label}</span>
-                    <Badge variant="outline" className="ml-auto text-xs">Soon</Badge>
-                  </div>
-                );
-              }
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetContent side="left" className="w-72 p-0 flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between h-16 px-4 border-b">
+            <Link to="/dashboard" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                <Wallet className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="font-semibold">KwachaLite</span>
+            </Link>
+          </div>
 
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => setIsOpen(false)}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm',
-                    isActive
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-          
-          {/* Bottom Navigation */}
-          <div className="p-4 border-t border-border/60 bg-muted/20">
-            <div className="space-y-2 mb-4">
-              <p className="text-xs font-semibold text-muted-foreground px-4 mb-3 uppercase tracking-wider">Settings</p>
-              {filteredSecondaryNav.map((item) => {
-                const isActive = pathname.startsWith(item.href);
+          {/* Workspace indicator */}
+          <div className="px-4 py-3 border-b">
+            <div className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm",
+              activeWorkspace === 'business' 
+                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400" 
+                : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+            )}>
+              <Sparkles className="h-4 w-4" />
+              <span className="font-medium">
+                {activeWorkspace === 'business' ? 'Business' : 'Personal'} Mode
+              </span>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex-1 overflow-y-auto py-4">
+            <div className="px-4 space-y-1">
+              {filteredMainNav.map((item) => {
+                const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+                
+                if (item.isComingSoon) {
+                  return (
+                    <div
+                      key={item.href + item.label}
+                      onClick={() => handleComingSoonClick(item.label)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground/50 cursor-not-allowed"
+                    >
+                      <item.icon className="h-5 w-5" strokeWidth={1.5} />
+                      <span>{item.label}</span>
+                      <Badge variant="outline" className="ml-auto text-[10px] px-1.5 py-0 border-dashed">Soon</Badge>
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={item.href}
                     to={item.href}
                     onClick={() => setIsOpen(false)}
-                    aria-current={isActive ? 'page' : undefined}
                     className={cn(
-                      'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium text-sm',
-                      isActive
-                        ? 'bg-card text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-card/60'
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                      isActive 
+                        ? "bg-accent text-accent-foreground font-medium" 
+                        : "text-muted-foreground hover:bg-muted/80"
                     )}
                   >
-                    <item.icon className="h-5 w-5" />
+                    <item.icon className="h-5 w-5" strokeWidth={1.5} />
                     <span>{item.label}</span>
                   </Link>
                 );
               })}
             </div>
-            <div className="pt-4 border-t border-border/60">
-              <UserNav />
-            </div>
           </div>
-        </div>
-      </div>
-    </>
+
+          {/* Footer */}
+          <div className="border-t p-4 space-y-1">
+            {filteredSecondaryNav.map((item) => {
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+                    isActive 
+                      ? "bg-muted text-foreground" 
+                      : "text-muted-foreground hover:bg-muted/80"
+                  )}
+                >
+                  <item.icon className="h-5 w-5" strokeWidth={1.5} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 
 export function MobileSidebarTrigger() {
-  const { setIsOpen } = useMobileSidebar();
-  
+  const { setIsOpen } = useMobileSidebar();  
   return (
     <Button
       variant="ghost"
       size="icon"
       onClick={() => setIsOpen(true)}
-      className="h-9 w-9 sm:hidden text-muted-foreground hover:text-foreground hover:bg-muted"
+      className="h-9 w-9 sm:hidden text-muted-foreground"
     >
-      <Menu className="h-5 w-5" />
+      <Menu className="h-5 w-5" strokeWidth={1.5} />
     </Button>
   );
 }

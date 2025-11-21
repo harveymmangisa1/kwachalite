@@ -16,6 +16,7 @@ import ClientDetail from '@/app/dashboard/clients/[id]/page';
 import Goals from '@/app/dashboard/goals/page';
 import Help from '@/app/dashboard/help/page';
 import GroupSavings from '@/app/dashboard/savings/groups/page';
+import SavingsPage from '@/app/dashboard/savings/page';
 import Loans from '@/app/dashboard/loans/page';
 import Products from '@/app/dashboard/products/page';
 import Quotes from '@/app/dashboard/quotes/page';
@@ -60,6 +61,7 @@ function App() {
             <Route path="clients" element={<Clients />} />
             <Route path="clients/:id" element={<ClientDetail />} />
             <Route path="goals" element={<Goals />} />
+            <Route path="savings" element={<SavingsPage />} />
             <Route path="savings/groups" element={<GroupSavings />} />
             <Route path="help" element={<Help />} />
             <Route path="loans" element={<Loans />} />

@@ -41,7 +41,7 @@ const getCurrencyConfig = () => {
     ? localStorage.getItem('kwachalite-currency') 
     : null;
   
-  const currencyCode = savedCurrency || getEnvVar('VITE_CURRENCY_CODE', 'USD');
+  const currencyCode = savedCurrency || getEnvVar('VITE_CURRENCY_CODE', 'MWK');
   const currencySymbol = getCurrencySymbol(currencyCode);
   const locale = getCurrencyLocale(currencyCode);
   

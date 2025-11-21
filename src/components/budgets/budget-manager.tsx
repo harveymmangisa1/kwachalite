@@ -21,7 +21,7 @@ import { formatCurrency } from '@/lib/utils';
 
 export function BudgetManager() {
   const { activeWorkspace } = useActiveWorkspace();
-  const { categories, updateCategory, deleteCategory, addCategory } = useAppStore();
+  const { categories, updateCategory, deleteCategory, addCategory, transactions } = useAppStore();
   const { toast } = useToast();
   
   const [editingCategoryId, setEditingCategoryId] = React.useState<string | null>(null);
@@ -33,8 +33,7 @@ export function BudgetManager() {
 
   const handleAddCategory = () => {
     if (newCategoryName.trim() !== '') {
-      const newCategory: Category = {
-        id: `new-${Date.now()}`,
+      const newCategory: Omit<Category, 'id'> = {
         name: newCategoryName,
         type: newCategoryType,
         workspace: activeWorkspace,
@@ -83,6 +82,40 @@ export function BudgetManager() {
   const filteredCategories = categories.filter(c => c.workspace === activeWorkspace);
   const incomeCategories = filteredCategories.filter(c => c.type === 'income');
   const expenseCategories = filteredCategories.filter(c => c.type === 'expense');
+
+  // Calculate budget progress from actual transactions
+  const calculateBudgetProgress = (category: Category) => {
+    if (!category.budget || category.budget <= 0) return 0;
+    
+    // Get transactions for this category within the budget period
+    const now = new Date();
+    const categoryTransactions = transactions.filter(t => {
+      if (t.category !== category.name || t.workspace !== activeWorkspace) return false;
+      
+      const transactionDate = new Date(t.date);
+      
+      // Filter by budget frequency
+      if (category.budgetFrequency === 'weekly') {
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+        weekStart.setHours(0, 0, 0, 0);
+        return transactionDate >= weekStart;
+      } else {
+        // Monthly (default)
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        return transactionDate >= monthStart;
+      }
+    });
+
+    // Calculate total spent (for expense categories) or earned (for income categories)
+    const totalAmount = categoryTransactions
+      .filter(t => t.type === category.type)
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    // Calculate percentage
+    const percentage = (totalAmount / category.budget) * 100;
+    return Math.min(100, Math.max(0, percentage));
+  };
 
   // Progress circle component
   const ProgressCircle = ({ percentage, size = 40, strokeWidth = 3, color = '#10B981' }: { percentage: number, size?: number, strokeWidth?: number, color?: string }) => {
@@ -169,8 +202,8 @@ export function BudgetManager() {
     // Render the icon component properly
     const IconComponent = category.icon;
 
-    // Calculate budget progress
-    const budgetProgress = category.budget && category.budget > 0 ? 50 : 0; // In a real app, this would be calculated from transactions
+    // Calculate budget progress from actual transactions
+    const budgetProgress = calculateBudgetProgress(category);
 
     return (
        <div key={category.id} className="flex items-center justify-between rounded-md border p-3 bg-white shadow-sm hover:shadow-md transition-shadow">
@@ -179,23 +212,28 @@ export function BudgetManager() {
              <IconComponent className="h-5 w-5 text-muted-foreground" />
              {category.type === 'expense' && category.budget && (
                <div className="absolute -top-1 -right-1">
-                 <ProgressCircle 
-                   percentage={Math.min(100, budgetProgress)} 
-                   size={16} 
-                   strokeWidth={2}
-                   color={budgetProgress > 90 ? '#EF4444' : budgetProgress > 75 ? '#F59E0B' : '#10B981'} 
-                 />
+                  <ProgressCircle 
+                    percentage={budgetProgress} 
+                    size={16} 
+                    strokeWidth={2}
+                    color={budgetProgress > 90 ? '#EF4444' : budgetProgress > 75 ? '#F59E0B' : '#10B981'} 
+                  />
                </div>
              )}
            </div>
            <span className="font-medium text-sm">{category.name}</span>
          </div>
-         <div className="flex items-center gap-2">
-            {category.type === 'expense' && category.budget && (
+          <div className="flex flex-col items-end gap-1">
+             {category.type === 'expense' && category.budget && (
+                <>
                 <span className="text-sm text-muted-foreground w-32 text-right pr-2">
                     {formatCurrency(category.budget || 0)} / {category.budgetFrequency === 'weekly' ? 'wk' : 'mo'}
                 </span>
-            )}
+                <span className="text-xs text-muted-foreground w-32 text-right pr-2">
+                    Spent: {formatCurrency((category.budget || 0) * (budgetProgress / 100))}
+                </span>
+                </>
+             )}
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(category)}>
                 <Pen className="h-4 w-4 text-blue-600" />
             </Button>
@@ -220,6 +258,38 @@ export function BudgetManager() {
             Add, edit, or delete categories and set weekly/monthly budgets for your expenses.
           </CardDescription>
         </CardHeader>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Plus className="h-5 w-5" />
+            Add New Category
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Input
+              placeholder="New category name..."
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              className="flex-grow"
+            />
+            <Select value={newCategoryType} onValueChange={(v) => setNewCategoryType(v as 'income' | 'expense')}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expense">Expense</SelectItem>
+                <SelectItem value="income">Income</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button onClick={handleAddCategory} className="w-full sm:w-auto">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Category
+            </Button>
+          </div>
+        </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

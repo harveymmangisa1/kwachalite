@@ -26,41 +26,41 @@ import {
 // Define the initial categories with configurable budget defaults
 export const initialCategories: Category[] = [
   // Personal Expense Categories
-  { id: 'groceries', name: 'Groceries', icon: ShoppingBasket, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.groceries, budgetFrequency: 'monthly' },
-  { id: 'transport', name: 'Transport', icon: Car, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.transport, budgetFrequency: 'monthly' },
-  { id: 'housing', name: 'Housing', icon: Home, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.housing, budgetFrequency: 'monthly' },
-  { id: 'food', name: 'Food & Dining', icon: Utensils, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.food, budgetFrequency: 'monthly' },
-  { id: 'health', name: 'Health', icon: Heart, color: 'hsl(var(--chart-5))', type: 'expense', workspace: 'personal' },
-  { id: 'entertainment', name: 'Entertainment', icon: Film, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.entertainment, budgetFrequency: 'monthly' },
-  { id: 'education', name: 'Education', icon: GraduationCap, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'personal' },
-  { id: 'gifts', name: 'Gifts', icon: Gift, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'personal' },
+  { id: 'd9a8a3f0-29e8-4b71-80f3-9b8f6d3e1b3c', name: 'Groceries', icon: ShoppingBasket, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.groceries, budgetFrequency: 'monthly' },
+  { id: 'd7c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Transport', icon: Car, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.transport, budgetFrequency: 'monthly' },
+  { id: 'f8c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Housing', icon: Home, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.housing, budgetFrequency: 'monthly' },
+  { id: 'a1c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Food & Dining', icon: Utensils, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.food, budgetFrequency: 'monthly' },
+  { id: 'b2c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Health', icon: Heart, color: 'hsl(var(--chart-5))', type: 'expense', workspace: 'personal' },
+  { id: 'c3c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Entertainment', icon: Film, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'personal', budget: appConfig.defaults.budgets.entertainment, budgetFrequency: 'monthly' },
+  { id: 'e4c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Education', icon: GraduationCap, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'personal' },
+  { id: 'a5c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Gifts', icon: Gift, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'personal' },
   
   // Personal Income Categories
-  { id: 'salary', name: 'Salary', icon: Landmark, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
-  { id: 'freelance_personal', name: 'Freelance', icon: Briefcase, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
-  { id: 'investment', name: 'Investment', icon: TrendingUp, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
-  { id: 'side_hustle', name: 'Side Hustle', icon: PiggyBank, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
+  { id: 'b6c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Salary', icon: Landmark, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
+  { id: 'c7c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Freelance', icon: Briefcase, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
+  { id: 'd8c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Investment', icon: TrendingUp, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
+  { id: 'e9c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Side Hustle', icon: PiggyBank, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'personal' },
 
   // Business Expense Categories
-  { id: 'office_supplies', name: 'Office Supplies', icon: Briefcase, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'business', budget: appConfig.defaults.budgets.office, budgetFrequency: 'monthly' },
-  { id: 'software', name: 'Software & Subscriptions', icon: Computer, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'business', budget: appConfig.defaults.budgets.software, budgetFrequency: 'monthly' },
-  { id: 'marketing', name: 'Marketing & Advertising', icon: TrendingUp, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'business', budget: 500, budgetFrequency: 'monthly' },
-  { id: 'travel', name: 'Business Travel', icon: Car, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'business' },
-  { id: 'client_expenses', name: 'Client Expenses', icon: Users, color: 'hsl(var(--chart-5))', type: 'expense', workspace: 'business' },
-  { id: 'shipping', name: 'Shipping & Delivery', icon: Truck, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'business' },
-  { id: 'utilities', name: 'Utilities', icon: Home, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'business', budget: 300, budgetFrequency: 'monthly' },
-  { id: 'rent', name: 'Rent & Facilities', icon: Home, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'business', budget: 1500, budgetFrequency: 'monthly' },
-  { id: 'equipment', name: 'Equipment & Assets', icon: Computer, color: 'hsl(var(--chart-5))', type: 'expense', workspace: 'business' },
-  { id: 'insurance', name: 'Insurance', icon: Heart, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'business' },
-  { id: 'professional_services', name: 'Professional Services', icon: Briefcase, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'business' },
-  { id: 'inventory', name: 'Inventory & Supplies', icon: ShoppingBasket, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'business' },
+  { id: 'f0c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Office Supplies', icon: Briefcase, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'business', budget: appConfig.defaults.budgets.office, budgetFrequency: 'monthly' },
+  { id: 'a2c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Software & Subscriptions', icon: Computer, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'business', budget: appConfig.defaults.budgets.software, budgetFrequency: 'monthly' },
+  { id: 'b3c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Marketing & Advertising', icon: TrendingUp, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'business', budget: 500, budgetFrequency: 'monthly' },
+  { id: 'c4c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Business Travel', icon: Car, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'business' },
+  { id: 'd5c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Client Expenses', icon: Users, color: 'hsl(var(--chart-5))', type: 'expense', workspace: 'business' },
+  { id: 'e6c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Shipping & Delivery', icon: Truck, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'business' },
+  { id: 'f7c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Utilities', icon: Home, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'business', budget: 300, budgetFrequency: 'monthly' },
+  { id: 'a8c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Rent & Facilities', icon: Home, color: 'hsl(var(--chart-4))', type: 'expense', workspace: 'business', budget: 1500, budgetFrequency: 'monthly' },
+  { id: 'b9c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Equipment & Assets', icon: Computer, color: 'hsl(var(--chart-5))', type: 'expense', workspace: 'business' },
+  { id: 'd0c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Insurance', icon: Heart, color: 'hsl(var(--chart-1))', type: 'expense', workspace: 'business' },
+  { id: 'e1c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Professional Services', icon: Briefcase, color: 'hsl(var(--chart-2))', type: 'expense', workspace: 'business' },
+  { id: 'f2c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Inventory & Supplies', icon: ShoppingBasket, color: 'hsl(var(--chart-3))', type: 'expense', workspace: 'business' },
 
   // Business Income Categories
-  { id: 'client_payments', name: 'Client Payments', icon: CreditCard, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
-  { id: 'product_sales', name: 'Product Sales', icon: ShoppingBasket, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
-  { id: 'service_revenue', name: 'Service Revenue', icon: Briefcase, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
-  { id: 'subscription_revenue', name: 'Subscription Revenue', icon: Computer, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
-  { id: 'consulting', name: 'Consulting Revenue', icon: Users, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
+  { id: 'a3c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Client Payments', icon: CreditCard, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
+  { id: 'b4c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Product Sales', icon: ShoppingBasket, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
+  { id: 'c5c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Service Revenue', icon: Briefcase, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
+  { id: 'd6c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Subscription Revenue', icon: Computer, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
+  { id: 'e7c6e0e6-2b8e-4b8a-8b4a-6b5e7d3f9e2b', name: 'Consulting Revenue', icon: Users, color: 'hsl(var(--chart-2))', type: 'income', workspace: 'business' },
 ];
 
 
@@ -123,7 +123,7 @@ interface AppState {
   // Category methods
   updateCategory: (category: Category) => void;
   deleteCategory: (categoryId: string) => void;
-  addCategory: (category: Category) => void;
+  addCategory: (category: Omit<Category, 'id'>) => void;
   // Sales Receipt methods
   addSalesReceipt: (receipt: SalesReceipt) => void;
   updateSalesReceipt: (receipt: SalesReceipt) => void;
@@ -179,7 +179,8 @@ interface AppState {
   deleteTaskNote: (taskId: string) => void;
   // Sync methods
   setSyncData: (key: keyof AppState, data: any) => void;
-  initializeSupabaseSync: () => void;
+  initializeSupabaseSync: () => Promise<void>;
+  syncFromSupabase: () => Promise<void>;
 }
 
 export const useAppStore = create<AppState>()(
@@ -383,8 +384,9 @@ export const useAppStore = create<AppState>()(
       },
       // Category methods
       addCategory: (category) => {
-        set((state) => ({ categories: [...state.categories, category] }));
-        supabaseSync.syncCategory(category, 'create');
+        const newCategory = { ...category, id: crypto.randomUUID() };
+        set((state) => ({ categories: [...state.categories, newCategory] }));
+        supabaseSync.syncCategory(newCategory, 'create');
       },
       updateCategory: (category) => {
         set(state => ({
@@ -432,20 +434,24 @@ export const useAppStore = create<AppState>()(
       },
       // Business Budget methods
       addBusinessBudget: (budget) => {
-        set((state) => ({ businessBudgets: [budget, ...state.businessBudgets] }));
-        // TODO: Add supabase sync for business budgets when implemented
+        const newBudget = { ...budget, id: crypto.randomUUID() };
+        set((state) => ({ businessBudgets: [newBudget, ...state.businessBudgets] }));
+        supabaseSync.syncBusinessBudget(newBudget, 'create');
       },
       updateBusinessBudget: (budget) => {
         set(state => ({
           businessBudgets: state.businessBudgets.map(b => b.id === budget.id ? budget : b)
         }));
-        // TODO: Add supabase sync for business budgets when implemented
+        supabaseSync.syncBusinessBudget(budget, 'update');
       },
       deleteBusinessBudget: (budgetId) => {
-        set(state => ({
-          businessBudgets: state.businessBudgets.filter(b => b.id !== budgetId)
-        }));
-        // TODO: Add supabase sync for business budgets when implemented
+        const budget = get().businessBudgets.find(b => b.id === budgetId);
+        if(budget) {
+            set(state => ({
+              businessBudgets: state.businessBudgets.filter(b => b.id !== budgetId)
+            }));
+            supabaseSync.syncBusinessBudget(budget, 'delete');
+        }
       },
       // Business Revenue methods
       addBusinessRevenue: (revenue) => {
@@ -655,9 +661,13 @@ export const useAppStore = create<AppState>()(
       },
       // Sync methods
       setSyncData: (key, data) => {
+        // Only update if data is not empty to prevent overriding local data during initialization
+        if (Array.isArray(data) && data.length === 0) {
+          return; // Don't override local data with empty arrays
+        }
         set({ [key]: data });
       },
-      initializeSupabaseSync: () => {
+      initializeSupabaseSync: async () => {
         // Set up Supabase sync event listeners
         if (typeof window !== 'undefined') {
           const handleSupabaseUpdate = (event: CustomEvent) => {
@@ -669,6 +679,56 @@ export const useAppStore = create<AppState>()(
           
           // Load offline queue
           supabaseSync.loadOfflineQueue();
+          
+          // Load data from Supabase for multi-device sync
+          await get().syncFromSupabase();
+        }
+      },
+      syncFromSupabase: async () => {
+        const supabaseData = await supabaseSync.loadUserData();
+        if (supabaseData) {
+          // Merge Supabase data with local data, preferring Supabase for conflicts
+          const currentState = get();
+          
+          // For each data type, merge with preference for Supabase data
+          const dataKeys: Array<keyof typeof supabaseData> = ['transactions', 'bills', 'savingsGoals'];
+          dataKeys.forEach((key) => {
+            const supabaseArray = supabaseData[key];
+            const localArray = currentState[key];
+            
+            if (Array.isArray(supabaseArray) && Array.isArray(localArray)) {
+              // Create a map of local items by ID for quick lookup
+              const localMap = new Map(localArray.map((item: any) => [item.id, item]));
+              
+              // Merge arrays: use Supabase data, but keep local-only items
+              const mergedData = supabaseArray.map((supabaseItem: any) => {
+                const localItem = localMap.get(supabaseItem.id);
+                if (localItem) {
+                  // Compare timestamps for conflict resolution
+                  const localTime = new Date(localItem.updated_at || localItem.created_at || 0);
+                  const supabaseTime = new Date(supabaseItem.updated_at || supabaseItem.created_at || 0);
+                  
+                  // If local item is newer, use local data but add sync flag
+                  if (localTime > supabaseTime) {
+                    return {
+                      ...localItem,
+                      _needsSync: true // Mark for sync to Supabase
+                    };
+                  }
+                  // Otherwise use Supabase data
+                  return supabaseItem;
+                }
+                return supabaseItem;
+              });
+              
+              // Add local-only items (items not in Supabase)
+              const supabaseIds = new Set(supabaseArray.map((item: any) => item.id));
+              const localOnlyItems = localArray.filter((item: any) => !supabaseIds.has(item.id));
+              
+              // Update state with merged data
+              get().setSyncData(key, [...mergedData, ...localOnlyItems]);
+            }
+          });
         }
       },
     }),

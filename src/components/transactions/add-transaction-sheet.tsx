@@ -1,16 +1,14 @@
-
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { createTransactionSchema, validateData } from '@/lib/validations';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { AsyncButton } from '@/components/ui/async-button';
-import { LoadingState, ErrorState } from '@/components/ui/loading';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,347 +16,266 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetClose,
-  SheetFooter,
 } from '@/components/ui/sheet';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useAppStore } from '@/lib/data';
-import { PlusCircle, DollarSign, FileText, Calendar } from 'lucide-react';
-import React from 'react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, PlusCircle } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useActiveWorkspace } from '@/hooks/use-active-workspace';
-import { useFormSubmission } from '@/hooks/use-async-operation';
-import { formatCurrency, getCurrentCurrencySymbol } from '@/lib/utils';
+import { useAppStore } from '@/lib/data';
 import type { Transaction } from '@/lib/types';
-import { ScrollArea } from '../ui/scroll-area';
-import { ProgressiveForm, StepContent } from '@/components/ui/progressive-form';
 
-// Custom form data type that allows string for amount
-type TransactionFormInput = {
-  type: 'income' | 'expense';
-  amount: string;
-  category: string;
-  description: string;
-  date: string;
-};
-
-const STEPS = [
-  { id: 1, name: 'Type & Amount', icon: DollarSign, description: 'Transaction basics' },
-  { id: 2, name: 'Details', icon: FileText, description: 'Description & category' },
-  { id: 3, name: 'Date', icon: Calendar, description: 'Transaction date' },
-];
+const formSchema = z.object({
+  date: z.date(),
+  description: z.string().min(1, 'Description is required'),
+  amount: z.coerce.number().positive('Amount must be positive'),
+  type: z.enum(['income', 'expense']),
+  category_id: z.string().min(1, 'Category is required'),
+  workspace: z.enum(['personal', 'business']),
+});
 
 export function AddTransactionSheet() {
-  const [open, setOpen] = React.useState(false);
-  const [currentStep, setCurrentStep] = React.useState(1);
   const { toast } = useToast();
-  const { activeWorkspace } = useActiveWorkspace();
-  const { categories, transactions, addTransaction } = useAppStore();
+  const { categories, addTransaction } = useAppStore();
+  const [open, setOpen] = useState(false);
 
-  const form = useForm<TransactionFormInput>({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      type: 'expense',
-      amount: '',
-      category: '',
+      date: new Date(),
       description: '',
-      date: new Date().toISOString().split('T')[0],
+      type: 'expense',
+      workspace: 'personal',
     },
   });
-
-  const watchedValues = form.watch();
-
-  const canProceed = React.useMemo(() => {
-    switch (currentStep) {
-      case 1:
-        return !!watchedValues.type && parseFloat(watchedValues.amount) > 0;
-      case 2:
-        return !!watchedValues.description.trim() && !!watchedValues.category;
-      case 3:
-        return !!watchedValues.date;
-      default:
-        return false;
-    }
-  }, [currentStep, watchedValues]);
-
-  // Create async operation for form submission
-  const { execute: submitTransaction, isLoading, error } = useFormSubmission(
-    async (values: TransactionFormInput) => {
-
-      
-      // Validate amount
-      const numericAmount = typeof values.amount === 'string' ? parseFloat(values.amount) : values.amount;
-      if (!numericAmount || numericAmount <= 0) {
-        throw new Error('Amount is required and must be positive');
-      }
-      
-      if (!values.category) {
-        throw new Error('Please select a category');
-      }
-      
-      if (!values.description.trim()) {
-        throw new Error('Description is required');
-      }
-      
-      // Validate the data schema
-      const validation = validateData(createTransactionSchema, {
-        ...values,
-        workspace: activeWorkspace,
-      });
-
-      if (!validation.success) {
-        throw new Error(validation.errors.join(', '));
-      }
-      
-      // Budget checking logic
-      if (values.type === 'expense') {
-        const category = categories.find(c => c.name === values.category && c.workspace === activeWorkspace);
-        
-        if (category && category.budget) {
-          const now = new Date();
-          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-          const currentSpending = transactions
-            .filter(t => 
-              t.category === category.name && 
-              t.workspace === activeWorkspace &&
-              new Date(t.date) >= startOfMonth &&
-              new Date(t.date) <= endOfMonth
-            )
-            .reduce((sum, t) => sum + t.amount, 0);
-
-          const newTotalSpending = currentSpending + numericAmount;
-          const budgetThreshold = category.budget * 0.85;
-
-          if (newTotalSpending > category.budget) {
-            throw new Error(`This transaction would exceed your budget for ${category.name}. Current spending: ${formatCurrency(newTotalSpending)} of ${formatCurrency(category.budget)}.`);
-          } else if (newTotalSpending > budgetThreshold) {
-            toast({
-              title: 'Budget Warning',
-              description: `You are about to exceed your budget for ${category.name}. You've spent ${formatCurrency(newTotalSpending)} of ${formatCurrency(category.budget)}.`,
-              variant: 'destructive'
-            });
-          }
-        }
-      }
-      
-      // Create and add transaction
-      const newTransaction: Transaction = {
-          id: new Date().toISOString(),
-          ...values,
-          amount: numericAmount,
-          workspace: activeWorkspace,
-      };
-      
-      addTransaction(newTransaction);
-      
-      // Reset form and close sheet on success
-      form.reset();
-      setCurrentStep(1);
-      setOpen(false);
-    },
-    {
-      successMessage: 'Transaction added successfully',
-      showErrorToast: false, // We'll handle errors in the UI
-    }
-  );
 
   const transactionType = form.watch('type');
 
-  React.useEffect(() => {
-    form.setValue('category', '');
-  }, [transactionType, form]);
+  const groupedCategories = useMemo(() => {
+    return categories.reduce((acc, cat) => {
+      if (cat.type) {
+        acc[cat.type].push(cat);
+      }
+      return acc;
+    }, { income: [], expense: [] } as Record<'income' | 'expense', typeof categories>);
+  }, [categories]);
 
-  const filteredCategories = React.useMemo(() => {
-    return categories.filter((c) => c.type === transactionType && c.workspace === activeWorkspace);
-  }, [transactionType, activeWorkspace, categories]);
+  useEffect(() => {
+    // If the selected category doesn't match the transaction type, reset it
+    const selectedCategoryId = form.getValues('category_id');
+    if (selectedCategoryId) {
+      const selectedCategory = categories.find(c => c.id === selectedCategoryId);
+      if (selectedCategory && selectedCategory.type !== transactionType) {
+        form.setValue('category_id', '');
+      }
+    }
+  }, [transactionType, categories, form]);
 
-  // Form submission handler that uses our async operation
-  const handleSubmit = form.handleSubmit((values) => {
-    submitTransaction(values);
-  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const newTransaction: Transaction = {
+      id: new Date().toISOString(), // Temporary ID
+      ...values,
+      date: values.date.toISOString().split('T')[0],
+      category: categories.find(c => c.id === values.category_id)?.name || 'General',
+    };
+    
+    addTransaction(newTransaction);
+
+    toast({
+      title: 'Transaction Added',
+      description: 'The new transaction has been successfully recorded.',
+    });
+    form.reset();
+    setOpen(false);
+  }
 
   return (
-    <Sheet open={open} onOpenChange={(isOpen) => {
-      setOpen(isOpen);
-      if (!isOpen) {
-        setCurrentStep(1);
-        form.reset();
-      }
-    }}>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <AsyncButton size="sm" className="gap-1" loading={isLoading}>
-          <PlusCircle className="h-3 w-3" />
+        <Button size="sm" className="gap-1">
+          <PlusCircle className="h-4 w-4" />
           Add Transaction
-        </AsyncButton>
+        </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
-        <SheetHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-slate-200">
-          <SheetTitle className="text-lg sm:text-xl">Add New Transaction</SheetTitle>
-          <SheetDescription className="text-sm">
-            Enter the details of your transaction below. This will be added to your <span className="font-semibold">{activeWorkspace}</span> workspace.
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Add New Transaction</SheetTitle>
+          <SheetDescription>
+            Record a new income or expense transaction.
           </SheetDescription>
         </SheetHeader>
 
-        <ProgressiveForm
-          steps={STEPS}
-          currentStep={currentStep}
-          onStepChange={setCurrentStep}
-          canProceed={canProceed}
-          isSubmitting={isLoading}
-          onSubmit={() => handleSubmit()}
-          submitText="Save Transaction"
-        >
-          <Form {...form}>
-            <form className="flex-1 flex flex-col overflow-hidden">
-              {error && (
-                <div className="px-4 sm:px-6 mb-4">
-                  <ErrorState error={error} />
-                </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Groceries, Salary" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-              <ScrollArea className="flex-1 px-4 sm:px-6">
-                <div className="py-4 sm:py-6">
-                  {/* Step 1: Type & Amount */}
-                  <StepContent step={1} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">Transaction Basics</h3>
-                      <p className="text-sm text-muted-foreground mb-3 sm:mb-4">Select type and enter amount</p>
-                    </div>
-                    <div className="space-y-3 sm:space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="type"
-                        render={({ field }) => (
-<FormItem>
-                             <FormLabel className="text-sm font-medium">Type *</FormLabel>
-                             <Select
-                               onValueChange={field.onChange}
-                               defaultValue={field.value}
-                             >
-                               <FormControl>
-                                 <SelectTrigger className="h-11 sm:h-10">
-                                   <SelectValue placeholder="Select a transaction type" />
-                                 </SelectTrigger>
-                               </FormControl>
-                               <SelectContent>
-                                 <SelectItem value="expense">Expense</SelectItem>
-                                 <SelectItem value="income">Income</SelectItem>
-                               </SelectContent>
-                             </Select>
-                             <FormMessage />
-                           </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="amount"
-                        render={({ field }) => (
-<FormItem>
-                             <FormLabel className="text-sm font-medium">Amount *</FormLabel>
-                             <FormControl>
-                               <Input 
-                                 type="number" 
-                                 placeholder={`${getCurrentCurrencySymbol()} 10,000`} 
-                                 {...field}
-                                 step="0.01"
-                                 min="0"
-                                 className="h-11 sm:h-10 text-base"
-                               />
-                             </FormControl>
-                             <FormMessage />
-                           </FormItem>
-                        )}
-                      />
-                    </div>
-                  </StepContent>
+            />
 
-                  {/* Step 2: Details */}
-                  <StepContent step={2} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">Transaction Details</h3>
-                      <p className="text-sm text-muted-foreground mb-3 sm:mb-4">Add description and category</p>
-                    </div>
-                    <div className="space-y-3 sm:space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-<FormItem>
-                             <FormLabel className="text-sm font-medium">Description *</FormLabel>
-                             <FormControl>
-                               <Input placeholder="e.g. Groceries at Shoprite" {...field} className="h-11 sm:h-10 text-base" />
-                             </FormControl>
-                             <FormMessage />
-                           </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-<FormItem>
-                             <FormLabel className="text-sm font-medium">Category *</FormLabel>
-                             <Select
-                               onValueChange={field.onChange}
-                               value={field.value}
-                             >
-                               <FormControl>
-                                 <SelectTrigger className="h-11 sm:h-10">
-                                   <SelectValue placeholder="Select a category" />
-                                 </SelectTrigger>
-                               </FormControl>
-                               <SelectContent>
-                                 {filteredCategories.map((cat) => (
-                                   <SelectItem key={cat.id} value={cat.name}>
-                                     {cat.name}
-                                   </SelectItem>
-                                 ))}
-                               </SelectContent>
-                             </Select>
-                             <FormMessage />
-                           </FormItem>
-                        )}
-                      />
-                    </div>
-                  </StepContent>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount *</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="0.00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="expense">Expense</SelectItem>
+                        <SelectItem value="income">Income</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                  {/* Step 3: Date */}
-                  <StepContent step={3} currentStep={currentStep}>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">Transaction Date</h3>
-                      <p className="text-sm text-slate-600 mb-3 sm:mb-4">Select the transaction date</p>
-                    </div>
-                    <FormField
-                      control={form.control}
-                      name="date"
-                      render={({ field }) => (
-<FormItem>
-                           <FormLabel className="text-sm font-medium">Date *</FormLabel>
-                           <FormControl>
-                             <Input type="date" {...field} className="h-11 sm:h-10 text-base" />
-                           </FormControl>
-                           <FormMessage />
-                         </FormItem>
+            <FormField
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {groupedCategories[transactionType].length > 0 ? (
+                        groupedCategories[transactionType].map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="-" disabled>
+                          No {transactionType} categories found
+                        </SelectItem>
                       )}
-                    />
-                  </StepContent>
-                </div>
-              </ScrollArea>
-            </form>
-          </Form>
-        </ProgressiveForm>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+               <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date *</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                  control={form.control}
+                  name="workspace"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Workspace *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a workspace" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="personal">Personal</SelectItem>
+                          <SelectItem value="business">Business</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add Transaction</Button>
+            </div>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );

@@ -98,7 +98,7 @@ export function ProgressiveForm({
       </div>
 
       {/* Form Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1">
         {children}
       </div>
 
@@ -144,9 +144,10 @@ export function ProgressiveForm({
             ) : (
               <Button 
                 type="submit"
+                variant="default"
                 onClick={onSubmit}
                 disabled={!canProceed || isSubmitting}
-                className="gap-1 bg-emerald-600 hover:bg-emerald-700 h-9 sm:h-8 text-xs sm:text-sm"
+                className="gap-1 bg-blue-500 hover:bg-blue-600 h-9 sm:h-8 text-xs sm:text-sm"
               >
                 <Check className="h-3 w-3" />
                 {isSubmitting ? 'Submitting...' : submitText}

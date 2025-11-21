@@ -54,24 +54,47 @@ export function BudgetAdjustModal({
   const [budget, setBudget] = useState<string>('');
   const [budgetFrequency, setBudgetFrequency] = useState<'weekly' | 'monthly'>('monthly');
   
-  // Calculate spending data for the category
-  const categoryTransactions = transactions.filter(t => t.category === category?.id);
+  // Calculate spending data for the category within budget period
+  if (!category) return null;
   
-  const totalSpent = categoryTransactions.reduce((sum, t) => sum + t.amount, 0);
-  
-  // Group transactions by month for chart
-  const monthlySpending: Record<string, number> = {};
-  categoryTransactions.forEach(transaction => {
-    const date = new Date(transaction.date);
-    const month = date.toLocaleString('default', { month: 'short' });
-    const year = date.getFullYear();
-    const monthYear = `${month} ${year}`;
+  const now = new Date();
+  const categoryTransactions = transactions.filter(t => {
+    if (t.category !== category.name) return false;
     
-    if (!monthlySpending[monthYear]) {
-      monthlySpending[monthYear] = 0;
+    const transactionDate = new Date(t.date);
+    
+    // Filter by budget frequency
+    if (category.budgetFrequency === 'weekly') {
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+      weekStart.setHours(0, 0, 0, 0);
+      return transactionDate >= weekStart;
+    } else {
+      // Monthly (default)
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      return transactionDate >= monthStart;
     }
-    monthlySpending[monthYear] += transaction.amount;
   });
+  
+  const totalSpent = categoryTransactions
+    .filter(t => t.type === 'expense') // Only count expenses for budget tracking
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  
+  // Group transactions by month for chart (only expenses)
+  const monthlySpending: Record<string, number> = {};
+  categoryTransactions
+    .filter(t => t.type === 'expense')
+    .forEach(transaction => {
+      const date = new Date(transaction.date);
+      const month = date.toLocaleString('default', { month: 'short' });
+      const year = date.getFullYear();
+      const monthYear = `${month} ${year}`;
+      
+      if (!monthlySpending[monthYear]) {
+        monthlySpending[monthYear] = 0;
+      }
+      monthlySpending[monthYear] += Math.abs(transaction.amount);
+    });
   
   const chartData = Object.entries(monthlySpending).map(([month, amount]) => ({
     month,

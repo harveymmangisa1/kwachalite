@@ -11,9 +11,26 @@ import type {
   Client, 
   Product, 
   Quote, 
-  Loan 
+  Loan,
+  BusinessBudget,
+  BusinessRevenue,
+  BusinessExpense,
+  SalesReceipt,
+  DeliveryNote,
+  SavingsGroup,
+  GroupMember,
+  GroupInvitation,
+  GroupContribution,
+  GroupActivity,
+  Project,
+  Invoice,
+  ClientPayment,
+  ClientExpense,
+  CommunicationLog,
+  TaskNote
 } from '@/lib/types';
 import { Briefcase } from 'lucide-react';
+import { initialCategories } from './data';
 
 // Temporary type assertion to bypass TypeScript issues
 const db = supabase as any;
@@ -46,8 +63,14 @@ export class SupabaseSync {
 
   private handleOnline = () => {
     this.updateSyncState({ isOnline: true });
+    // Sync any pending changes when coming back online
+    this.syncOfflineChanges();
+    
+    // Also trigger a full sync to ensure data consistency across devices
     if (this.user) {
-      this.syncOfflineChanges();
+      this.updateStoreData('transactions', []);
+      this.updateStoreData('bills', []);
+      this.updateStoreData('savingsGoals', []);
     }
   };
 
@@ -222,6 +245,23 @@ export class SupabaseSync {
         )
         .subscribe();
 
+      // Listen to business budgets
+      const businessBudgetsSubscription = db
+        .channel('business_budgets_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'business_budgets',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateBusinessBudgets();
+          }
+        )
+        .subscribe();
+
       this.subscriptions = [
         () => db.removeChannel(transactionsSubscription),
         () => db.removeChannel(billsSubscription),
@@ -231,6 +271,7 @@ export class SupabaseSync {
         () => db.removeChannel(productsSubscription),
         () => db.removeChannel(quotesSubscription),
         () => db.removeChannel(loansSubscription),
+        () => db.removeChannel(businessBudgetsSubscription),
       ];
 
       // Initial data fetch
@@ -259,6 +300,7 @@ export class SupabaseSync {
         this.fetchAndUpdateProducts(),
         this.fetchAndUpdateQuotes(),
         this.fetchAndUpdateLoans(),
+        this.fetchAndUpdateBusinessBudgets(),
       ]);
     } catch (error) {
       console.error('Error in initial data fetch:', error);
@@ -355,7 +397,7 @@ export class SupabaseSync {
     this.updateStoreData('savingsGoals', savingsGoals);
   }
 
-  private async fetchAndUpdateCategories() {
+  private async fetchAndUpdateCategories(isRetry = false) {
     if (!this.user) return;
 
     const { data, error } = await db
@@ -367,6 +409,33 @@ export class SupabaseSync {
     if (error) {
       console.error('Error fetching categories:', error);
       this.updateSyncState({ syncError: error.message });
+      return;
+    }
+
+    if (data && data.length === 0 && !isRetry) {
+      // No categories for this user, let's seed them from initialCategories
+      const newCategories = initialCategories.map(c => ({
+        id: c.id,
+        name: c.name,
+        icon: 'folder',
+        color: c.color,
+        type: c.type,
+        workspace: c.workspace,
+        budget: c.budget,
+        budget_frequency: c.budgetFrequency,
+        user_id: this.user!.id,
+      }));
+
+      const { error: insertError } = await db.from('categories').insert(newCategories);
+
+      if (insertError) {
+        console.error('Error seeding categories:', insertError);
+        this.updateSyncState({ syncError: insertError.message });
+        return;
+      }
+      
+      // Re-fetch after seeding
+      await this.fetchAndUpdateCategories(true);
       return;
     }
 
@@ -492,6 +561,36 @@ export class SupabaseSync {
     }));
 
     this.updateStoreData('loans', loans);
+  }
+
+  private async fetchAndUpdateBusinessBudgets() {
+    if (!this.user) return;
+
+    const { data, error } = await db
+      .from('business_budgets')
+      .select('*')
+      .eq('user_id', this.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching business budgets:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+
+    const budgets: BusinessBudget[] = (data || []).map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      budgetAmount: item.budget_amount,
+      period: item.period,
+      startDate: item.start_date,
+      endDate: item.end_date,
+      currentSpent: item.current_spent,
+      workspace: 'business',
+    }));
+
+    this.updateStoreData('businessBudgets', budgets);
   }
 
   private stopListening() {
@@ -923,6 +1022,59 @@ export class SupabaseSync {
     }
   }
 
+  async syncBusinessBudget(budget: BusinessBudget, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('business_budgets', budget.id, budget, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('business_budgets')
+          .delete()
+          .eq('id', budget.id)
+          .eq('user_id', this.user.id);
+        
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: budget.id,
+          name: budget.name,
+          category: budget.category,
+          budget_amount: budget.budgetAmount,
+          period: budget.period,
+          start_date: budget.startDate,
+          end_date: budget.endDate,
+          current_spent: budget.currentSpent,
+          workspace: budget.workspace,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('business_budgets')
+          .upsert(syncData, { onConflict: 'id' });
+        
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} business budget:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('business_budgets', budget.id, budget, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
   // Offline support
   private offlineQueue: Array<{
     collection: string;
@@ -968,6 +1120,10 @@ export class SupabaseSync {
           await this.syncQuote(operation.data, operation.operation);
         } else if (operation.collection === 'categories') {
           await this.syncCategory(operation.data, operation.operation);
+        } else if (operation.collection === 'business_budgets') {
+          await this.syncBusinessBudget(operation.data, operation.operation);
+        } else if (operation.collection === 'savings_goals') {
+            await this.syncSavingsGoal(operation.data, operation.operation);
         }
         // Add other collection types as needed
       }
@@ -1005,6 +1161,74 @@ export class SupabaseSync {
         localStorage.removeItem('db-sync-queue');
       }
     }
+  }
+
+  // Data loading functions for multi-device sync
+  async loadUserData() {
+    if (!this.user) return null;
+
+    try {
+      // Focus on core data types first
+      const [
+        transactionsData,
+        billsData,
+        savingsGoalsData
+      ] = await Promise.all([
+        db.from('transactions').select('*').eq('user_id', this.user.id),
+        db.from('bills').select('*').eq('user_id', this.user.id),
+        db.from('savings_goals').select('*').eq('user_id', this.user.id)
+      ]);
+
+      return {
+        transactions: this.transformTransactions(transactionsData.data || []),
+        bills: this.transformBills(billsData.data || []),
+        savingsGoals: this.transformSavingsGoals(savingsGoalsData.data || [])
+      };
+    } catch (error) {
+      console.error('Error loading user data from Supabase:', error);
+      return null;
+    }
+  }
+
+  // Transform functions to convert Supabase data to app format
+  private transformTransactions(data: any[]): Transaction[] {
+    return data.map(item => ({
+      id: item.id,
+      type: item.type,
+      amount: item.amount,
+      description: item.description,
+      category: item.category,
+      workspace: item.workspace,
+      date: item.date,
+      created_at: item.created_at
+    }));
+  }
+
+  private transformBills(data: any[]): Bill[] {
+    return data.map(item => ({
+      id: item.id,
+      name: item.name,
+      amount: item.amount,
+      dueDate: item.due_date,
+      status: item.status || 'unpaid',
+      isRecurring: item.is_recurring || false,
+      recurringFrequency: item.recurring_frequency,
+      workspace: item.workspace || 'personal'
+    }));
+  }
+
+  private transformSavingsGoals(data: any[]): SavingsGoal[] {
+    return data.map(item => ({
+      id: item.id,
+      name: item.name,
+      targetAmount: item.target_amount,
+      currentAmount: item.current_amount,
+      deadline: item.deadline,
+      type: item.type,
+      members: item.members,
+      workspace: item.workspace,
+      items: item.items
+    }));
   }
 
   // Clean up

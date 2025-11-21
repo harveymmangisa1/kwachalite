@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { AsyncButton } from '@/components/ui/async-button';
@@ -21,6 +19,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useBusinessProfile, type BusinessProfile } from '@/hooks/use-business-profile-v2';
 import { useToast } from '@/hooks/use-toast';
 import { SyncStatus } from '@/components/sync-status';
+import { supabase } from '@/lib/supabase';
 
 export function BusinessProfileSettings() {
   const { user } = useAuth();
@@ -108,6 +107,48 @@ export function BusinessProfileSettings() {
     }));
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user!.id}-${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('business-logos')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('business-logos')
+        .getPublicUrl(filePath);
+
+      setBusinessProfile(prev => ({
+        ...prev,
+        logo_url: publicUrl
+      }));
+
+      toast({
+        title: 'Logo uploaded',
+        description: 'Your new business logo has been uploaded.',
+      });
+
+    } catch (error) {
+      toast({
+        title: 'Logo upload failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Get initials for avatar fallback
   const businessInitials = businessProfile.name
     ? businessProfile.name.split(' ')
@@ -180,7 +221,7 @@ export function BusinessProfileSettings() {
                 </Avatar>
                 <div className="grid gap-2">
                     <Label htmlFor="logo">Business Logo</Label>
-                    <Input id="logo" type="file" className="text-sm" />
+                    <Input id="logo" type="file" className="text-sm" onChange={handleLogoUpload} />
                     <p className="text-xs text-muted-foreground">JPG, GIF or PNG. 1MB max.</p>
                 </div>
             </div>
