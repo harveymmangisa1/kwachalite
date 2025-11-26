@@ -599,8 +599,20 @@ export class SupabaseSync {
   }
 
   private updateStoreData(key: string, data: any) {
-    // Dispatch custom event to update the Zustand store
+    // Update Zustand store directly if available, otherwise use custom event
     if (typeof window !== 'undefined') {
+      try {
+        // Try to get store dynamically to avoid circular imports
+        const store = (window as any).__KWACHALITE_STORE__;
+        if (store && store.setSyncData) {
+          store.setSyncData(key, data);
+          return;
+        }
+      } catch (error) {
+        console.error('Error updating store directly:', error);
+      }
+      
+      // Fallback to custom event
       window.dispatchEvent(
         new CustomEvent('supabase-sync-update', {
           detail: { key, data }
