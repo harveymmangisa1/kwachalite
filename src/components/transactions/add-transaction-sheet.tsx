@@ -39,7 +39,11 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useAppStore } from '@/lib/data';
+import { useAuth } from '@/hooks/use-auth';
+import { AnalyticsService } from '@/lib/analytics';
 import type { Transaction } from '@/lib/types';
+// Example: In addTransaction method
+import { StreakService, ACTIVITY_TYPES } from '@/lib/streak-service';
 
 const formSchema = z.object({
   date: z.date(),
@@ -53,6 +57,7 @@ const formSchema = z.object({
 export function AddTransactionSheet() {
   const { toast } = useToast();
   const { categories, addTransaction } = useAppStore();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -95,8 +100,29 @@ export function AddTransactionSheet() {
       date: values.date.toISOString().split('T')[0],
       category: categories.find(c => c.id === values.category_id)?.name || 'General',
     };
-    
-    addTransaction(newTransaction);
+
+addTransaction(newTransaction);
+
+    // Record streak activity if user is authenticated
+    if (user?.id) {
+      try {
+        StreakService.recordActivity(user.id, ACTIVITY_TYPES.TRANSACTION_ADDED);
+        
+        // Track analytics event
+        AnalyticsService.trackEvent({
+          event_type: 'transaction',
+          user_id: user.id,
+          properties: {
+            amount: newTransaction.amount,
+            type: newTransaction.type,
+            category: newTransaction.category,
+            workspace: newTransaction.workspace,
+          },
+        });
+      } catch (error) {
+        console.error('Failed to record activity:', error);
+      }
+    }
 
     toast({
       title: 'Transaction Added',
@@ -189,7 +215,7 @@ export function AddTransactionSheet() {
                     </FormControl>
                     <SelectContent>
                       {groupedCategories[transactionType].length > 0 ? (
-                        groupedCategories[transactionType].map((cat) => (
+                        groupedCategories[transactionType].map((cat: any) => (
                           <SelectItem key={cat.id} value={cat.id}>
                             {cat.name}
                           </SelectItem>
@@ -207,7 +233,7 @@ export function AddTransactionSheet() {
             />
 
             <div className="grid grid-cols-2 gap-4">
-               <FormField
+              <FormField
                 control={form.control}
                 name="date"
                 render={({ field }) => (
@@ -246,26 +272,26 @@ export function AddTransactionSheet() {
                 )}
               />
               <FormField
-                  control={form.control}
-                  name="workspace"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Workspace *</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a workspace" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="personal">Personal</SelectItem>
-                          <SelectItem value="business">Business</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                control={form.control}
+                name="workspace"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Workspace *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a workspace" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="personal">Personal</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <div className="flex justify-end space-x-2 pt-4">

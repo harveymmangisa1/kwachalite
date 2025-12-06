@@ -1,211 +1,327 @@
-/* ------------------------------------
- * MINIMAL GRAYSCALE GLOBALS
- * ------------------------------------ */
+/* ============================================
+ * KWACHALITE DESIGN SYSTEM
+ * Modern, Mobile-First, Corporate with Personality
+ * ============================================ */
 
- @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
 
- @tailwind base;
- @tailwind components;
- @tailwind utilities;
- 
- @layer base {
-   :root {
-     --font-sans: 'Inter', sans-serif;
-     
-     /* Pure grayscale palette */
-     --background: 255 255 255;
-     --foreground: 10 10 10;
-     --card: 255 255 255;
-     --card-foreground: 10 10 10;
-     
-     --primary: 10 10 10;
-     --primary-foreground: 255 255 255;
-     
-     --secondary: 245 245 245;
-     --secondary-foreground: 10 10 10;
-     
-     --muted: 245 245 245;
-     --muted-foreground: 115 115 115;
-     
-     --accent: 240 240 240;
-     --accent-foreground: 10 10 10;
-     
-      --border: 229 229 229;
-      --input: 229 229 229;
-      --ring: 10 10 10;
-      --popover: 255 255 255;
-      --popover-foreground: 10 10 10;
-      
-      --radius: 0.5rem;
-   }
-   
-   body {
-     font-family: var(--font-sans);
-     -webkit-font-smoothing: antialiased;
-     -moz-osx-font-smoothing: grayscale;
-   }
- 
-   h1, h2, h3, h4, h5 {
-     letter-spacing: -0.015em;
-   }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    
+    /* Design System Colors */
+    --background: 255 255 255;
+    --foreground: 28 25 23;
+    
+    --card: 255 255 255;
+    --card-foreground: 28 25 23;
+    
+    --primary: 98 125 152;      /* Blue-gray 500 */
+    --primary-foreground: 255 255 255;
+    
+    --accent: 255 107 74;       /* Warm coral 500 */
+    --accent-foreground: 255 255 255;
+    
+    --secondary: 245 245 244;   /* Neutral 100 */
+    --secondary-foreground: 28 25 23;
+    
+    --muted: 245 245 244;
+    --muted-foreground: 120 113 108;
+    
+    --border: 231 229 228;      /* Neutral 200 */
+    --input: 231 229 228;
+    --ring: 98 125 152;         /* Primary */
+    
+    --success: 34 197 94;
+    --warning: 245 158 11;
+    --error: 239 68 68;
+    
+    --radius: 0.5rem;
   }
- 
- @layer base {
-   * {
-     @apply border-border;
-   }
-   
-   body {
-     @apply bg-background text-foreground;
-   }
- 
-   html {
-     scroll-behavior: smooth;
-   }
-   
-   ::-webkit-scrollbar {
-     width: 6px;
-     height: 6px;
-   }
-   
-   ::-webkit-scrollbar-track {
-     @apply bg-transparent;
-   }
-   
-   ::-webkit-scrollbar-thumb {
-     @apply bg-muted rounded-full;
-   }
-   
-   ::-webkit-scrollbar-thumb:hover {
-     @apply bg-muted-foreground/50;
-   }
- }
- 
-  @layer components {
-    .focus-ring {
-      @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
-    }
   
-    .card-minimal {
-      @apply rounded-lg border bg-card p-3 sm:p-4 shadow-sm;
-    }
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
   
-    .card-hover {
-      @apply rounded-lg border bg-card p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow;
-    }
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
   
-    .badge-minimal {
-      @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium;
-    }
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
   
-    .separator {
-      @apply h-px bg-border;
-    }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
 
-    .container-padding {
-      @apply px-4 sm:px-6 lg:px-8;
+@layer components {
+  /* ============================================
+   * CARD COMPONENTS
+   * ============================================ */
+  .card-base {
+    @apply bg-white rounded-xl shadow-card border border-border;
+  }
+  
+  .card-hover {
+    @apply bg-white rounded-xl shadow-card border border-border 
+           hover:shadow-card-hover transition-shadow duration-200;
+  }
+  
+  .card-interactive {
+    @apply bg-white rounded-xl shadow-card border border-border 
+           cursor-pointer hover:shadow-card-hover hover:border-primary-200 
+           transition-all duration-200;
+  }
+  
+  /* ============================================
+   * BUTTON COMPONENTS
+   * ============================================ */
+  .btn-base {
+    @apply inline-flex items-center justify-center rounded-lg font-medium 
+           transition-all duration-200 focus:outline-none focus:ring-2 
+           focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply btn-base bg-primary-600 text-white hover:bg-primary-700 
+           focus:ring-primary-500 shadow-button hover:shadow-button-hover;
+  }
+  
+  .btn-accent {
+    @apply btn-base bg-accent-500 text-white hover:bg-accent-600 
+           focus:ring-accent-500 shadow-button hover:shadow-button-hover;
+  }
+  
+  .btn-secondary {
+    @apply btn-base bg-neutral-100 text-neutral-900 hover:bg-neutral-200 
+           focus:ring-neutral-500;
+  }
+  
+  .btn-ghost {
+    @apply btn-base text-neutral-700 hover:bg-neutral-100 
+           focus:ring-neutral-500;
+  }
+  
+  /* Button sizes */
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+  
+  .btn-md {
+    @apply px-4 py-2 text-base;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+  
+  /* ============================================
+   * INPUT COMPONENTS
+   * ============================================ */
+  .input-base {
+    @apply block w-full rounded-lg border border-border bg-white 
+           px-4 py-2.5 text-neutral-900 placeholder-neutral-400 
+           focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 
+           transition-all duration-200;
+  }
+  
+  .input-error {
+    @apply border-error-500 focus:border-error-500 focus:ring-error-500/20;
+  }
+  
+  /* ============================================
+   * BADGE COMPONENTS
+   * ============================================ */
+  .badge-base {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full 
+           text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply badge-base bg-primary-100 text-primary-800;
+  }
+  
+  .badge-success {
+    @apply badge-base bg-success-100 text-success-800;
+  }
+  
+  .badge-warning {
+    @apply badge-base bg-warning-100 text-warning-800;
+  }
+  
+  .badge-error {
+    @apply badge-base bg-error-100 text-error-800;
+  }
+  
+  /* ============================================
+   * LAYOUT UTILITIES
+   * ============================================ */
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .section-spacing {
+    @apply space-y-6 sm:space-y-8;
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  /* ============================================
+   * MOBILE OPTIMIZATIONS
+   * ============================================ */
+  @media (max-width: 640px) {
+    .mobile-touch-target {
+      @apply min-h-[44px] min-w-[44px];
     }
-
-    /* Safe area for mobile devices */
-    .safe-area-bottom {
-      padding-bottom: env(safe-area-inset-bottom, 0);
+    
+    .mobile-grid {
+      @apply grid-cols-1 gap-4;
     }
-
-    /* Transparent input fields */
-    .input-transparent {
-      @apply bg-transparent border-muted-foreground/20 focus:border-primary/50;
+    
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
-
-    /* Tour animations */
-    @keyframes tour-highlight {
-      0% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.8);
-      }
-      70% {
-        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-      }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
     }
-
-    .tour-highlight-pulse {
-      animation: tour-highlight 2s infinite;
-    }
-
-    /* Form scroll fixes */
+  }
+  
+  /* ============================================
+   * FORM UTILITIES
+   * ============================================ */
+  .form-scroll-container {
+    @apply max-h-[calc(90vh-120px)] overflow-y-auto pr-2;
+  }
+  
+  @media (max-width: 640px) {
     .form-scroll-container {
-      max-height: calc(90vh - 120px);
-      overflow-y: auto;
-      padding-right: 8px;
-    }
-
-    .form-scroll-container::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .form-scroll-container::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .form-scroll-container::-webkit-scrollbar-thumb {
-      background: hsl(var(--muted-foreground) / 0.3);
-      border-radius: 3px;
-    }
-
-    .form-scroll-container::-webkit-scrollbar-thumb:hover {
-      background: hsl(var(--muted-foreground) / 0.5);
-    }
-
-    /* Ensure modal content scrolls properly */
-    [data-state="open"] {
-      overflow: hidden !important;
-    }
-
-    /* Better scroll for long forms */
-    .space-y-6 {
-      scroll-behavior: smooth;
-    }
-
-    /* Mobile form scroll fixes */
-    @media (max-width: 640px) {
-      .form-scroll-container {
-        max-height: calc(100vh - 160px);
-        padding-right: 4px;
-      }
-    }
-
-    /* Mobile optimizations */
-    @media (max-width: 640px) {
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-      }
-
-      /* Better touch targets */
-      .mobile-touch-target {
-        min-height: 44px;
-        min-width: 44px;
-      }
-
-      /* Compact text for mobile */
-      .mobile-text-sm {
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-      }
-
-      /* Safe area padding */
-      .safe-area-top {
-        padding-top: env(safe-area-inset-top, 0);
-      }
-
-      /* Responsive grid adjustments */
-      .mobile-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
+      @apply max-h-[calc(100vh-160px)] pr-1;
     }
   }
+  
+  /* ============================================
+   * ANIMATIONS
+   * ============================================ */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  .shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(
+      to right,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 1000px 100%;
+  }
+  
+  /* ============================================
+   * ACCESSIBILITY
+   * ============================================ */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+  
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  /* ============================================
+   * PRINT STYLES
+   * ============================================ */
+  @media print {
+    body {
+      @apply text-black bg-white;
+    }
+    
+    .no-print {
+      display: none !important;
+    }
+    
+    .card-base,
+    .card-hover,
+    .card-interactive {
+      @apply shadow-none border border-neutral-300;
+    }
+  }
+}
+
+/* ============================================
+ * UTILITY CLASSES
+ * ============================================ */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-accent-500 
+           bg-clip-text text-transparent;
+  }
+  
+  /* Glassmorphism */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  /* Truncate with tooltip */
+  .truncate-tooltip {
+    @apply truncate cursor-help;
+  }
+}

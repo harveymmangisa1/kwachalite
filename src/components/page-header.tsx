@@ -2,6 +2,10 @@ import type { ReactNode } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from './ui/input';
 import { UserNav } from './user-nav';
+import { useAuth } from '@/hooks/use-auth';
+// In your header component
+import { StreakBadge } from '@/components/streak/StreakDisplay';
+
 
 interface PageHeaderProps {
   title: string;
@@ -11,6 +15,8 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, description, children, icon }: PageHeaderProps) {
+  const { user } = useAuth();
+  
   return (
     <div className="flex flex-col gap-4 mb-6 px-4 pt-4 sm:px-6 sm:pt-0">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background sm:static sm:h-auto sm:border-0 sm:bg-transparent">
@@ -38,6 +44,7 @@ export function PageHeader({ title, description, children, icon }: PageHeaderPro
           </div>
           {children && <div className="flex items-center gap-2">{children}</div>}
         </div>
+        {user && <StreakBadge userId={user.id} />}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { DashboardHero } from '@/components/dashboard/DashboardHero';
 import { OverviewCards } from '@/components/dashboard/overview-cards';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { IncomeExpenseChart } from '@/components/analytics/income-expense-chart';
@@ -8,6 +9,7 @@ import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { BusinessDashboard } from '@/components/dashboard/business-dashboard';
 import { GettingStarted } from '@/components/onboarding/getting-started';
 import { useOnboarding } from '@/hooks/use-onboarding';
+import { StreakDisplay } from '@/components/streak/StreakDisplay';
 import { useAppStore } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,7 +30,7 @@ export default function Dashboard() {
     transactions.filter(t => t.workspace === 'personal'),
     [transactions]
   );
-  
+
   const businessTransactions = React.useMemo(() =>
     transactions.filter(t => t.workspace === 'business'),
     [transactions]
@@ -41,13 +43,41 @@ export default function Dashboard() {
     return <BusinessDashboard transactions={businessTransactions} />;
   }
 
+  if (!user) return null;
+
   return (
     <div className="container-padding py-4 sm:py-8 space-y-6 sm:space-y-8">
-      <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+      {/* Single unified hero card */}
+      <DashboardHero 
+        userName={user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+        userId={user.id}
+        transactions={personalTransactions}
+      />
+      
       {shouldShowDashboard ? (
+        <>
           <OverviewCards transactions={personalTransactions} />
+          
+          {/* Other dashboard content */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RecentTransactions transactions={personalTransactions} />
+            <CategoryPieChart transactions={personalTransactions} />
+          </div>
+          
+          <IncomeExpenseChart transactions={personalTransactions} />
+          
+          {/* Optional: Detailed streak view in a collapsible section */}
+          <details className="group">
+            <summary className="cursor-pointer text-sm font-medium text-neutral-700 hover:text-neutral-900 p-3 bg-gray-50 rounded-lg">
+              View detailed streak statistics
+            </summary>
+            <div className="mt-4">
+              <StreakDisplay userId={user.id} />
+            </div>
+          </details>
+        </>
       ) : (
-        <GettingStarted 
+        <GettingStarted
           onSkip={skipOnboarding}
           onComplete={completeOnboarding}
         />

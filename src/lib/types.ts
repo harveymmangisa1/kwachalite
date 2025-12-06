@@ -3,25 +3,85 @@ import type { LucideIcon } from 'lucide-react';
 
 export type Workspace = 'personal' | 'business';
 
+// ============================================
+// STREAK FEATURE TYPES
+// ============================================
+export interface UserStreak {
+    id: string;
+    user_id: string;
+    current_streak: number;
+    longest_streak: number;
+    last_activity_date: string;
+    last_activity_type: string;
+    total_active_days: number;
+    streak_freeze_count: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface DailyActivity {
+    id: string;
+    user_id: string;
+    activity_date: string;
+    activities: Array<{
+        type: string;
+        timestamp: string;
+    }>;
+    transactions_count: number;
+    savings_count: number;
+    bills_paid_count: number;
+    goals_updated_count: number;
+    points_earned: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface StreakMilestone {
+    id: string;
+    user_id: string;
+    milestone_type: 'first_day' | 'week_streak' | 'month_streak' | 'quarter_streak' | 'year_streak' | 'hundred_days' | 'custom';
+    milestone_value: number;
+    achieved_at: string;
+    reward_type?: 'badge' | 'points' | 'feature_unlock';
+    reward_data?: any;
+    created_at: string;
+}
+
+export interface StreakFreezeHistory {
+    id: string;
+    user_id: string;
+    freeze_date: string;
+    reason?: 'manual' | 'auto' | 'reward';
+    created_at: string;
+}
+
+export interface StreakUpdateResult {
+    current_streak: number;
+    longest_streak: number;
+    is_new_milestone: boolean;
+    milestone_type: string | null;
+}
+
+
 export interface Transaction {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  category: string;
-  workspace: Workspace;
+    id: string;
+    date: string;
+    description: string;
+    amount: number;
+    type: 'income' | 'expense';
+    category: string;
+    workspace: Workspace;
 }
 
 export interface Category {
-  id:string;
-  name: string;
-  icon: LucideIcon;
-  color: string;
-  type: 'income' | 'expense';
-  workspace: Workspace;
-  budget?: number;
-  budgetFrequency?: 'weekly' | 'monthly';
+    id: string;
+    name: string;
+    icon: LucideIcon;
+    color: string;
+    type: 'income' | 'expense';
+    workspace: Workspace;
+    budget?: number;
+    budgetFrequency?: 'weekly' | 'monthly';
 }
 
 export interface Bill {

@@ -17,31 +17,10 @@ export function DashboardHeader() {
     const { activeWorkspace, setActiveWorkspace } = useActiveWorkspace();
     const { user } = useAuth();
     const { getDisplayName } = useBusinessProfile();
-    const [greeting, setGreeting] = React.useState('');
 
-    React.useEffect(() => {
-        const now = new Date();
-        const hour = now.getHours();
-        if (hour < 12) {
-            setGreeting('Good morning');
-        } else if (hour < 18) {
-            setGreeting('Good afternoon');
-        } else {
-            setGreeting('Good evening');
-        }
-    }, []);
-
-    // Get the display name based on the active workspace
-    const displayName = React.useMemo(() => {
-        if (activeWorkspace === 'business') {
-            return getDisplayName();
-        }
-        return user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User';
-    }, [activeWorkspace, getDisplayName, user]);
-
-    return (
+return (
         <div className="container-padding pt-6 pb-4 sm:pt-8 sm:pb-6">
-            <header className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <header className="flex flex-col gap-4 sm:gap-6">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                     {/* Modern workspace switcher */}
                     <div className="relative">
@@ -104,35 +83,17 @@ export function DashboardHeader() {
                             className="w-full pl-12 pr-4 h-11 bg-background/60 backdrop-blur-sm border-border/50 rounded-xl focus:bg-background focus:border-primary transition-all duration-300 shadow-sm hover:shadow-md"
                         />
                     </div>
-                </div>
-                
-                <div className='flex items-center gap-3'>
-                    <div className="hidden sm:block">
-                        <SyncStatus />
+                    
+                    <div className='flex items-center gap-3'>
+                        <div className="hidden sm:block">
+                            <SyncStatus />
+                        </div>
+                        <UserNav />
                     </div>
-                    <UserNav />
                 </div>
-            </header>
-            
-            <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <h1 className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-                        {greeting}, {displayName}!
-                    </h1>
-                    <div className="hidden sm:block text-3xl animate-bounce">👋</div>
-                </div>
-                <p className="text-muted-foreground text-lg font-medium leading-relaxed">
-                    {activeWorkspace === 'personal' 
-                        ? "Here's a comprehensive overview of your financial activity and insights."
-                        : `Here's a complete overview of your business performance and key metrics.`
-                    }
-                </p>
                 
                 {/* Quick actions for mobile */}
-                <div className="flex sm:hidden items-center gap-3 pt-6">
-                    <div className="flex-1">
-                        <SyncStatus />
-                    </div>
+                <div className="flex sm:hidden items-center gap-3">
                     {activeWorkspace === 'personal' ? (
                         <AddTransactionSheet />
                     ) : (
@@ -144,7 +105,7 @@ export function DashboardHeader() {
                 </div>
                 
                 {/* Quick actions for desktop */}
-                <div className="hidden sm:flex items-center gap-4 pt-4">
+                <div className="hidden sm:flex items-center gap-4">
                     {activeWorkspace === 'personal' ? (
                         <AddTransactionSheet />
                     ) : (
@@ -154,7 +115,7 @@ export function DashboardHeader() {
                         </>
                     )}
                 </div>
-            </div>
+            </header>
         </div>
     );
 }

@@ -3,14 +3,14 @@
 import { supabase } from './supabase';
 import type { User } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
-import type { 
-  Transaction, 
-  Bill, 
-  SavingsGoal, 
-  Category, 
-  Client, 
-  Product, 
-  Quote, 
+import type {
+  Transaction,
+  Bill,
+  SavingsGoal,
+  Category,
+  Client,
+  Product,
+  Quote,
   Loan,
   BusinessBudget,
   BusinessRevenue,
@@ -65,7 +65,7 @@ export class SupabaseSync {
     this.updateSyncState({ isOnline: true });
     // Sync any pending changes when coming back online
     this.syncOfflineChanges();
-    
+
     // Also trigger a full sync to ensure data consistency across devices
     if (this.user) {
       this.updateStoreData('transactions', []);
@@ -433,7 +433,7 @@ export class SupabaseSync {
         this.updateSyncState({ syncError: insertError.message });
         return;
       }
-      
+
       // Re-fetch after seeding
       await this.fetchAndUpdateCategories(true);
       return;
@@ -611,7 +611,7 @@ export class SupabaseSync {
       } catch (error) {
         console.error('Error updating store directly:', error);
       }
-      
+
       // Fallback to custom event
       window.dispatchEvent(
         new CustomEvent('supabase-sync-update', {
@@ -637,7 +637,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', transaction.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -648,7 +648,7 @@ export class SupabaseSync {
         const { error } = await db
           .from('transactions')
           .upsert(syncData, { onConflict: 'id' });
-        
+
         if (error) throw error;
       }
 
@@ -682,7 +682,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', bill.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -700,7 +700,7 @@ export class SupabaseSync {
         const { error } = await db
           .from('bills')
           .upsert(syncData, { onConflict: 'id' });
-        
+
         if (error) throw error;
       }
 
@@ -734,7 +734,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', goal.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -753,7 +753,7 @@ export class SupabaseSync {
         const { error } = await db
           .from('savings_goals')
           .upsert(syncData, { onConflict: 'id' });
-        
+
         if (error) throw error;
       }
 
@@ -787,7 +787,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', client.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -802,7 +802,7 @@ export class SupabaseSync {
         const { error } = await db
           .from('clients')
           .upsert(syncData, { onConflict: 'id' });
-        
+
         if (error) throw error;
       }
 
@@ -836,7 +836,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', product.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -850,11 +850,11 @@ export class SupabaseSync {
 
         const { error } = await db
           .from('products')
-          .upsert(syncData, { 
+          .upsert(syncData, {
             onConflict: 'id',
-            ignoreDuplicates: false 
+            ignoreDuplicates: false
           });
-        
+
         if (error) throw error;
       }
 
@@ -888,7 +888,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', quote.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const totalAmount = quote.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -906,11 +906,11 @@ export class SupabaseSync {
 
         const { error } = await db
           .from('quotes')
-          .upsert(syncData, { 
+          .upsert(syncData, {
             onConflict: 'id',
-            ignoreDuplicates: false 
+            ignoreDuplicates: false
           });
-        
+
         if (error) throw error;
       }
 
@@ -944,7 +944,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', loan.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -963,7 +963,7 @@ export class SupabaseSync {
         const { error } = await db
           .from('loans')
           .upsert(syncData, { onConflict: 'id' });
-        
+
         if (error) throw error;
       }
 
@@ -997,7 +997,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', category.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -1015,7 +1015,7 @@ export class SupabaseSync {
         const { error } = await db
           .from('categories')
           .upsert(syncData, { onConflict: 'id' });
-        
+
         if (error) throw error;
       }
 
@@ -1049,7 +1049,7 @@ export class SupabaseSync {
           .delete()
           .eq('id', budget.id)
           .eq('user_id', this.user.id);
-        
+
         if (error) throw error;
       } else {
         const syncData = {
@@ -1068,7 +1068,7 @@ export class SupabaseSync {
         const { error } = await db
           .from('business_budgets')
           .upsert(syncData, { onConflict: 'id' });
-        
+
         if (error) throw error;
       }
 
@@ -1082,6 +1082,833 @@ export class SupabaseSync {
         syncError: error instanceof Error ? error.message : 'Unknown error',
       });
       this.queueOfflineOperation('business_budgets', budget.id, budget, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  // ============================================
+  // SALES RECEIPTS SYNC
+  // ============================================
+  async syncSalesReceipt(receipt: SalesReceipt, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('sales_receipts', receipt.id, receipt, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('sales_receipts')
+          .delete()
+          .eq('id', receipt.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: receipt.id,
+          receipt_number: receipt.receiptNumber,
+          invoice_id: receipt.invoiceId || null,
+          quote_id: receipt.quoteId || null,
+          client_id: receipt.clientId,
+          date: receipt.date,
+          amount: receipt.amount,
+          payment_method: receipt.paymentMethod,
+          reference_number: receipt.referenceNumber || null,
+          notes: receipt.notes || null,
+          status: receipt.status,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('sales_receipts')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} sales receipt:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('sales_receipts', receipt.id, receipt, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  // ============================================
+  // DELIVERY NOTES SYNC
+  // ============================================
+  async syncDeliveryNote(deliveryNote: DeliveryNote, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('delivery_notes', deliveryNote.id, deliveryNote, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('delivery_notes')
+          .delete()
+          .eq('id', deliveryNote.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: deliveryNote.id,
+          delivery_note_number: deliveryNote.deliveryNoteNumber,
+          invoice_id: deliveryNote.invoiceId || null,
+          quote_id: deliveryNote.quoteId || null,
+          client_id: deliveryNote.clientId,
+          date: deliveryNote.date,
+          delivery_date: deliveryNote.deliveryDate,
+          delivery_address: deliveryNote.deliveryAddress,
+          items: deliveryNote.items,
+          delivery_method: deliveryNote.deliveryMethod,
+          tracking_number: deliveryNote.trackingNumber || null,
+          notes: deliveryNote.notes || null,
+          status: deliveryNote.status,
+          received_by: deliveryNote.receivedBy || null,
+          received_at: deliveryNote.receivedAt || null,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('delivery_notes')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} delivery note:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('delivery_notes', deliveryNote.id, deliveryNote, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  // ============================================
+  // BUSINESS REVENUE SYNC
+  // ============================================
+  async syncBusinessRevenue(revenue: BusinessRevenue, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('business_revenues', revenue.id, revenue, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('business_revenues')
+          .delete()
+          .eq('id', revenue.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: revenue.id,
+          source: revenue.source,
+          source_id: revenue.sourceId || null,
+          client_id: revenue.clientId || null,
+          amount: revenue.amount,
+          date: revenue.date,
+          description: revenue.description,
+          category: revenue.category,
+          status: revenue.status,
+          payment_method: revenue.paymentMethod || null,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('business_revenues')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} business revenue:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('business_revenues', revenue.id, revenue, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  // ============================================
+  // BUSINESS EXPENSE SYNC
+  // ============================================
+  async syncBusinessExpense(expense: BusinessExpense, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('business_expenses', expense.id, expense, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('business_expenses')
+          .delete()
+          .eq('id', expense.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: expense.id,
+          vendor: expense.vendor || null,
+          amount: expense.amount,
+          date: expense.date,
+          description: expense.description,
+          category: expense.category,
+          receipt_url: expense.receiptUrl || null,
+          tax_deductible: expense.taxDeductible,
+          status: expense.status,
+          payment_method: expense.paymentMethod || null,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('business_expenses')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} business expense:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('business_expenses', expense.id, expense, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  // ============================================
+  // GROUP SAVINGS SYNC
+  // ============================================
+  async syncSavingsGroup(group: SavingsGroup, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('savings_groups', group.id, group, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('savings_groups')
+          .delete()
+          .eq('id', group.id)
+          .eq('created_by', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: group.id,
+          name: group.name,
+          description: group.description || null,
+          target_amount: group.targetAmount,
+          current_amount: group.currentAmount,
+          deadline: group.deadline || null,
+          created_by: group.createdBy,
+          is_public: group.isPublic,
+          status: group.status,
+          currency: group.currency || 'USD',
+          contribution_rules: group.contributionRules || null,
+        };
+
+        const { error } = await db
+          .from('savings_groups')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} savings group:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('savings_groups', group.id, group, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncGroupMember(member: GroupMember, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('group_members', member.id, member, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('group_members')
+          .delete()
+          .eq('id', member.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: member.id,
+          group_id: member.groupId,
+          user_id: member.userId,
+          name: member.name,
+          email: member.email,
+          role: member.role,
+          joined_at: member.joinedAt,
+          total_contributed: member.totalContributed,
+          last_contribution_at: member.lastContributionAt || null,
+          status: member.status,
+        };
+
+        const { error } = await db
+          .from('group_members')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} group member:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('group_members', member.id, member, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncGroupInvitation(invitation: GroupInvitation, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('group_invitations', invitation.id, invitation, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('group_invitations')
+          .delete()
+          .eq('id', invitation.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: invitation.id,
+          group_id: invitation.groupId,
+          invited_by: invitation.invitedBy,
+          invited_email: invitation.invitedEmail,
+          token: invitation.token,
+          status: invitation.status,
+          message: invitation.message || null,
+          expires_at: invitation.expiresAt,
+          accepted_at: invitation.acceptedAt || null,
+        };
+
+        const { error } = await db
+          .from('group_invitations')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} group invitation:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('group_invitations', invitation.id, invitation, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncGroupContribution(contribution: GroupContribution, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('group_contributions', contribution.id, contribution, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('group_contributions')
+          .delete()
+          .eq('id', contribution.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: contribution.id,
+          group_id: contribution.groupId,
+          member_id: contribution.memberId,
+          amount: contribution.amount,
+          description: contribution.description || null,
+          contributed_at: contribution.contributedAt,
+          method: contribution.method,
+          status: contribution.status,
+          confirmed_by: contribution.confirmedBy || null,
+          confirmed_at: contribution.confirmedAt || null,
+          proof_file: contribution.proofFile || null,
+          proof_url: contribution.proofUrl || null,
+          rejection_reason: contribution.rejectionReason || null,
+        };
+
+        const { error } = await db
+          .from('group_contributions')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} group contribution:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('group_contributions', contribution.id, contribution, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncGroupActivity(activity: GroupActivity, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('group_activities', activity.id, activity, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('group_activities')
+          .delete()
+          .eq('id', activity.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: activity.id,
+          group_id: activity.groupId,
+          type: activity.type,
+          user_id: activity.userId,
+          description: activity.description,
+          metadata: activity.metadata || null,
+        };
+
+        const { error } = await db
+          .from('group_activities')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} group activity:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('group_activities', activity.id, activity, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  // ============================================
+  // CRM SYNC METHODS
+  // ============================================
+  async syncProject(project: Project, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('projects', project.id, project, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('projects')
+          .delete()
+          .eq('id', project.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: project.id,
+          name: project.name,
+          description: project.description || null,
+          client_id: project.client_id,
+          status: project.status,
+          start_date: project.start_date || null,
+          end_date: project.end_date || null,
+          budget: project.budget || null,
+          actual_cost: project.actual_cost || 0,
+          priority: project.priority || null,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('projects')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} project:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('projects', project.id, project, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncInvoice(invoice: Invoice, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('invoices', invoice.id, invoice, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('invoices')
+          .delete()
+          .eq('id', invoice.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: invoice.id,
+          invoice_number: invoice.invoice_number,
+          client_id: invoice.client_id,
+          project_id: invoice.project_id || null,
+          issue_date: invoice.issue_date,
+          due_date: invoice.due_date,
+          status: invoice.status,
+          subtotal: invoice.subtotal,
+          tax_rate: invoice.tax_rate || 0,
+          tax_amount: invoice.tax_amount || 0,
+          total_amount: invoice.total_amount,
+          paid_amount: invoice.paid_amount || 0,
+          notes: invoice.notes || null,
+          items: invoice.items,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('invoices')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} invoice:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('invoices', invoice.id, invoice, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncClientPayment(payment: ClientPayment, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('client_payments', payment.id, payment, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('client_payments')
+          .delete()
+          .eq('id', payment.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: payment.id,
+          client_id: payment.client_id,
+          project_id: payment.project_id || null,
+          invoice_id: payment.invoice_id || null,
+          amount: payment.amount,
+          payment_date: payment.payment_date,
+          status: payment.status,
+          payment_method: payment.payment_method || null,
+          reference_number: payment.reference_number || null,
+          description: payment.description || null,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('client_payments')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} client payment:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('client_payments', payment.id, payment, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncClientExpense(expense: ClientExpense, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('client_expenses', expense.id, expense, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('client_expenses')
+          .delete()
+          .eq('id', expense.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: expense.id,
+          client_id: expense.client_id,
+          project_id: expense.project_id || null,
+          amount: expense.amount,
+          expense_date: expense.expense_date,
+          category: expense.category,
+          description: expense.description,
+          vendor: expense.vendor || null,
+          receipt_url: expense.receipt_url || null,
+          is_billable: expense.is_billable || false,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('client_expenses')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} client expense:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('client_expenses', expense.id, expense, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncCommunicationLog(log: CommunicationLog, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('communication_logs', log.id, log, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('communication_logs')
+          .delete()
+          .eq('id', log.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: log.id,
+          client_id: log.client_id,
+          project_id: log.project_id || null,
+          type: log.type,
+          subject: log.subject || null,
+          content: log.content,
+          communication_date: log.communication_date,
+          direction: log.direction || null,
+          duration_minutes: log.duration_minutes || null,
+          next_follow_up: log.next_follow_up || null,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('communication_logs')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} communication log:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('communication_logs', log.id, log, operation);
+    } finally {
+      this.updateSyncState({ isSyncing: false });
+    }
+  }
+
+  async syncTaskNote(task: TaskNote, operation: 'create' | 'update' | 'delete') {
+    if (!this.user || !this.syncState.isOnline) {
+      this.queueOfflineOperation('task_notes', task.id, task, operation);
+      return;
+    }
+
+    this.updateSyncState({ isSyncing: true });
+
+    try {
+      if (operation === 'delete') {
+        const { error } = await db
+          .from('task_notes')
+          .delete()
+          .eq('id', task.id)
+          .eq('user_id', this.user.id);
+
+        if (error) throw error;
+      } else {
+        const syncData = {
+          id: task.id,
+          client_id: task.client_id,
+          project_id: task.project_id || null,
+          title: task.title,
+          description: task.description || null,
+          priority: task.priority || null,
+          status: task.status,
+          due_date: task.due_date || null,
+          completed_date: task.completed_date || null,
+          user_id: this.user.id,
+        };
+
+        const { error } = await db
+          .from('task_notes')
+          .upsert(syncData, { onConflict: 'id' });
+
+        if (error) throw error;
+      }
+
+      this.updateSyncState({
+        lastSyncTime: new Date(),
+        syncError: null,
+      });
+    } catch (error) {
+      console.error(`Error ${operation} task note:`, error);
+      this.updateSyncState({
+        syncError: error instanceof Error ? error.message : 'Unknown error',
+      });
+      this.queueOfflineOperation('task_notes', task.id, task, operation);
     } finally {
       this.updateSyncState({ isSyncing: false });
     }
@@ -1135,7 +1962,7 @@ export class SupabaseSync {
         } else if (operation.collection === 'business_budgets') {
           await this.syncBusinessBudget(operation.data, operation.operation);
         } else if (operation.collection === 'savings_goals') {
-            await this.syncSavingsGoal(operation.data, operation.operation);
+          await this.syncSavingsGoal(operation.data, operation.operation);
         }
         // Add other collection types as needed
       }

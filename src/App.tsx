@@ -2,7 +2,7 @@ import React from 'react';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
-import ErrorBoundary from '@/components/error-boundary';
+import ErrorBoundary from '@/components/admin-error-boundary';
 
 import LoginPage from '@/app/page';
 import DashboardLayout from '@/app/dashboard/layout';
@@ -34,6 +34,7 @@ import DeliveryNotes from '@/app/dashboard/delivery-notes/page';
 import BusinessFinancials from '@/app/dashboard/business-financials/page';
 import BusinessBudgets from '@/app/dashboard/business-budgets/page';
 import TestProfile from '@/app/dashboard/test-profile/page';
+import AdminDashboard from '@/app/admin/page';
 import LandingPage from '@/app/landing/page';
 import NotFoundPage from '@/app/404/page';
 
@@ -52,7 +53,7 @@ function App() {
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/join-group/:token" element={<JoinGroup />} />
-          <Route path="/dashboard" element={<DashboardLayout />}>
+<Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="bills" element={<Bills />} />
@@ -80,6 +81,7 @@ function App() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="about" element={<About />} />
           </Route>
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
