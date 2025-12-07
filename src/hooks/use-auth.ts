@@ -73,12 +73,6 @@ export const useAuth = () => {
           // Initialize sync if user exists
           if (session?.user) {
             supabaseSync.setUser(session.user);
-            // Load data from Supabase
-            try {
-              await useAppStore.getState().loadData();
-            } catch (dataError) {
-              console.error('Failed to load data from Supabase:', dataError);
-            }
             // Add timeout to profile creation as well
             try {
               await Promise.race([
@@ -182,12 +176,6 @@ export const useAuth = () => {
 
       // Handle user profile creation on sign up
       if (event === 'SIGNED_IN' && session?.user) {
-        // Load data from Supabase
-        try {
-          await useAppStore.getState().loadData();
-        } catch (dataError) {
-          console.error('Failed to load data from Supabase on sign-in:', dataError);
-        }
         try {
           await Promise.race([
             ensureUserProfile(session.user),

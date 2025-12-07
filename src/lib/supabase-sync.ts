@@ -262,6 +262,256 @@ export class SupabaseSync {
         )
         .subscribe();
 
+      // Listen to sales receipts
+      const salesReceiptsSubscription = db
+        .channel('sales_receipts_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'sales_receipts',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateSalesReceipts();
+          }
+        )
+        .subscribe();
+
+      // Listen to delivery notes
+      const deliveryNotesSubscription = db
+        .channel('delivery_notes_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'delivery_notes',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateDeliveryNotes();
+          }
+        )
+        .subscribe();
+
+      // Listen to business revenues
+      const businessRevenuesSubscription = db
+        .channel('business_revenues_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'business_revenues',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateBusinessRevenues();
+          }
+        )
+        .subscribe();
+
+      // Listen to business expenses
+      const businessExpensesSubscription = db
+        .channel('business_expenses_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'business_expenses',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateBusinessExpenses();
+          }
+        )
+        .subscribe();
+
+      // Listen to savings groups
+      const savingsGroupsSubscription = db
+        .channel('savings_groups_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'savings_groups',
+          },
+          async () => {
+            await this.fetchAndUpdateSavingsGroups();
+          }
+        )
+        .subscribe();
+      
+      // Listen to group members
+      const groupMembersSubscription = db
+        .channel('group_members_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'group_members',
+          },
+          async () => {
+            await this.fetchAndUpdateGroupMembers();
+          }
+        )
+        .subscribe();
+
+      // Listen to group invitations
+      const groupInvitationsSubscription = db
+        .channel('group_invitations_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'group_invitations',
+          },
+          async () => {
+            await this.fetchAndUpdateGroupInvitations();
+          }
+        )
+        .subscribe();
+
+      // Listen to group contributions
+      const groupContributionsSubscription = db
+        .channel('group_contributions_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'group_contributions',
+          },
+          async () => {
+            await this.fetchAndUpdateGroupContributions();
+          }
+        )
+        .subscribe();
+      
+      // Listen to group activities
+      const groupActivitiesSubscription = db
+        .channel('group_activities_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'group_activities',
+          },
+          async () => {
+            await this.fetchAndUpdateGroupActivities();
+          }
+        )
+        .subscribe();
+
+      // Listen to projects
+      const projectsSubscription = db
+        .channel('projects_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'projects',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateProjects();
+          }
+        )
+        .subscribe();
+
+      // Listen to invoices
+      const invoicesSubscription = db
+        .channel('invoices_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'invoices',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateInvoices();
+          }
+        )
+        .subscribe();
+
+      // Listen to client payments
+      const clientPaymentsSubscription = db
+        .channel('client_payments_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'client_payments',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateClientPayments();
+          }
+        )
+        .subscribe();
+      
+      // Listen to client expenses
+      const clientExpensesSubscription = db
+        .channel('client_expenses_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'client_expenses',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateClientExpenses();
+          }
+        )
+        .subscribe();
+
+      // Listen to communication logs
+      const communicationLogsSubscription = db
+        .channel('communication_logs_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'communication_logs',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateCommunicationLogs();
+          }
+        )
+        .subscribe();
+
+      // Listen to task notes
+      const taskNotesSubscription = db
+        .channel('task_notes_channel')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'task_notes',
+            filter: `user_id=eq.${this.user.id}`,
+          },
+          async () => {
+            await this.fetchAndUpdateTaskNotes();
+          }
+        )
+        .subscribe();
+
       this.subscriptions = [
         () => db.removeChannel(transactionsSubscription),
         () => db.removeChannel(billsSubscription),
@@ -272,6 +522,21 @@ export class SupabaseSync {
         () => db.removeChannel(quotesSubscription),
         () => db.removeChannel(loansSubscription),
         () => db.removeChannel(businessBudgetsSubscription),
+        () => db.removeChannel(salesReceiptsSubscription),
+        () => db.removeChannel(deliveryNotesSubscription),
+        () => db.removeChannel(businessRevenuesSubscription),
+        () => db.removeChannel(businessExpensesSubscription),
+        () => db.removeChannel(savingsGroupsSubscription),
+        () => db.removeChannel(groupMembersSubscription),
+        () => db.removeChannel(groupInvitationsSubscription),
+        () => db.removeChannel(groupContributionsSubscription),
+        () => db.removeChannel(groupActivitiesSubscription),
+        () => db.removeChannel(projectsSubscription),
+        () => db.removeChannel(invoicesSubscription),
+        () => db.removeChannel(clientPaymentsSubscription),
+        () => db.removeChannel(clientExpensesSubscription),
+        () => db.removeChannel(communicationLogsSubscription),
+        () => db.removeChannel(taskNotesSubscription),
       ];
 
       // Initial data fetch
@@ -301,6 +566,21 @@ export class SupabaseSync {
         this.fetchAndUpdateQuotes(),
         this.fetchAndUpdateLoans(),
         this.fetchAndUpdateBusinessBudgets(),
+        this.fetchAndUpdateSalesReceipts(),
+        this.fetchAndUpdateDeliveryNotes(),
+        this.fetchAndUpdateBusinessRevenues(),
+        this.fetchAndUpdateBusinessExpenses(),
+        this.fetchAndUpdateSavingsGroups(),
+        this.fetchAndUpdateGroupMembers(),
+        this.fetchAndUpdateGroupInvitations(),
+        this.fetchAndUpdateGroupContributions(),
+        this.fetchAndUpdateGroupActivities(),
+        this.fetchAndUpdateProjects(),
+        this.fetchAndUpdateInvoices(),
+        this.fetchAndUpdateClientPayments(),
+        this.fetchAndUpdateClientExpenses(),
+        this.fetchAndUpdateCommunicationLogs(),
+        this.fetchAndUpdateTaskNotes(),
       ]);
     } catch (error) {
       console.error('Error in initial data fetch:', error);
@@ -591,6 +871,428 @@ export class SupabaseSync {
     }));
 
     this.updateStoreData('businessBudgets', budgets);
+  }
+
+
+  private async fetchAndUpdateSalesReceipts() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('sales_receipts')
+      .select('*')
+      .eq('user_id', this.user.id)
+      .order('date', { ascending: false });
+    if (error) {
+      console.error('Error fetching sales receipts:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const receipts: SalesReceipt[] = (data || []).map((item: any) => ({
+      id: item.id,
+      receiptNumber: item.receipt_number,
+      invoiceId: item.invoice_id,
+      quoteId: item.quote_id,
+      clientId: item.client_id,
+      date: item.date,
+      amount: item.amount,
+      paymentMethod: item.payment_method,
+      referenceNumber: item.reference_number,
+      notes: item.notes,
+      status: item.status,
+    }));
+    this.updateStoreData('salesReceipts', receipts);
+  }
+
+  private async fetchAndUpdateDeliveryNotes() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('delivery_notes')
+      .select('*')
+      .eq('user_id', this.user.id)
+      .order('date', { ascending: false });
+    if (error) {
+      console.error('Error fetching delivery notes:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const notes: DeliveryNote[] = (data || []).map((item: any) => ({
+      id: item.id,
+      deliveryNoteNumber: item.delivery_note_number,
+      invoiceId: item.invoice_id,
+      quoteId: item.quote_id,
+      clientId: item.client_id,
+      date: item.date,
+      deliveryDate: item.delivery_date,
+      deliveryAddress: item.delivery_address,
+      items: item.items,
+      deliveryMethod: item.delivery_method,
+      trackingNumber: item.tracking_number,
+      notes: item.notes,
+      status: item.status,
+      receivedBy: item.received_by,
+      receivedAt: item.received_at,
+    }));
+    this.updateStoreData('deliveryNotes', notes);
+  }
+
+  private async fetchAndUpdateBusinessRevenues() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('business_revenues')
+      .select('*')
+      .eq('user_id', this.user.id)
+      .order('date', { ascending: false });
+    if (error) {
+      console.error('Error fetching business revenues:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const revenues: BusinessRevenue[] = (data || []).map((item: any) => ({
+      id: item.id,
+      source: item.source,
+      sourceId: item.source_id,
+      clientId: item.client_id,
+      amount: item.amount,
+      date: item.date,
+      description: item.description,
+      category: item.category,
+      status: item.status,
+      paymentMethod: item.payment_method,
+    }));
+    this.updateStoreData('businessRevenues', revenues);
+  }
+
+  private async fetchAndUpdateBusinessExpenses() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('business_expenses')
+      .select('*')
+      .eq('user_id', this.user.id)
+      .order('date', { ascending: false });
+    if (error) {
+      console.error('Error fetching business expenses:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const expenses: BusinessExpense[] = (data || []).map((item: any) => ({
+      id: item.id,
+      vendor: item.vendor,
+      amount: item.amount,
+      date: item.date,
+      description: item.description,
+      category: item.category,
+      receiptUrl: item.receipt_url,
+      taxDeductible: item.tax_deductible,
+      status: item.status,
+      paymentMethod: item.payment_method,
+    }));
+    this.updateStoreData('businessExpenses', expenses);
+  }
+
+  private async fetchAndUpdateSavingsGroups() {
+    if (!this.user) return;
+    // This needs to fetch groups where the user is a member, not just the creator
+    const { data, error } = await db
+      .rpc('get_user_savings_groups')
+    if (error) {
+      console.error('Error fetching savings groups:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const groups: SavingsGroup[] = (data || []).map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      targetAmount: item.target_amount,
+      currentAmount: item.current_amount,
+      deadline: item.deadline,
+      createdBy: item.created_by,
+      isPublic: item.is_public,
+      status: item.status,
+      currency: item.currency,
+      contributionRules: item.contribution_rules,
+    }));
+    this.updateStoreData('savingsGroups', groups);
+  }
+
+  private async fetchAndUpdateGroupMembers() {
+    if (!this.user) return;
+     const { data, error } = await db
+      .from('group_members')
+      .select('*')
+    if (error) {
+      console.error('Error fetching group members:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const members: GroupMember[] = (data || []).map((item: any) => ({
+      id: item.id,
+      groupId: item.group_id,
+      userId: item.user_id,
+      name: item.name,
+      email: item.email,
+      role: item.role,
+      joinedAt: item.joined_at,
+      totalContributed: item.total_contributed,
+      lastContributionAt: item.last_contribution_at,
+      status: item.status,
+    }));
+    this.updateStoreData('groupMembers', members);
+  }
+
+  private async fetchAndUpdateGroupInvitations() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('group_invitations')
+      .select('*')
+      .or(`invited_by.eq.${this.user.id},invited_email.eq.${this.user.email}`);
+    if (error) {
+      console.error('Error fetching group invitations:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const invitations: GroupInvitation[] = (data || []).map((item: any) => ({
+        id: item.id,
+        groupId: item.group_id,
+        invitedBy: item.invited_by,
+        invitedEmail: item.invited_email,
+        token: item.token,
+        status: item.status,
+        message: item.message,
+        expiresAt: item.expires_at,
+        acceptedAt: item.accepted_at,
+    }));
+    this.updateStoreData('groupInvitations', invitations);
+  }
+
+  private async fetchAndUpdateGroupContributions() {
+    if (!this.user) return;
+    // This is tricky, we need to get contributions for groups the user is in.
+    // Let's assume an RPC or a more complex query is needed. For now, fetch all in user's groups.
+     const { data: groupIds, error: groupIdsError } = await db
+      .from('group_members')
+      .select('group_id')
+      .eq('user_id', this.user.id);
+    if (groupIdsError) {
+      console.error('Error fetching user group IDs:', groupIdsError);
+      return;
+    }
+    const ids = groupIds.map(g => g.group_id);
+    const { data, error } = await db
+      .from('group_contributions')
+      .select('*')
+      .in('group_id', ids)
+    if (error) {
+      console.error('Error fetching group contributions:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const contributions: GroupContribution[] = (data || []).map((item: any) => ({
+      id: item.id,
+      groupId: item.group_id,
+      memberId: item.member_id,
+      amount: item.amount,
+      description: item.description,
+      contributedAt: item.contributed_at,
+      method: item.method,
+      status: item.status,
+      confirmedBy: item.confirmed_by,
+      confirmedAt: item.confirmed_at,
+      proofFile: item.proof_file,
+      proofUrl: item.proof_url,
+      rejectionReason: item.rejection_reason,
+    }));
+    this.updateStoreData('groupContributions', contributions);
+  }
+
+    private async fetchAndUpdateGroupActivities() {
+    if (!this.user) return;
+    const { data: groupIds, error: groupIdsError } = await db
+      .from('group_members')
+      .select('group_id')
+      .eq('user_id', this.user.id);
+    if (groupIdsError) {
+      console.error('Error fetching user group IDs for activities:', groupIdsError);
+      return;
+    }
+    const ids = groupIds.map(g => g.group_id);
+    const { data, error } = await db
+      .from('group_activities')
+      .select('*')
+      .in('group_id', ids);
+
+    if (error) {
+      console.error('Error fetching group activities:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const activities: GroupActivity[] = (data || []).map((item: any) => ({
+        id: item.id,
+        groupId: item.group_id,
+        type: item.type,
+        userId: item.user_id,
+        description: item.description,
+        metadata: item.metadata,
+    }));
+    this.updateStoreData('groupActivities', activities);
+  }
+
+  private async fetchAndUpdateProjects() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('projects')
+      .select('*')
+      .eq('user_id', this.user.id);
+    if (error) {
+      console.error('Error fetching projects:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const projects: Project[] = (data || []).map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      client_id: item.client_id,
+      status: item.status,
+      start_date: item.start_date,
+      end_date: item.end_date,
+      budget: item.budget,
+      actual_cost: item.actual_cost,
+      priority: item.priority,
+    }));
+    this.updateStoreData('projects', projects);
+  }
+
+  private async fetchAndUpdateInvoices() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('invoices')
+      .select('*')
+      .eq('user_id', this.user.id);
+    if (error) {
+      console.error('Error fetching invoices:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const invoices: Invoice[] = (data || []).map((item: any) => ({
+        id: item.id,
+        invoice_number: item.invoice_number,
+        client_id: item.client_id,
+        project_id: item.project_id,
+        issue_date: item.issue_date,
+        due_date: item.due_date,
+        status: item.status,
+        subtotal: item.subtotal,
+        tax_rate: item.tax_rate,
+        tax_amount: item.tax_amount,
+        total_amount: item.total_amount,
+        paid_amount: item.paid_amount,
+        notes: item.notes,
+        items: item.items,
+    }));
+    this.updateStoreData('invoices', invoices);
+  }
+
+  private async fetchAndUpdateClientPayments() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('client_payments')
+      .select('*')
+      .eq('user_id', this.user.id);
+    if (error) {
+      console.error('Error fetching client payments:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const payments: ClientPayment[] = (data || []).map((item: any) => ({
+        id: item.id,
+        client_id: item.client_id,
+        project_id: item.project_id,
+        invoice_id: item.invoice_id,
+        amount: item.amount,
+        payment_date: item.payment_date,
+        status: item.status,
+        payment_method: item.payment_method,
+        reference_number: item.reference_number,
+        description: item.description,
+    }));
+    this.updateStoreData('payments', payments);
+  }
+
+  private async fetchAndUpdateClientExpenses() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('client_expenses')
+      .select('*')
+      .eq('user_id', this.user.id);
+    if (error) {
+      console.error('Error fetching client expenses:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const expenses: ClientExpense[] = (data || []).map((item: any) => ({
+        id: item.id,
+        client_id: item.client_id,
+        project_id: item.project_id,
+        amount: item.amount,
+        expense_date: item.expense_date,
+        category: item.category,
+        description: item.description,
+        vendor: item.vendor,
+        receipt_url: item.receipt_url,
+        is_billable: item.is_billable,
+    }));
+    this.updateStoreData('expenses', expenses);
+  }
+
+  private async fetchAndUpdateCommunicationLogs() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('communication_logs')
+      .select('*')
+      .eq('user_id', this.user.id);
+    if (error) {
+      console.error('Error fetching communication logs:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const logs: CommunicationLog[] = (data || []).map((item: any) => ({
+        id: item.id,
+        client_id: item.client_id,
+        project_id: item.project_id,
+        type: item.type,
+        subject: item.subject,
+        content: item.content,
+        communication_date: item.communication_date,
+        direction: item.direction,
+        duration_minutes: item.duration_minutes,
+        next_follow_up: item.next_follow_up,
+    }));
+    this.updateStoreData('communications', logs);
+  }
+
+  private async fetchAndUpdateTaskNotes() {
+    if (!this.user) return;
+    const { data, error } = await db
+      .from('task_notes')
+      .select('*')
+      .eq('user_id', this.user.id);
+    if (error) {
+      console.error('Error fetching task notes:', error);
+      this.updateSyncState({ syncError: error.message });
+      return;
+    }
+    const tasks: TaskNote[] = (data || []).map((item: any) => ({
+        id: item.id,
+        client_id: item.client_id,
+        project_id: item.project_id,
+        title: item.title,
+        description: item.description,
+        priority: item.priority,
+        status: item.status,
+        due_date: item.due_date,
+        completed_date: item.completed_date,
+    }));
+    this.updateStoreData('tasks', tasks);
   }
 
   private stopListening() {
@@ -1951,20 +2653,80 @@ export class SupabaseSync {
     try {
       // Process offline queue operations
       for (const operation of this.offlineQueue) {
-        if (operation.collection === 'transactions') {
-          await this.syncTransaction(operation.data, operation.operation);
-        } else if (operation.collection === 'bills') {
-          await this.syncBill(operation.data, operation.operation);
-        } else if (operation.collection === 'quotes') {
-          await this.syncQuote(operation.data, operation.operation);
-        } else if (operation.collection === 'categories') {
-          await this.syncCategory(operation.data, operation.operation);
-        } else if (operation.collection === 'business_budgets') {
-          await this.syncBusinessBudget(operation.data, operation.operation);
-        } else if (operation.collection === 'savings_goals') {
-          await this.syncSavingsGoal(operation.data, operation.operation);
+        switch (operation.collection) {
+          case 'transactions':
+            await this.syncTransaction(operation.data, operation.operation);
+            break;
+          case 'bills':
+            await this.syncBill(operation.data, operation.operation);
+            break;
+          case 'savings_goals':
+            await this.syncSavingsGoal(operation.data, operation.operation);
+            break;
+          case 'categories':
+            await this.syncCategory(operation.data, operation.operation);
+            break;
+          case 'clients':
+            await this.syncClient(operation.data, operation.operation);
+            break;
+          case 'products':
+            await this.syncProduct(operation.data, operation.operation);
+            break;
+          case 'quotes':
+            await this.syncQuote(operation.data, operation.operation);
+            break;
+          case 'loans':
+            await this.syncLoan(operation.data, operation.operation);
+            break;
+          case 'business_budgets':
+            await this.syncBusinessBudget(operation.data, operation.operation);
+            break;
+          case 'sales_receipts':
+            await this.syncSalesReceipt(operation.data, operation.operation);
+            break;
+          case 'delivery_notes':
+            await this.syncDeliveryNote(operation.data, operation.operation);
+            break;
+          case 'business_revenues':
+            await this.syncBusinessRevenue(operation.data, operation.operation);
+            break;
+          case 'business_expenses':
+            await this.syncBusinessExpense(operation.data, operation.operation);
+            break;
+          case 'savings_groups':
+            await this.syncSavingsGroup(operation.data, operation.operation);
+            break;
+          case 'group_members':
+            await this.syncGroupMember(operation.data, operation.operation);
+            break;
+          case 'group_invitations':
+            await this.syncGroupInvitation(operation.data, operation.operation);
+            break;
+          case 'group_contributions':
+            await this.syncGroupContribution(operation.data, operation.operation);
+            break;
+          case 'group_activities':
+            await this.syncGroupActivity(operation.data, operation.operation);
+            break;
+          case 'projects':
+            await this.syncProject(operation.data, operation.operation);
+            break;
+          case 'invoices':
+            await this.syncInvoice(operation.data, operation.operation);
+            break;
+          case 'client_payments':
+            await this.syncClientPayment(operation.data, operation.operation);
+            break;
+          case 'client_expenses':
+            await this.syncClientExpense(operation.data, operation.operation);
+            break;
+          case 'communication_logs':
+            await this.syncCommunicationLog(operation.data, operation.operation);
+            break;
+          case 'task_notes':
+            await this.syncTaskNote(operation.data, operation.operation);
+            break;
         }
-        // Add other collection types as needed
       }
 
       // Clear the queue
