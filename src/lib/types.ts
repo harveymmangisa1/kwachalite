@@ -69,7 +69,8 @@ export interface Transaction {
     description: string;
     amount: number;
     type: 'income' | 'expense';
-    category: string;
+    category_id: string;
+    category?: string;
     workspace: Workspace;
 }
 
