@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBusinessProfile } from '@/hooks/use-business-profile';
+import { useBusinessProfile } from '@/hooks/use-business-profile-v2';
 
 interface TermsConditionsProps {
   showPaymentTerms?: boolean;

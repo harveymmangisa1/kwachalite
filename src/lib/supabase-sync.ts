@@ -43,7 +43,34 @@ export interface SyncState {
 }
 
 export class SupabaseSync {
+  private readonly storeKeyToCollection: Record<string, string> = {
+    transactions: 'transactions',
+    bills: 'bills',
+    savingsGoals: 'savings_goals',
+    categories: 'categories',
+    clients: 'clients',
+    products: 'products',
+    quotes: 'quotes',
+    loans: 'loans',
+    businessBudgets: 'business_budgets',
+    salesReceipts: 'sales_receipts',
+    deliveryNotes: 'delivery_notes',
+    businessRevenues: 'business_revenues',
+    businessExpenses: 'business_expenses',
+    savingsGroups: 'savings_groups',
+    groupMembers: 'group_members',
+    groupInvitations: 'group_invitations',
+    groupContributions: 'group_contributions',
+    groupActivities: 'group_activities',
+    projects: 'projects',
+    invoices: 'invoices',
+    clientPayments: 'client_payments',
+    clientExpenses: 'client_expenses',
+    communicationLogs: 'communication_logs',
+    tasks: 'task_notes',
+  };
   private user: User | null = null;
+  private missingTables = new Set<string>();
   private subscriptions: (() => void)[] = [];
   private syncState: SyncState = {
     isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
@@ -55,6 +82,7 @@ export class SupabaseSync {
 
   constructor() {
     if (typeof window !== 'undefined') {
+      this.loadOfflineQueue();
       // Listen for online/offline events
       window.addEventListener('online', this.handleOnline);
       window.addEventListener('offline', this.handleOffline);
@@ -96,19 +124,21 @@ export class SupabaseSync {
   setUser(user: User | null) {
     this.user = user;
     if (user) {
-      this.startListening();
+      this.loadOfflineQueue();
+      void this.startListening();
     } else {
       this.stopListening();
     }
   }
 
   // Start listening to Supabase real-time subscriptions
-  private startListening() {
+  private async startListening() {
     if (!this.user) return;
 
     this.stopListening(); // Clean up existing subscriptions
 
     try {
+      await this.syncOfflineChanges();
       // Listen to transactions
       const transactionsSubscription = db
         .channel('transactions_channel')
@@ -592,6 +622,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateTransactions() {
     if (!this.user) return;
+    if (this.shouldSkipTable('transactions')) return;
 
     const { data, error } = await (db as any)
       .from('transactions')
@@ -600,6 +631,9 @@ export class SupabaseSync {
       .order('date', { ascending: false });
 
     if (error) {
+      if (this.handleMissingTableError('transactions', error)) {
+        return;
+      }
       console.error('Error fetching transactions:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -620,6 +654,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateBills() {
     if (!this.user) return;
+    if (this.shouldSkipTable('bills')) return;
 
     const { data, error } = await db
       .from('bills')
@@ -628,6 +663,9 @@ export class SupabaseSync {
       .order('due_date', { ascending: true }) as { data: Database['public']['Tables']['bills']['Row'][] | null, error: any };
 
     if (error) {
+      if (this.handleMissingTableError('bills', error)) {
+        return;
+      }
       console.error('Error fetching bills:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -649,6 +687,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateSavingsGoals() {
     if (!this.user) return;
+    if (this.shouldSkipTable('savings_goals')) return;
 
     const { data, error } = await db
       .from('savings_goals')
@@ -657,6 +696,9 @@ export class SupabaseSync {
       .order('deadline', { ascending: true });
 
     if (error) {
+      if (this.handleMissingTableError('savings_goals', error)) {
+        return;
+      }
       console.error('Error fetching savings goals:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -679,6 +721,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateCategories(isRetry = false) {
     if (!this.user) return;
+    if (this.shouldSkipTable('categories')) return;
 
     const { data, error } = await db
       .from('categories')
@@ -687,6 +730,9 @@ export class SupabaseSync {
       .order('name', { ascending: true });
 
     if (error) {
+      if (this.handleMissingTableError('categories', error)) {
+        return;
+      }
       console.error('Error fetching categories:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -735,6 +781,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateClients() {
     if (!this.user) return;
+    if (this.shouldSkipTable('clients')) return;
 
     const { data, error } = await db
       .from('clients')
@@ -743,6 +790,9 @@ export class SupabaseSync {
       .order('name', { ascending: true });
 
     if (error) {
+      if (this.handleMissingTableError('clients', error)) {
+        return;
+      }
       console.error('Error fetching clients:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -761,6 +811,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateProducts() {
     if (!this.user) return;
+    if (this.shouldSkipTable('products')) return;
 
     const { data, error } = await db
       .from('products')
@@ -769,6 +820,9 @@ export class SupabaseSync {
       .order('name', { ascending: true });
 
     if (error) {
+      if (this.handleMissingTableError('products', error)) {
+        return;
+      }
       console.error('Error fetching products:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -787,6 +841,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateQuotes() {
     if (!this.user) return;
+    if (this.shouldSkipTable('quotes')) return;
 
     const { data, error } = await db
       .from('quotes')
@@ -795,6 +850,9 @@ export class SupabaseSync {
       .order('created_at', { ascending: false });
 
     if (error) {
+      if (this.handleMissingTableError('quotes', error)) {
+        return;
+      }
       console.error('Error fetching quotes:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -815,6 +873,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateLoans() {
     if (!this.user) return;
+    if (this.shouldSkipTable('loans')) return;
 
     const { data, error } = await db
       .from('loans')
@@ -823,6 +882,9 @@ export class SupabaseSync {
       .order('created_at', { ascending: false });
 
     if (error) {
+      if (this.handleMissingTableError('loans', error)) {
+        return;
+      }
       console.error('Error fetching loans:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -845,6 +907,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateBusinessBudgets() {
     if (!this.user) return;
+    if (this.shouldSkipTable('business_budgets')) return;
 
     const { data, error } = await db
       .from('business_budgets')
@@ -853,6 +916,9 @@ export class SupabaseSync {
       .order('created_at', { ascending: false });
 
     if (error) {
+      if (this.handleMissingTableError('business_budgets', error)) {
+        return;
+      }
       console.error('Error fetching business budgets:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -876,12 +942,16 @@ export class SupabaseSync {
 
   private async fetchAndUpdateSalesReceipts() {
     if (!this.user) return;
+    if (this.shouldSkipTable('sales_receipts')) return;
     const { data, error } = await db
       .from('sales_receipts')
       .select('*')
       .eq('user_id', this.user.id)
       .order('date', { ascending: false });
     if (error) {
+      if (this.handleMissingTableError('sales_receipts', error)) {
+        return;
+      }
       console.error('Error fetching sales receipts:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -904,12 +974,16 @@ export class SupabaseSync {
 
   private async fetchAndUpdateDeliveryNotes() {
     if (!this.user) return;
+    if (this.shouldSkipTable('delivery_notes')) return;
     const { data, error } = await db
       .from('delivery_notes')
       .select('*')
       .eq('user_id', this.user.id)
       .order('date', { ascending: false });
     if (error) {
+      if (this.handleMissingTableError('delivery_notes', error)) {
+        return;
+      }
       console.error('Error fetching delivery notes:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -936,12 +1010,16 @@ export class SupabaseSync {
 
   private async fetchAndUpdateBusinessRevenues() {
     if (!this.user) return;
+    if (this.shouldSkipTable('business_revenues')) return;
     const { data, error } = await db
       .from('business_revenues')
       .select('*')
       .eq('user_id', this.user.id)
       .order('date', { ascending: false });
     if (error) {
+      if (this.handleMissingTableError('business_revenues', error)) {
+        return;
+      }
       console.error('Error fetching business revenues:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -963,12 +1041,16 @@ export class SupabaseSync {
 
   private async fetchAndUpdateBusinessExpenses() {
     if (!this.user) return;
+    if (this.shouldSkipTable('business_expenses')) return;
     const { data, error } = await db
       .from('business_expenses')
       .select('*')
       .eq('user_id', this.user.id)
       .order('date', { ascending: false });
     if (error) {
+      if (this.handleMissingTableError('business_expenses', error)) {
+        return;
+      }
       console.error('Error fetching business expenses:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -990,10 +1072,14 @@ export class SupabaseSync {
 
   private async fetchAndUpdateSavingsGroups() {
     if (!this.user) return;
+    if (this.shouldSkipTable('savings_groups')) return;
     // This needs to fetch groups where the user is a member, not just the creator
     const { data, error } = await db
       .rpc('get_user_savings_groups')
     if (error) {
+      if (this.handleMissingTableError('savings_groups', error)) {
+        return;
+      }
       console.error('Error fetching savings groups:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1016,10 +1102,14 @@ export class SupabaseSync {
 
   private async fetchAndUpdateGroupMembers() {
     if (!this.user) return;
+    if (this.shouldSkipTable('group_members')) return;
      const { data, error } = await db
       .from('group_members')
       .select('*')
     if (error) {
+      if (this.handleMissingTableError('group_members', error)) {
+        return;
+      }
       console.error('Error fetching group members:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1041,11 +1131,15 @@ export class SupabaseSync {
 
   private async fetchAndUpdateGroupInvitations() {
     if (!this.user) return;
+    if (this.shouldSkipTable('group_invitations')) return;
     const { data, error } = await db
       .from('group_invitations')
       .select('*')
       .or(`invited_by.eq.${this.user.id},invited_email.eq.${this.user.email}`);
     if (error) {
+      if (this.handleMissingTableError('group_invitations', error)) {
+        return;
+      }
       console.error('Error fetching group invitations:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1066,6 +1160,7 @@ export class SupabaseSync {
 
   private async fetchAndUpdateGroupContributions() {
     if (!this.user) return;
+    if (this.shouldSkipTable('group_contributions')) return;
     // This is tricky, we need to get contributions for groups the user is in.
     // Let's assume an RPC or a more complex query is needed. For now, fetch all in user's groups.
      const { data: groupIds, error: groupIdsError } = await db
@@ -1082,6 +1177,9 @@ export class SupabaseSync {
       .select('*')
       .in('group_id', ids)
     if (error) {
+      if (this.handleMissingTableError('group_contributions', error)) {
+        return;
+      }
       console.error('Error fetching group contributions:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1106,6 +1204,7 @@ export class SupabaseSync {
 
     private async fetchAndUpdateGroupActivities() {
     if (!this.user) return;
+    if (this.shouldSkipTable('group_activities')) return;
     const { data: groupIds, error: groupIdsError } = await db
       .from('group_members')
       .select('group_id')
@@ -1121,6 +1220,9 @@ export class SupabaseSync {
       .in('group_id', ids);
 
     if (error) {
+      if (this.handleMissingTableError('group_activities', error)) {
+        return;
+      }
       console.error('Error fetching group activities:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1138,11 +1240,15 @@ export class SupabaseSync {
 
   private async fetchAndUpdateProjects() {
     if (!this.user) return;
+    if (this.shouldSkipTable('projects')) return;
     const { data, error } = await db
       .from('projects')
       .select('*')
       .eq('user_id', this.user.id);
     if (error) {
+      if (this.handleMissingTableError('projects', error)) {
+        return;
+      }
       console.error('Error fetching projects:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1164,11 +1270,15 @@ export class SupabaseSync {
 
   private async fetchAndUpdateInvoices() {
     if (!this.user) return;
+    if (this.shouldSkipTable('invoices')) return;
     const { data, error } = await db
       .from('invoices')
       .select('*')
       .eq('user_id', this.user.id);
     if (error) {
+      if (this.handleMissingTableError('invoices', error)) {
+        return;
+      }
       console.error('Error fetching invoices:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1194,11 +1304,15 @@ export class SupabaseSync {
 
   private async fetchAndUpdateClientPayments() {
     if (!this.user) return;
+    if (this.shouldSkipTable('client_payments')) return;
     const { data, error } = await db
       .from('client_payments')
       .select('*')
       .eq('user_id', this.user.id);
     if (error) {
+      if (this.handleMissingTableError('client_payments', error)) {
+        return;
+      }
       console.error('Error fetching client payments:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1220,11 +1334,15 @@ export class SupabaseSync {
 
   private async fetchAndUpdateClientExpenses() {
     if (!this.user) return;
+    if (this.shouldSkipTable('client_expenses')) return;
     const { data, error } = await db
       .from('client_expenses')
       .select('*')
       .eq('user_id', this.user.id);
     if (error) {
+      if (this.handleMissingTableError('client_expenses', error)) {
+        return;
+      }
       console.error('Error fetching client expenses:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1246,11 +1364,15 @@ export class SupabaseSync {
 
   private async fetchAndUpdateCommunicationLogs() {
     if (!this.user) return;
+    if (this.shouldSkipTable('communication_logs')) return;
     const { data, error } = await db
       .from('communication_logs')
       .select('*')
       .eq('user_id', this.user.id);
     if (error) {
+      if (this.handleMissingTableError('communication_logs', error)) {
+        return;
+      }
       console.error('Error fetching communication logs:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1272,11 +1394,15 @@ export class SupabaseSync {
 
   private async fetchAndUpdateTaskNotes() {
     if (!this.user) return;
+    if (this.shouldSkipTable('task_notes')) return;
     const { data, error } = await db
       .from('task_notes')
       .select('*')
       .eq('user_id', this.user.id);
     if (error) {
+      if (this.handleMissingTableError('task_notes', error)) {
+        return;
+      }
       console.error('Error fetching task notes:', error);
       this.updateSyncState({ syncError: error.message });
       return;
@@ -1300,10 +1426,31 @@ export class SupabaseSync {
     this.subscriptions = [];
   }
 
+  private shouldSkipTable(table: string) {
+    return this.missingTables.has(table);
+  }
+
+  private handleMissingTableError(table: string, error: any) {
+    const message = error?.message ?? '';
+    if (error?.code === '42P01' || message.includes('does not exist')) {
+      this.missingTables.add(table);
+      console.warn(`Skipping sync for missing table: ${table}`, error);
+      return true;
+    }
+    return false;
+  }
+
   private updateStoreData(key: string, data: any) {
     // Update Zustand store directly if available, otherwise use custom event
     if (typeof window !== 'undefined') {
       try {
+        if (Array.isArray(data) && data.length === 0) {
+          const collection = this.storeKeyToCollection[key];
+          if (collection && this.hasPendingOperationsFor(collection)) {
+            return;
+          }
+        }
+
         // Try to get store dynamically to avoid circular imports
         const store = (window as any).__KWACHALITE_STORE__;
         if (store && store.setSyncData) {
@@ -1321,6 +1468,10 @@ export class SupabaseSync {
         })
       );
     }
+  }
+
+  private hasPendingOperationsFor(collection: string) {
+    return this.offlineQueue.some(operation => operation.collection === collection);
   }
 
   // Sync methods for different data types
@@ -2646,7 +2797,7 @@ export class SupabaseSync {
   }
 
   private async syncOfflineChanges() {
-    if (!this.user || this.offlineQueue.length === 0) return;
+    if (!this.user || this.offlineQueue.length === 0 || !this.syncState.isOnline) return;
 
     this.updateSyncState({ isSyncing: true });
 

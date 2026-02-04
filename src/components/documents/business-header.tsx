@@ -1,6 +1,6 @@
 import React from 'react';
 import Logo from '@/components/logo';
-import { useBusinessProfile } from '@/hooks/use-business-profile';
+import { useBusinessProfile } from '@/hooks/use-business-profile-v2';
 import { LoadingSpinner } from '@/components/ui/loading';
 
 interface BusinessHeaderProps {

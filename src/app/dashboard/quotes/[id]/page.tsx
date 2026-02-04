@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { useBusinessProfile } from '@/hooks/use-business-profile';
+import { useBusinessProfile } from '@/hooks/use-business-profile-v2';
 import { AddReceiptSheet } from '@/components/receipts/add-receipt-sheet';
 import { AddDeliveryNoteSheet } from '@/components/delivery-notes/add-delivery-note-sheet';
 import { TermsConditions } from '@/components/documents/terms-conditions';
@@ -269,4 +269,3 @@ export default function QuotePage() {
         </div>
     );
 }
-

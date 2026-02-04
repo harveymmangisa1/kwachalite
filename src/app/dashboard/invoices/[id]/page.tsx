@@ -13,7 +13,7 @@ import html2canvas from 'html2canvas';
 import React from 'react';
 import Logo from '@/components/logo';
 import { BusinessHeader } from '@/components/documents/business-header';
-import { useBusinessProfile } from '@/hooks/use-business-profile';
+import { useBusinessProfile } from '@/hooks/use-business-profile-v2';
 import { AddReceiptSheet } from '@/components/receipts/add-receipt-sheet';
 import { AddDeliveryNoteSheet } from '@/components/delivery-notes/add-delivery-note-sheet';
 import { TermsConditions } from '@/components/documents/terms-conditions';

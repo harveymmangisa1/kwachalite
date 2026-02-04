@@ -42,9 +42,9 @@ export default function LandingPage() {
             <span className="font-semibold text-foreground">KwachaLite</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/">
-              <Button variant="ghost" className="h-9 text-sm px-3 sm:px-4">Sign in</Button>
-            </Link>
+          <Link to="/login">
+            <Button variant="ghost" className="h-9 text-sm px-3 sm:px-4">Sign in</Button>
+          </Link>
             <Link to="/signup">
               <Button className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 text-sm px-3 sm:px-4">Get started</Button>
             </Link>
@@ -89,7 +89,7 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                 </Button>
               </Link>
-              <Link to="/" className="w-full sm:w-auto">
+              <Link to="/login" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl border-2 h-12 sm:h-11 border-border hover:bg-muted ui-smooth w-full">
                   Sign In
                 </Button>
