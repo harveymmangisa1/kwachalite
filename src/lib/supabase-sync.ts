@@ -29,8 +29,16 @@ import type {
   CommunicationLog,
   TaskNote
 } from '@/lib/types';
-import { Briefcase } from 'lucide-react';
+// // import { Briefcase } from 'lucide-react'; // Using default icon
 import { initialCategories } from './data';
+
+// Import crypto for ID generation
+const createId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+};
 
 // Temporary type assertion to bypass TypeScript issues
 const db = supabase as any;
@@ -647,6 +655,7 @@ export class SupabaseSync {
       type: (item.type as 'income' | 'expense') || 'expense',
       category: item.category || 'Other',
       workspace: (item.workspace as 'personal' | 'business') || 'personal',
+      category_id: item.category_id || '',
     }));
 
     this.updateStoreData('transactions', transactions);
@@ -741,7 +750,7 @@ export class SupabaseSync {
     if (data && data.length === 0 && !isRetry) {
       // No categories for this user, let's seed them from initialCategories
       const newCategories = initialCategories.map(c => ({
-        id: c.id,
+        id: createId(),
         name: c.name,
         icon: 'folder',
         color: c.color,
@@ -768,7 +777,7 @@ export class SupabaseSync {
     const categories: Category[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
-      icon: Briefcase, // Default icon - in a real app, you'd map icon names to components
+      icon: 'folder', // Default icon - in a real app, you'd map icon names to components
       color: item.color || '#0066cc',
       type: (item.type as 'income' | 'expense') || 'expense',
       workspace: (item.workspace as 'personal' | 'business') || 'personal',
@@ -1084,7 +1093,31 @@ export class SupabaseSync {
       this.updateSyncState({ syncError: error.message });
       return;
     }
-    const groups: SavingsGroup[] = (data || []).map((item: any) => ({
+    
+    // Get group IDs where user is a member
+    const memberGroupIds = memberGroups?.map((m: any) => m.group_id) || [];
+    
+    // Fetch those groups
+    let additionalGroups: any[] = [];
+    if (memberGroupIds.length > 0) {
+      const { data: additionalData, error: additionalError } = await db
+          .from('savings_groups')
+          .select('*')
+          .in('id', memberGroupIds);
+      if (additionalError) {
+        console.error('Error fetching member groups:', additionalError);
+      } else {
+        additionalGroups = additionalData || [];
+      }
+    }
+    
+    // Combine and deduplicate groups
+    const allGroups = [...(createdGroups || []), ...additionalGroups];
+    const uniqueGroups = allGroups.filter((group, index, self) => 
+      index === self.findIndex(g => g.id === group.id)
+    );
+    
+    const groups: SavingsGroup[] = uniqueGroups.map((item: any) => ({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -1092,11 +1125,14 @@ export class SupabaseSync {
       currentAmount: item.current_amount,
       deadline: item.deadline,
       createdBy: item.created_by,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
       isPublic: item.is_public,
       status: item.status,
       currency: item.currency,
       contributionRules: item.contribution_rules,
     }));
+    
     this.updateStoreData('savingsGroups', groups);
   }
 
@@ -1170,12 +1206,12 @@ export class SupabaseSync {
     if (groupIdsError) {
       console.error('Error fetching user group IDs:', groupIdsError);
       return;
-    }
-    const ids = groupIds.map(g => g.group_id);
-    const { data, error } = await db
-      .from('group_contributions')
-      .select('*')
-      .in('group_id', ids)
+     }
+     const ids = groupIds.map((g: any) => g.group_id);
+     const { data, error } = await db
+       .from('group_contributions')
+       .select('*')
+       .in('group_id', ids)
     if (error) {
       if (this.handleMissingTableError('group_contributions', error)) {
         return;
@@ -1212,12 +1248,12 @@ export class SupabaseSync {
     if (groupIdsError) {
       console.error('Error fetching user group IDs for activities:', groupIdsError);
       return;
-    }
-    const ids = groupIds.map(g => g.group_id);
-    const { data, error } = await db
-      .from('group_activities')
-      .select('*')
-      .in('group_id', ids);
+     }
+     const ids = groupIds.map((g: any) => g.group_id);
+     const { data, error } = await db
+       .from('group_activities')
+       .select('*')
+       .in('group_id', ids);
 
     if (error) {
       if (this.handleMissingTableError('group_activities', error)) {
@@ -2952,7 +2988,8 @@ export class SupabaseSync {
       category: item.category,
       workspace: item.workspace,
       date: item.date,
-      created_at: item.created_at
+      created_at: item.created_at,
+      category_id: item.category_id || ''
     }));
   }
 

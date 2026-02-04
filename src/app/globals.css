@@ -1,9 +1,10 @@
 /* ============================================
- * KWACHALITE DESIGN SYSTEM
- * Modern, Mobile-First, Corporate with Personality
+ * KWACHALITE DESIGN SYSTEM V2
+ * Corporate with Personality - Modern, Mobile-First, Trust-Building
  * ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,35 +13,58 @@
 @layer base {
   :root {
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    
-    /* Design System Colors */
-    --background: 255 255 255;
-    --foreground: 28 25 23;
+    --font-mono: 'JetBrains Mono', Menlo, Monaco, monospace;
+
+    /* Neutral Palette (Warm Gray) */
+    --neutral-50: 250 250 249;
+    --neutral-100: 245 245 244;
+    --neutral-200: 231 229 228;
+    --neutral-300: 214 211 209;
+    --neutral-400: 168 162 158;
+    --neutral-500: 120 113 108;
+    --neutral-600: 87 83 78;
+    --neutral-700: 68 64 60;
+    --neutral-800: 41 37 36;
+    --neutral-900: 28 25 23;
+
+    /* Primary Palette (Blue-Gray) */
+    --primary-500: 98 125 152;
+
+    /* Accent Palette (Warm Coral) */
+    --accent-500: 255 107 74;
+
+    /* Main variables for shadcn/ui */
+    --background: var(--neutral-50);
+    --foreground: var(--neutral-900);
     
     --card: 255 255 255;
-    --card-foreground: 28 25 23;
+    --card-foreground: var(--neutral-900);
     
-    --primary: 98 125 152;      /* Blue-gray 500 */
+    --primary: var(--primary-500);
     --primary-foreground: 255 255 255;
     
-    --accent: 255 107 74;       /* Warm coral 500 */
+    --accent: var(--accent-500);
     --accent-foreground: 255 255 255;
     
-    --secondary: 245 245 244;   /* Neutral 100 */
-    --secondary-foreground: 28 25 23;
+    --secondary: var(--neutral-100);
+    --secondary-foreground: var(--neutral-900);
     
-    --muted: 245 245 244;
-    --muted-foreground: 120 113 108;
+    --muted: var(--neutral-100);
+    --muted-foreground: var(--neutral-500);
     
-    --border: 231 229 228;      /* Neutral 200 */
-    --input: 231 229 228;
-    --ring: 98 125 152;         /* Primary */
+    --border: var(--neutral-200);
+    --input: var(--neutral-200);
+    --ring: var(--primary-500);
     
     --success: 34 197 94;
     --warning: 245 158 11;
     --error: 239 68 68;
     
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* lg */
+  }
+
+  .dark {
+    /* TODO: Define dark mode palette */
   }
   
   body {
@@ -52,220 +76,40 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    letter-spacing: -0.02em;
-    font-weight: 700;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
   
-  /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
   }
-  
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
   }
   
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: hsl(var(--neutral-100));
   }
   
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground) / 0.3);
-    border-radius: 4px;
+    background: hsl(var(--neutral-300));
+    border-radius: 10px;
+    border: 2px solid hsl(var(--neutral-100));
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground) / 0.5);
+    background: hsl(var(--neutral-400));
   }
 }
 
-@layer components {
-  /* ============================================
-   * CARD COMPONENTS
-   * ============================================ */
-  .card-base {
-    @apply bg-white rounded-xl shadow-card border border-border;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
-  
-  .card-hover {
-    @apply bg-white rounded-xl shadow-card border border-border 
-           hover:shadow-card-hover transition-shadow duration-200;
-  }
-  
-  .card-interactive {
-    @apply bg-white rounded-xl shadow-card border border-border 
-           cursor-pointer hover:shadow-card-hover hover:border-primary-200 
-           transition-all duration-200;
-  }
-  
-  /* ============================================
-   * BUTTON COMPONENTS
-   * ============================================ */
-  .btn-base {
-    @apply inline-flex items-center justify-center rounded-lg font-medium 
-           transition-all duration-200 focus:outline-none focus:ring-2 
-           focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-  
-  .btn-primary {
-    @apply btn-base bg-primary-600 text-white hover:bg-primary-700 
-           focus:ring-primary-500 shadow-button hover:shadow-button-hover;
-  }
-  
-  .btn-accent {
-    @apply btn-base bg-accent-500 text-white hover:bg-accent-600 
-           focus:ring-accent-500 shadow-button hover:shadow-button-hover;
-  }
-  
-  .btn-secondary {
-    @apply btn-base bg-neutral-100 text-neutral-900 hover:bg-neutral-200 
-           focus:ring-neutral-500;
-  }
-  
-  .btn-ghost {
-    @apply btn-base text-neutral-700 hover:bg-neutral-100 
-           focus:ring-neutral-500;
-  }
-  
-  /* Button sizes */
-  .btn-sm {
-    @apply px-3 py-1.5 text-sm;
-  }
-  
-  .btn-md {
-    @apply px-4 py-2 text-base;
-  }
-  
-  .btn-lg {
-    @apply px-6 py-3 text-lg;
-  }
-  
-  /* ============================================
-   * INPUT COMPONENTS
-   * ============================================ */
-  .input-base {
-    @apply block w-full rounded-lg border border-border bg-white 
-           px-4 py-2.5 text-neutral-900 placeholder-neutral-400 
-           focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 
-           transition-all duration-200;
-  }
-  
-  .input-error {
-    @apply border-error-500 focus:border-error-500 focus:ring-error-500/20;
-  }
-  
-  /* ============================================
-   * BADGE COMPONENTS
-   * ============================================ */
-  .badge-base {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full 
-           text-xs font-medium;
-  }
-  
-  .badge-primary {
-    @apply badge-base bg-primary-100 text-primary-800;
-  }
-  
-  .badge-success {
-    @apply badge-base bg-success-100 text-success-800;
-  }
-  
-  .badge-warning {
-    @apply badge-base bg-warning-100 text-warning-800;
-  }
-  
-  .badge-error {
-    @apply badge-base bg-error-100 text-error-800;
-  }
-  
-  /* ============================================
-   * LAYOUT UTILITIES
-   * ============================================ */
-  .container-padding {
-    @apply px-4 sm:px-6 lg:px-8;
-  }
-  
-  .section-spacing {
-    @apply space-y-6 sm:space-y-8;
-  }
-  
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-  
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top, 0);
-  }
-  
-  /* ============================================
-   * MOBILE OPTIMIZATIONS
-   * ============================================ */
-  @media (max-width: 640px) {
-    .mobile-touch-target {
-      @apply min-h-[44px] min-w-[44px];
-    }
-    
-    .mobile-grid {
-      @apply grid-cols-1 gap-4;
-    }
-    
-    .scrollbar-hide {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    
-    .scrollbar-hide::-webkit-scrollbar {
-      display: none;
-    }
-  }
-  
-  /* ============================================
-   * FORM UTILITIES
-   * ============================================ */
-  .form-scroll-container {
-    @apply max-h-[calc(90vh-120px)] overflow-y-auto pr-2;
-  }
-  
-  @media (max-width: 640px) {
-    .form-scroll-container {
-      @apply max-h-[calc(100vh-160px)] pr-1;
-    }
-  }
-  
-  /* ============================================
-   * ANIMATIONS
-   * ============================================ */
-  @keyframes shimmer {
-    0% {
-      background-position: -1000px 0;
-    }
-    100% {
-      background-position: 1000px 0;
-    }
-  }
-  
-  .shimmer {
-    animation: shimmer 2s linear infinite;
-    background: linear-gradient(
-      to right,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted-foreground) / 0.1) 50%,
-      hsl(var(--muted)) 100%
-    );
-    background-size: 1000px 100%;
-  }
-  
-  /* ============================================
-   * ACCESSIBILITY
-   * ============================================ */
-  .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 
-           focus-visible:ring-primary-500 focus-visible:ring-offset-2;
-  }
-  
-  /* Reduce motion for users who prefer it */
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -276,52 +120,25 @@
       scroll-behavior: auto !important;
     }
   }
-  
-  /* ============================================
-   * PRINT STYLES
-   * ============================================ */
-  @media print {
-    body {
-      @apply text-black bg-white;
-    }
-    
-    .no-print {
-      display: none !important;
-    }
-    
-    .card-base,
-    .card-hover,
-    .card-interactive {
-      @apply shadow-none border border-neutral-300;
-    }
-  }
 }
-
-/* ============================================
- * UTILITY CLASSES
- * ============================================ */
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  .text-pretty {
-    text-wrap: pretty;
-  }
-  
-  /* Gradient text */
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary-600 to-accent-500 
-           bg-clip-text text-transparent;
-  }
-  
-  /* Glassmorphism */
-  .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
-  }
-  
-  /* Truncate with tooltip */
-  .truncate-tooltip {
-    @apply truncate cursor-help;
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* Pure White */
+    --foreground: 222.2 84% 4.9%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
   }
 }

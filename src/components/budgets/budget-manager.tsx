@@ -1,338 +1,260 @@
 'use client';
+
+import React, { useMemo, useState } from 'react';
+import { 
+  Pen, Trash2, Check, X, Briefcase, Plus, 
+  Target, Wallet, TrendingUp, AlertCircle 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/lib/data';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
-import React from 'react';
-import type { Category } from '@/lib/types';
-import { Label } from '../ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Pen, Trash2, Check, X, Briefcase, Plus, Target, Wallet } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { formatCurrency } from '@/lib/utils';
+import type { Category } from '@/lib/types';
 
 export function BudgetManager() {
   const { activeWorkspace } = useActiveWorkspace();
   const { categories, updateCategory, deleteCategory, addCategory, transactions } = useAppStore();
   const { toast } = useToast();
   
-  const [editingCategoryId, setEditingCategoryId] = React.useState<string | null>(null);
-  const [editedCategory, setEditedCategory] = React.useState<Partial<Category>>({});
-  
-  const [newCategoryName, setNewCategoryName] = React.useState('');
-  const [newCategoryType, setNewCategoryType] = React.useState<'income' | 'expense'>('expense');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<Partial<Category>>({});
+  const [newName, setNewName] = useState('');
+  const [newType, setNewType] = useState<'income' | 'expense'>('expense');
 
+  // Filtered categories with memoization for performance
+  const { incomeCats, expenseCats } = useMemo(() => {
+    const filtered = categories.filter(c => c.workspace === activeWorkspace);
+    return {
+      incomeCats: filtered.filter(c => c.type === 'income'),
+      expenseCats: filtered.filter(c => c.type === 'expense')
+    };
+  }, [categories, activeWorkspace]);
 
-  const handleAddCategory = () => {
-    if (newCategoryName.trim() !== '') {
-      const newCategory: Omit<Category, 'id'> = {
-        name: newCategoryName,
-        type: newCategoryType,
-        workspace: activeWorkspace,
-        icon: Briefcase, // A default icon
-        color: 'hsl(var(--primary))',
-        budgetFrequency: 'monthly',
-      };
-      addCategory(newCategory);
-      setNewCategoryName('');
-      toast({
-        title: 'Category Added',
-        description: `The category "${newCategoryName}" has been added.`,
-      });
-    }
-  };
-  
-  const handleEdit = (category: Category) => {
-    setEditingCategoryId(category.id);
-    setEditedCategory({ 
-      name: category.name, 
-      budget: category.budget, 
-      budgetFrequency: category.budgetFrequency || 'monthly' 
-    });
-  };
-  
-  const handleCancelEdit = () => {
-    setEditingCategoryId(null);
-    setEditedCategory({});
-  }
-
-  const handleUpdateCategory = (categoryId: string) => {
-    const originalCategory = categories.find(c => c.id === categoryId);
-    if (originalCategory) {
-      updateCategory({ ...originalCategory, ...editedCategory });
-    }
-    setEditingCategoryId(null);
-    setEditedCategory({});
-    toast({ title: 'Category Updated' });
-  };
-
-  const handleDeleteCategory = (categoryId: string) => {
-    deleteCategory(categoryId);
-    toast({ title: 'Category Deleted', variant: 'destructive' });
-  };
-
-  const filteredCategories = categories.filter(c => c.workspace === activeWorkspace);
-  const incomeCategories = filteredCategories.filter(c => c.type === 'income');
-  const expenseCategories = filteredCategories.filter(c => c.type === 'expense');
-
-  // Calculate budget progress from actual transactions
-  const calculateBudgetProgress = (category: Category) => {
-    if (!category.budget || category.budget <= 0) return 0;
+  const calculateProgress = (category: Category) => {
+    if (!category.budget || category.budget <= 0) return { percent: 0, spent: 0 };
     
-    // Get transactions for this category within the budget period
     const now = new Date();
-    const categoryTransactions = transactions.filter(t => {
-      if (t.category !== category.name || t.workspace !== activeWorkspace) return false;
-      
-      const transactionDate = new Date(t.date);
-      
-      // Filter by budget frequency
-      if (category.budgetFrequency === 'weekly') {
-        const weekStart = new Date(now);
-        weekStart.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
-        weekStart.setHours(0, 0, 0, 0);
-        return transactionDate >= weekStart;
-      } else {
-        // Monthly (default)
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        return transactionDate >= monthStart;
-      }
-    });
+    const periodStart = category.budgetFrequency === 'weekly' 
+      ? new Date(now.setDate(now.getDate() - now.getDay())) 
+      : new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Calculate total spent (for expense categories) or earned (for income categories)
-    const totalAmount = categoryTransactions
-      .filter(t => t.type === category.type)
+    const spent = transactions
+      .filter(t => t.category === category.name && t.workspace === activeWorkspace && new Date(t.date) >= periodStart)
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    // Calculate percentage
-    const percentage = (totalAmount / category.budget) * 100;
-    return Math.min(100, Math.max(0, percentage));
+    return {
+      percent: Math.min(100, (spent / category.budget) * 100),
+      spent
+    };
   };
 
-  // Progress circle component
-  const ProgressCircle = ({ percentage, size = 40, strokeWidth = 3, color = '#10B981' }: { percentage: number, size?: number, strokeWidth?: number, color?: string }) => {
-    const radius = (size - strokeWidth) / 2;
-    const circumference = radius * 2 * Math.PI;
-    const strokeDasharray = `${circumference} ${circumference}`;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-    return (
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg
-          className="transform -rotate-90"
-          width={size}
-          height={size}
-        >
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke="#E5E7EB"
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={color}
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeDasharray={strokeDasharray}
-            strokeDashoffset={strokeDashoffset}
-            className="transition-all duration-500"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[8px] font-semibold" style={{ color }}>
-            {Math.round(percentage)}%
-          </span>
-        </div>
-      </div>
-    );
+  const handleSaveEdit = (id: string) => {
+    const original = categories.find(c => c.id === id);
+    if (original) updateCategory({ ...original, ...editForm });
+    setEditingId(null);
+    toast({ title: 'Category updated successfully' });
   };
 
-  const renderCategory = (category: Category) => {
-    const isEditing = editingCategoryId === category.id;
+  const renderCategoryCard = (cat: Category) => {
+    const isEditing = editingId === cat.id;
+    const { percent, spent } = calculateProgress(cat);
+    const Icon = cat.icon || Briefcase;
 
     if (isEditing) {
       return (
-        <div key={category.id} className="flex items-center justify-between rounded-md border p-3 gap-2 bg-white shadow-sm">
-           <Input 
-            value={editedCategory.name || ''}
-            onChange={(e) => setEditedCategory(prev => ({...prev, name: e.target.value}))}
-            className="text-sm h-8 flex-1"
-          />
-          {category.type === 'expense' && (
-            <>
-            <Input 
-              type="number" 
-              placeholder="Set budget..." 
-              className="text-sm h-8 w-28"
-              value={editedCategory.budget || ''}
-              onChange={(e) => setEditedCategory(prev => ({...prev, budget: parseFloat(e.target.value) || undefined}))}
-            />
-            <Select 
-              value={editedCategory.budgetFrequency || 'monthly'} 
-              onValueChange={(v) => setEditedCategory(prev => ({...prev, budgetFrequency: v as 'weekly' | 'monthly'}))}>
-              <SelectTrigger className="w-[110px] h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-              </SelectContent>
-            </Select>
-            </>
-          )}
-          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleUpdateCategory(category.id)}><Check className="h-4 w-4 text-green-600" /></Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleCancelEdit}><X className="h-4 w-4 text-gray-600" /></Button>
+        <div key={cat.id} className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5 space-y-3 animate-in fade-in zoom-in-95 duration-200">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="col-span-2">
+              <Label className="text-[10px] uppercase font-bold text-muted-foreground">Name</Label>
+              <Input 
+                value={editForm.name || ''} 
+                onChange={e => setEditForm({...editForm, name: e.target.value})}
+                className="h-9 bg-white"
+              />
+            </div>
+            {cat.type === 'expense' && (
+              <>
+                <div>
+                  <Label className="text-[10px] uppercase font-bold text-muted-foreground">Budget</Label>
+                  <Input 
+                    type="number"
+                    value={editForm.budget || ''} 
+                    onChange={e => setEditForm({...editForm, budget: parseFloat(e.target.value)})}
+                    className="h-9 bg-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-[10px] uppercase font-bold text-muted-foreground">Cycle</Label>
+                  <Select 
+                    value={editForm.budgetFrequency} 
+                    onValueChange={v => setEditForm({...editForm, budgetFrequency: v as any})}
+                  >
+                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}><X className="h-4 w-4 mr-1"/> Cancel</Button>
+            <Button size="sm" onClick={() => handleSaveEdit(cat.id)}><Check className="h-4 w-4 mr-1"/> Save</Button>
+          </div>
         </div>
-      )
+      );
     }
 
-    // Render the icon component properly
-    const IconComponent = category.icon;
-
-    // Calculate budget progress from actual transactions
-    const budgetProgress = calculateBudgetProgress(category);
-
     return (
-       <div key={category.id} className="flex items-center justify-between rounded-md border p-3 bg-white shadow-sm hover:shadow-md transition-shadow">
-         <div className="flex items-center gap-3">
-           <div className="relative">
-             <IconComponent className="h-5 w-5 text-muted-foreground" />
-             {category.type === 'expense' && category.budget && (
-               <div className="absolute -top-1 -right-1">
-                  <ProgressCircle 
-                    percentage={budgetProgress} 
-                    size={16} 
-                    strokeWidth={2}
-                    color={budgetProgress > 90 ? '#EF4444' : budgetProgress > 75 ? '#F59E0B' : '#10B981'} 
-                  />
-               </div>
-             )}
-           </div>
-           <span className="font-medium text-sm">{category.name}</span>
-         </div>
-          <div className="flex flex-col items-end gap-1">
-             {category.type === 'expense' && category.budget && (
-                <>
-                <span className="text-sm text-muted-foreground w-32 text-right pr-2">
-                    {formatCurrency(category.budget || 0)} / {category.budgetFrequency === 'weekly' ? 'wk' : 'mo'}
-                </span>
-                <span className="text-xs text-muted-foreground w-32 text-right pr-2">
-                    Spent: {formatCurrency((category.budget || 0) * (budgetProgress / 100))}
-                </span>
-                </>
-             )}
-            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(category)}>
-                <Pen className="h-4 w-4 text-blue-600" />
+      <div key={cat.id} className="group relative flex flex-col p-4 rounded-xl border bg-card hover:border-primary/40 transition-all hover:shadow-sm">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-secondary text-secondary-foreground">
+              <Icon className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">{cat.name}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{cat.type}</p>
+            </div>
+          </div>
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setEditingId(cat.id); setEditForm(cat); }}>
+              <Pen className="h-3 w-3" />
             </Button>
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => handleDeleteCategory(category.id)}>
-                <Trash2 className="h-4 w-4" />
-            </Button>
-         </div>
-       </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Header Card */}
-      <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-6 w-6" />
-            Budget Manager
-          </CardTitle>
-          <CardDescription className="text-blue-100">
-            Add, edit, or delete categories and set weekly/monthly budgets for your expenses.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Plus className="h-5 w-5" />
-            Add New Category
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Input
-              placeholder="New category name..."
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              className="flex-grow"
-            />
-            <Select value={newCategoryType} onValueChange={(v) => setNewCategoryType(v as 'income' | 'expense')}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="expense">Expense</SelectItem>
-                <SelectItem value="income">Income</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={handleAddCategory} className="w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Category
+            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteCategory(cat.id)}>
+              <Trash2 className="h-3 w-3" />
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Income Categories */}
-        <Card className="rounded-2xl shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Wallet className="h-5 w-5 text-green-600" />
-              Income Categories
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {incomeCategories.length > 0 ? (
-              incomeCategories.map(renderCategory)
-            ) : (
-              <p className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
-                No income categories found. Add your first income category!
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        {cat.type === 'expense' && cat.budget ? (
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">
+                {formatCurrency(spent)} <span className="text-[10px]">spent</span>
+              </span>
+              <span className="font-medium">
+                {formatCurrency(cat.budget)} <span className="text-[10px] text-muted-foreground">/ {cat.budgetFrequency === 'weekly' ? 'wk' : 'mo'}</span>
+              </span>
+            </div>
+            <Progress 
+              value={percent} 
+              className="h-1.5" 
+              indicatorColor={percent > 90 ? 'bg-red-500' : percent > 70 ? 'bg-amber-500' : 'bg-emerald-500'}
+            />
+          </div>
+        ) : (
+          <div className="mt-auto pt-2 border-t border-dashed">
+            <p className="text-[10px] text-muted-foreground italic text-center">No budget limit set</p>
+          </div>
+        )}
+      </div>
+    );
+  };
 
-        {/* Expense Categories */}
-        <Card className="rounded-2xl shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Wallet className="h-5 w-5 text-red-600" />
-              Expense Categories & Budgets
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {expenseCategories.length > 0 ? (
-              expenseCategories.map(renderCategory)
-            ) : (
-              <p className="text-sm text-muted-foreground py-4 text-center bg-gray-50 rounded-lg">
-                No expense categories found. Add your first expense category!
-              </p>
-            )}
-          </CardContent>
-        </Card>
+  return (
+    <div className="max-w-6xl mx-auto space-y-8 p-2">
+      {/* Dynamic Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 text-white shadow-2xl">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <Badge className="bg-primary/20 text-primary-foreground border-none hover:bg-primary/30 mb-2">
+              {activeWorkspace === 'business' ? 'Business Mode' : 'Personal Mode'}
+            </Badge>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+              <Target className="h-8 w-8 text-primary" />
+              Budget Controls
+            </h1>
+            <p className="text-slate-400 max-w-md">
+              Define your financial boundaries. Set limits for expense categories and track real-time utilization.
+            </p>
+          </div>
+          
+          <Card className="bg-white/10 border-white/10 backdrop-blur-md text-white md:w-80">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                <TrendingUp className="text-primary h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-400 uppercase font-bold">Total Budgeted</p>
+                <p className="text-xl font-bold">
+                  {formatCurrency(expenseCats.reduce((acc, curr) => acc + (curr.budget || 0), 0))}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        {/* Decorative background element */}
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
       </div>
 
+      {/* Quick Add Section */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-secondary/30 p-4 rounded-2xl border border-dashed">
+        <div className="md:col-span-2 space-y-2">
+          <Label className="text-xs font-bold uppercase ml-1">Category Name</Label>
+          <Input 
+            placeholder="e.g., Marketing, Rent, Groceries..." 
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            className="bg-background"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs font-bold uppercase ml-1">Type</Label>
+          <Select value={newType} onValueChange={v => setNewType(v as any)}>
+            <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="expense">Expense</SelectItem>
+              <SelectItem value="income">Income</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button onClick={() => { addCategory({ name: newName, type: newType, workspace: activeWorkspace, icon: Briefcase, color: 'primary', budgetFrequency: 'monthly' }); setNewName(''); }} className="shadow-lg">
+          <Plus className="h-4 w-4 mr-2" /> Add Category
+        </Button>
+      </div>
 
+      {/* Main Categories Display */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <section className="space-y-4">
+          <div className="flex items-center gap-2 px-2">
+            <Wallet className="h-5 w-5 text-emerald-500" />
+            <h2 className="font-bold text-lg">Income Streams</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {incomeCats.length > 0 ? incomeCats.map(renderCategoryCard) : (
+              <div className="col-span-full py-12 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-muted-foreground bg-secondary/10">
+                <AlertCircle className="h-8 w-8 mb-2 opacity-20" />
+                <p className="text-sm">No income categories defined.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center gap-2 px-2">
+            <TrendingUp className="h-5 w-5 text-rose-500" />
+            <h2 className="font-bold text-lg">Expense & Budgets</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {expenseCats.length > 0 ? expenseCats.map(renderCategoryCard) : (
+              <div className="col-span-full py-12 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-muted-foreground bg-secondary/10">
+                <AlertCircle className="h-8 w-8 mb-2 opacity-20" />
+                <p className="text-sm">No expense categories defined.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
