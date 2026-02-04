@@ -19,13 +19,13 @@ import {
   Users,
   DollarSign,
   Calendar,
-  CheckSquare,
   AlertCircle,
   Eye,
   FileText,
-  MessageSquare,
-  Clock,
 } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAppStore } from '@/lib/data';
 import { AddClientSheet } from '@/components/clients/add-client-sheet';
@@ -130,7 +130,7 @@ export function CRMDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <CheckSquare className="h-4 w-4 text-muted-foreground" />
+            <Check className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeProjects}</div>
@@ -180,7 +180,7 @@ export function CRMDashboard() {
               <CardContent>
                 {recentCommunications.length === 0 ? (
                   <div className="text-center py-4">
-                    <MessageSquare className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <Mail className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-500">No communications logged yet</p>
                   </div>
                 ) : (
@@ -372,7 +372,7 @@ export function CRMDashboard() {
             <CardContent>
               {projects.length === 0 ? (
                 <div className="text-center py-8">
-                  <CheckSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <Check className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
                   <p className="text-gray-500 mb-4">Create your first project to get started</p>
                   <AddProjectSheet />
@@ -518,7 +518,7 @@ export function CRMDashboard() {
               <div className="space-y-4">
                 {/* This would show a timeline of recent activities */}
                 <div className="text-center py-8">
-                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Activity tracking coming soon</h3>
                   <p className="text-gray-500">View all your CRM activities in one place</p>
                 </div>

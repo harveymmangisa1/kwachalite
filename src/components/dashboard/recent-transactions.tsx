@@ -12,7 +12,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, cn } from '@/lib/utils';
-import { TrendingDown, TrendingUp, Plus } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus } from 'lucide-react';
 import type { Transaction } from '@/lib/types';
 import { Link } from 'react-router-dom';
 
@@ -38,17 +38,17 @@ const TransactionItem = React.memo(({ transaction }: { transaction: Transaction 
           )}
         >
           {isIncome ? (
-            <TrendingUp className="h-4 w-4" style={{ color: `rgb(var(--success))` }} />
+            <ArrowUp className="h-4 w-4" style={{ color: `rgb(var(--success))` }} />
           ) : (
-            <TrendingDown className="h-4 w-4" style={{ color: `rgb(var(--error))` }} />
+            <ArrowDown className="h-4 w-4" style={{ color: `rgb(var(--error))` }} />
           )}
         </div>
         <div className="min-w-0 flex-1 space-y-1">
           <div className="font-medium text-sm truncate" title={transaction.description}>
             {transaction.description}
           </div>
-          <div className="text-xs text-muted-foreground truncate" title={transaction.category}>
-            {transaction.category}
+          <div className="text-xs text-muted-foreground truncate" title={transaction.category || 'Uncategorized'}>
+            {transaction.category || 'Uncategorized'}
           </div>
           <div className="text-xs text-muted-foreground font-medium">
             {new Date(transaction.date).toLocaleDateString('en-US', {

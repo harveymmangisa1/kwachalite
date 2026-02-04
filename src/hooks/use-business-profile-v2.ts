@@ -88,25 +88,30 @@ export function useBusinessProfile() {
       
       console.log('Loading business profile for user:', user.id);
       
-      // Try to load from localStorage first (fastest)
+      // Try to load from Supabase first (primary source)
       const localStorageKey = `business_profile_${user.id}`;
-      let profileFromLocal = null;
       
-      try {
-        const savedProfile = localStorage.getItem(localStorageKey);
-        if (savedProfile) {
-          profileFromLocal = JSON.parse(savedProfile) as BusinessProfile;
-          console.log('Business profile loaded from localStorage');
-          if (mounted.current) {
-            setBusinessProfile(profileFromLocal);
-            setIsLoading(false);
+      // Only load from localStorage if offline or for initial loading state
+      const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+      
+      if (isOffline) {
+        try {
+          const savedProfile = localStorage.getItem(localStorageKey);
+          if (savedProfile) {
+            const profileFromLocal = JSON.parse(savedProfile) as BusinessProfile;
+            console.log('Business profile loaded from localStorage (offline mode)');
+            if (mounted.current) {
+              setBusinessProfile(profileFromLocal);
+              setIsLoading(false);
+            }
+            return; // Don't try Supabase if offline
           }
+        } catch (localError) {
+          console.warn('Failed to load from localStorage:', localError);
         }
-      } catch (localError) {
-        console.warn('Failed to load from localStorage:', localError);
       }
       
-      // Now try to load from Supabase (using dedicated table)
+      // Try to load from Supabase (using dedicated table) - PRIMARY SOURCE
       try {
         console.log('Attempting to load from Supabase business_profiles table...');
         
@@ -170,9 +175,9 @@ export function useBusinessProfile() {
         // We already set profileFromLocal above, so no need to do anything else
       }
       
-      // If we don't have any data from either source, set to null
-      if (!profileFromLocal && mounted.current && !businessProfile) {
-        console.log('No business profile found in any storage');
+      // If we don't have any data from any source, set to null
+      if (mounted.current && !businessProfile) {
+        console.log('No business profile found in Supabase or localStorage');
         setBusinessProfile(null);
       }
       
@@ -207,22 +212,109 @@ export function useBusinessProfile() {
     try {
       console.log('Attempting to update business profile...');
       
-      // Always save to localStorage first (fast and reliable)
+ // Try to save to Supabase FIRST (primary storage)
       try {
-        const localStorageKey = `business_profile_${user.id}`;
-        localStorage.setItem(localStorageKey, JSON.stringify(updatedProfile));
-        console.log('Successfully saved business profile to localStorage');
-      } catch (localError) {
-        console.error('Failed to save to localStorage:', localError);
-        throw new Error('Failed to save business profile locally. Please try again.');
+        console.log('Attempting to save to Supabase business_profiles table (PRIMARY)...');
+        
+        // Check if record exists first
+        const { data: existingData } = await supabase
+          .from('business_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+          
+        let supabaseError;
+        
+        if (existingData) {
+          // Update existing record
+          const { error } = await supabase
+            .from('business_profiles')
+            .update({
+              name: updatedProfile.name,
+              email: updatedProfile.email,
+              phone: updatedProfile.phone,
+              address: updatedProfile.address,
+              logo_url: updatedProfile.logo_url || null,
+              website: updatedProfile.website || null,
+              tax_id: updatedProfile.taxId || null,
+              registration_number: updatedProfile.registrationNumber || null,
+              terms_and_conditions: updatedProfile.termsAndConditions || null,
+              payment_details: updatedProfile.paymentDetails || null,
+              bank_name: updatedProfile.bankName || null,
+              account_name: updatedProfile.accountName || null,
+              account_number: updatedProfile.accountNumber || null,
+              routing_number: updatedProfile.routingNumber || null,
+              swift_code: updatedProfile.swiftCode || null,
+            })
+            .eq('user_id', user.id);
+          supabaseError = error;
+        } else {
+          // Insert new record
+          const { error } = await supabase
+            .from('business_profiles')
+            .insert({
+              user_id: user.id,
+              name: updatedProfile.name,
+              email: updatedProfile.email,
+              phone: updatedProfile.phone,
+              address: updatedProfile.address,
+              logo_url: updatedProfile.logo_url || null,
+              website: updatedProfile.website || null,
+              tax_id: updatedProfile.taxId || null,
+              registration_number: updatedProfile.registrationNumber || null,
+              terms_and_conditions: updatedProfile.termsAndConditions || null,
+              payment_details: updatedProfile.paymentDetails || null,
+              bank_name: updatedProfile.bankName || null,
+              account_name: updatedProfile.accountName || null,
+              account_number: updatedProfile.accountNumber || null,
+              routing_number: updatedProfile.routingNumber || null,
+              swift_code: updatedProfile.swiftCode || null,
+            });
+          supabaseError = error;
+        }
+        
+        if (supabaseError) {
+          console.warn('Database schema issue during save, falling back to localStorage:', supabaseError);
+          throw new Error(`Failed to save business profile to Supabase: ${supabaseError.message}`);
+        }
+        
+        console.log('Successfully saved business profile to Supabase (PRIMARY)');
+        
+        // Update localStorage cache from successful Supabase save
+        try {
+          const localStorageKey = `business_profile_${user.id}`;
+          localStorage.setItem(localStorageKey, JSON.stringify(updatedProfile));
+          console.log('Business profile cached to localStorage from Supabase save');
+        } catch (e) {
+          console.warn('Failed to update localStorage cache:', e);
+        }
+        
+        // Update local state immediately
+        if (mounted.current) {
+          setBusinessProfile(updatedProfile);
+        }
+        
+      } catch (supabaseError) {
+        console.warn('Failed to save to Supabase, falling back to localStorage:', supabaseError);
+        
+        // Fallback: save to localStorage ONLY if Supabase fails
+        try {
+          const localStorageKey = `business_profile_${user.id}`;
+          localStorage.setItem(localStorageKey, JSON.stringify(updatedProfile));
+          console.log('Successfully saved business profile to localStorage (fallback)');
+          
+          // Update local state immediately
+          if (mounted.current) {
+            setBusinessProfile(updatedProfile);
+          }
+          
+          // Don't throw - we already saved to localStorage
+          console.warn('Supabase save failed, but localStorage save successful');
+        } catch (localError) {
+          console.error('Failed to save to localStorage as well:', localError);
+          throw new Error('Failed to save business profile. Please try again.');
+        }
       }
-      
-      // Update local state immediately
-      if (mounted.current) {
-        setBusinessProfile(updatedProfile);
-      }
-      
-      // Try to save to Supabase in background
       try {
         console.log('Attempting to save to Supabase business_profiles table...');
         

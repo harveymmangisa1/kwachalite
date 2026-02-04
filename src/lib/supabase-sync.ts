@@ -29,8 +29,16 @@ import type {
   CommunicationLog,
   TaskNote
 } from '@/lib/types';
-import { Briefcase } from 'lucide-react';
+// // import { Briefcase } from 'lucide-react'; // Using default icon
 import { initialCategories } from './data';
+
+// Import crypto for ID generation
+const createId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+};
 
 // Temporary type assertion to bypass TypeScript issues
 const db = supabase as any;
@@ -613,6 +621,7 @@ export class SupabaseSync {
       type: (item.type as 'income' | 'expense') || 'expense',
       category: item.category || 'Other',
       workspace: (item.workspace as 'personal' | 'business') || 'personal',
+      category_id: item.category_id || '',
     }));
 
     this.updateStoreData('transactions', transactions);
@@ -695,7 +704,7 @@ export class SupabaseSync {
     if (data && data.length === 0 && !isRetry) {
       // No categories for this user, let's seed them from initialCategories
       const newCategories = initialCategories.map(c => ({
-        id: c.id,
+        id: createId(),
         name: c.name,
         icon: 'folder',
         color: c.color,
@@ -722,7 +731,7 @@ export class SupabaseSync {
     const categories: Category[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
-      icon: Briefcase, // Default icon - in a real app, you'd map icon names to components
+      icon: 'folder', // Default icon - in a real app, you'd map icon names to components
       color: item.color || '#0066cc',
       type: (item.type as 'income' | 'expense') || 'expense',
       workspace: (item.workspace as 'personal' | 'business') || 'personal',
@@ -990,15 +999,48 @@ export class SupabaseSync {
 
   private async fetchAndUpdateSavingsGroups() {
     if (!this.user) return;
-    // This needs to fetch groups where the user is a member, not just the creator
-    const { data, error } = await db
-      .rpc('get_user_savings_groups')
-    if (error) {
-      console.error('Error fetching savings groups:', error);
-      this.updateSyncState({ syncError: error.message });
+    
+    // Fetch groups created by user and groups where user is a member
+    const { data: createdGroups, error: createdError } = await db
+        .from('savings_groups')
+        .select('*')
+        .eq('created_by', this.user!.id);
+    
+    const { data: memberGroups, error: memberError } = await db
+        .from('group_members')
+        .select('group_id')
+        .eq('user_id', this.user!.id);
+    
+    if (createdError || memberError) {
+      console.error('Error fetching savings groups:', createdError || memberError);
+      this.updateSyncState({ syncError: (createdError || memberError)?.message || 'Unknown error' });
       return;
     }
-    const groups: SavingsGroup[] = (data || []).map((item: any) => ({
+    
+    // Get group IDs where user is a member
+    const memberGroupIds = memberGroups?.map((m: any) => m.group_id) || [];
+    
+    // Fetch those groups
+    let additionalGroups: any[] = [];
+    if (memberGroupIds.length > 0) {
+      const { data: additionalData, error: additionalError } = await db
+          .from('savings_groups')
+          .select('*')
+          .in('id', memberGroupIds);
+      if (additionalError) {
+        console.error('Error fetching member groups:', additionalError);
+      } else {
+        additionalGroups = additionalData || [];
+      }
+    }
+    
+    // Combine and deduplicate groups
+    const allGroups = [...(createdGroups || []), ...additionalGroups];
+    const uniqueGroups = allGroups.filter((group, index, self) => 
+      index === self.findIndex(g => g.id === group.id)
+    );
+    
+    const groups: SavingsGroup[] = uniqueGroups.map((item: any) => ({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -1006,11 +1048,14 @@ export class SupabaseSync {
       currentAmount: item.current_amount,
       deadline: item.deadline,
       createdBy: item.created_by,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
       isPublic: item.is_public,
       status: item.status,
       currency: item.currency,
       contributionRules: item.contribution_rules,
     }));
+    
     this.updateStoreData('savingsGroups', groups);
   }
 
@@ -1075,12 +1120,12 @@ export class SupabaseSync {
     if (groupIdsError) {
       console.error('Error fetching user group IDs:', groupIdsError);
       return;
-    }
-    const ids = groupIds.map(g => g.group_id);
-    const { data, error } = await db
-      .from('group_contributions')
-      .select('*')
-      .in('group_id', ids)
+     }
+     const ids = groupIds.map((g: any) => g.group_id);
+     const { data, error } = await db
+       .from('group_contributions')
+       .select('*')
+       .in('group_id', ids)
     if (error) {
       console.error('Error fetching group contributions:', error);
       this.updateSyncState({ syncError: error.message });
@@ -1113,12 +1158,12 @@ export class SupabaseSync {
     if (groupIdsError) {
       console.error('Error fetching user group IDs for activities:', groupIdsError);
       return;
-    }
-    const ids = groupIds.map(g => g.group_id);
-    const { data, error } = await db
-      .from('group_activities')
-      .select('*')
-      .in('group_id', ids);
+     }
+     const ids = groupIds.map((g: any) => g.group_id);
+     const { data, error } = await db
+       .from('group_activities')
+       .select('*')
+       .in('group_id', ids);
 
     if (error) {
       console.error('Error fetching group activities:', error);
@@ -2801,7 +2846,8 @@ export class SupabaseSync {
       category: item.category,
       workspace: item.workspace,
       date: item.date,
-      created_at: item.created_at
+      created_at: item.created_at,
+      category_id: item.category_id || ''
     }));
   }
 

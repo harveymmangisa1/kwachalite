@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -18,14 +17,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { 
-  Wifi, 
   WifiOff, 
   Cloud, 
   CloudOff, 
-  RefreshCw, 
+  Loader2, 
   AlertCircle,
-  CheckCircle,
-  Clock
+  CheckCircle2
 } from 'lucide-react';
 import { supabaseSync, type SyncState } from '@/lib/supabase-sync';
 import { useAuth } from '@/hooks/use-auth';
@@ -60,14 +57,14 @@ export function SyncStatus() {
     }
     
     if (syncState.isSyncing) {
-      return <RefreshCw className="h-3 w-3 animate-spin" />;
+      return <Loader2 className="h-3 w-3 animate-spin" />;
     }
     
     if (syncState.syncError) {
       return <AlertCircle className="h-3 w-3" />;
     }
     
-    return <CheckCircle className="h-3 w-3" />;
+    return <CheckCircle2 className="h-3 w-3" />;
   };
 
   const getSyncVariant = (): "default" | "secondary" | "destructive" | "outline" => {
@@ -81,27 +78,27 @@ export function SyncStatus() {
     if (!syncState.isOnline) return 'Offline';
     if (syncState.isSyncing) return 'Syncing...';
     if (syncState.syncError) return 'Sync Error';
-    return 'Synced';
+    return 'Supabase Synced';
   };
 
   const getSyncTooltip = () => {
     if (!syncState.isOnline) {
-      return 'You are currently offline. Changes will sync when connection is restored.';
+      return 'You are currently offline. Changes will sync with Supabase when connection is restored.';
     }
     
     if (syncState.isSyncing) {
-      return 'Synchronizing your data with the cloud...';
+      return 'Synchronizing your data with Supabase cloud...';
     }
     
     if (syncState.syncError) {
-      return `Sync error: ${syncState.syncError}. Click to retry.`;
+      return `Supabase sync error: ${syncState.syncError}. Click to retry.`;
     }
     
     if (syncState.lastSyncTime) {
-      return `Last synced ${formatDistanceToNow(syncState.lastSyncTime, { addSuffix: true })}`;
+      return `Last synced to Supabase ${formatDistanceToNow(syncState.lastSyncTime, { addSuffix: true })}`;
     }
     
-    return 'Your data is synced with the cloud';
+    return 'Your data is synced with Supabase cloud storage';
   };
 
   if (!user) return null;
@@ -133,7 +130,7 @@ export function SyncStatus() {
             ) : (
               <CloudOff className="h-4 w-4 text-gray-500" />
             )}
-            Sync Status
+            Supabase Sync Status
           </DropdownMenuLabel>
           
           <DropdownMenuSeparator />
@@ -144,8 +141,8 @@ export function SyncStatus() {
               <div className="flex items-center gap-1">
                 {syncState.isOnline ? (
                   <>
-                    <Wifi className="h-3 w-3 text-green-500" />
-                    <span className="text-green-600">Online</span>
+                    <Cloud className="h-3 w-3 text-green-500" />
+                    <span className="text-green-600">Online (Supabase)</span>
                   </>
                 ) : (
                   <>
@@ -172,9 +169,9 @@ export function SyncStatus() {
             
             {syncState.lastSyncTime && (
               <div className="flex items-center justify-between">
-                <span>Last sync:</span>
+                <span>Last Supabase sync:</span>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
+                  <div className="h-3 w-3 bg-gray-400 rounded-full" />
                   {formatDistanceToNow(syncState.lastSyncTime, { addSuffix: true })}
                 </div>
               </div>
@@ -182,7 +179,7 @@ export function SyncStatus() {
             
             {syncState.syncError && (
               <div className="text-xs text-red-600 bg-red-50 p-2 rounded">
-                <strong>Error:</strong> {syncState.syncError}
+                <strong>Supabase Error:</strong> {syncState.syncError}
               </div>
             )}
           </div>
@@ -193,13 +190,13 @@ export function SyncStatus() {
             onClick={handleRetrySync}
             disabled={syncState.isSyncing}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${syncState.isSyncing ? 'animate-spin' : ''}`} />
-            {syncState.isSyncing ? 'Syncing...' : 'Retry Sync'}
+            <Loader2 className={`mr-2 h-4 w-4 ${syncState.isSyncing ? 'animate-spin' : ''}`} />
+            {syncState.isSyncing ? 'Syncing to Supabase...' : 'Retry Supabase Sync'}
           </DropdownMenuItem>
           
           {!syncState.isOnline && (
             <div className="px-2 py-2 text-xs text-muted-foreground">
-              <p>You're working offline. Your changes will be saved locally and synced when you're back online.</p>
+              <p>You're working offline. Your changes will be saved locally and synced to Supabase when you're back online.</p>
             </div>
           )}
         </DropdownMenuContent>

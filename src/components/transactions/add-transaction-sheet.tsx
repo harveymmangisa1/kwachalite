@@ -4,11 +4,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { format } from 'date-fns';
+import { CalendarIcon, PlusCircle, Loader2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,9 +20,7 @@ import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -34,19 +34,19 @@ import {
 } from '@/components/ui/sheet';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, PlusCircle } from 'lucide-react';
-import { format } from 'date-fns';
+
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useAppStore } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
+import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { AnalyticsService } from '@/lib/analytics';
-import type { Transaction } from '@/lib/types';
-// Example: In addTransaction method
 import { StreakService, ACTIVITY_TYPES } from '@/lib/streak-service';
+import type { Transaction, Category } from '@/lib/types';
 
+// Moved outside to prevent re-initialization on every render
 const formSchema = z.object({
-  date: z.date(),
+  date: z.date({ required_error: "A date is required." }),
   description: z.string().min(1, 'Description is required'),
   amount: z.coerce.number().positive('Amount must be positive'),
   type: z.enum(['income', 'expense']),
@@ -54,110 +54,121 @@ const formSchema = z.object({
   workspace: z.enum(['personal', 'business']),
 });
 
+type TransactionFormValues = z.infer<typeof formSchema>;
+
 export function AddTransactionSheet() {
   const { toast } = useToast();
   const { categories, addTransaction } = useAppStore();
   const { user } = useAuth();
+  const { activeWorkspace } = useActiveWorkspace(); // Get the current workspace context
+  
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<TransactionFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       date: new Date(),
       description: '',
       type: 'expense',
-      workspace: 'personal',
+      workspace: activeWorkspace || 'personal', // Default to current view
     },
   });
 
   const transactionType = form.watch('type');
 
-  const groupedCategories = useMemo(() => {
-    return categories.reduce((acc, cat) => {
-      if (cat.type) {
-        acc[cat.type].push(cat);
-      }
-      return acc;
-    }, { income: [], expense: [] } as Record<'income' | 'expense', typeof categories>);
-  }, [categories]);
+  // Filter categories based on type AND current workspace for a better UX
+  const filteredCategories = useMemo(() => {
+    return categories.filter(cat => cat.type === transactionType);
+  }, [categories, transactionType]);
 
+  // Sync workspace if it changes in the background
   useEffect(() => {
-    // If the selected category doesn't match the transaction type, reset it
-    const selectedCategoryId = form.getValues('category_id');
-    if (selectedCategoryId) {
-      const selectedCategory = categories.find(c => c.id === selectedCategoryId);
-      if (selectedCategory && selectedCategory.type !== transactionType) {
-        form.setValue('category_id', '');
-      }
+    if (activeWorkspace) {
+      form.setValue('workspace', activeWorkspace as 'personal' | 'business');
     }
-  }, [transactionType, categories, form]);
+  }, [activeWorkspace, form]);
 
+  // Reset category if it doesn't match new type
+  useEffect(() => {
+    const currentCatId = form.getValues('category_id');
+    if (currentCatId && !filteredCategories.find(c => c.id === currentCatId)) {
+      form.setValue('category_id', '');
+    }
+  }, [transactionType, filteredCategories, form]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const newTransaction: Transaction = {
-      id: new Date().toISOString(), // Temporary ID
-      ...values,
-      date: values.date.toISOString().split('T')[0],
-      category: categories.find(c => c.id === values.category_id)?.name || 'General',
-    };
+  async function onSubmit(values: TransactionFormValues) {
+    setIsSubmitting(true);
+    try {
+      const selectedCategory = categories.find(c => c.id === values.category_id);
+      
+      const newTransaction: Transaction = {
+        id: crypto.randomUUID(), // Better than toISOString for unique IDs
+        ...values,
+        date: format(values.date, 'yyyy-MM-dd'),
+        category: selectedCategory?.name || 'General',
+      };
 
-addTransaction(newTransaction);
+      addTransaction(newTransaction);
 
-    // Record streak activity if user is authenticated
-    if (user?.id) {
-      try {
+      // Record services
+      if (user?.id) {
         StreakService.recordActivity(user.id, ACTIVITY_TYPES.TRANSACTION_ADDED);
-        
-        // Track analytics event
         AnalyticsService.trackEvent({
           event_type: 'transaction',
           user_id: user.id,
-          properties: {
-            amount: newTransaction.amount,
-            type: newTransaction.type,
-            category: newTransaction.category,
-            workspace: newTransaction.workspace,
-          },
+          properties: { ...values, category_name: newTransaction.category },
         });
-      } catch (error) {
-        console.error('Failed to record activity:', error);
       }
-    }
 
-    toast({
-      title: 'Transaction Added',
-      description: 'The new transaction has been successfully recorded.',
-    });
-    form.reset();
-    setOpen(false);
+      toast({
+        title: 'Transaction Added',
+        description: `${values.description} has been recorded.`,
+      });
+      
+      form.reset({
+        ...form.control._defaultValues,
+        date: new Date(),
+        workspace: values.workspace, // Keep workspace for consecutive entries
+      });
+      setOpen(false);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to save transaction. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button size="sm" className="gap-1">
+        <Button size="sm" className="gap-1 shadow-sm">
           <PlusCircle className="h-4 w-4" />
           Add Transaction
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col">
         <SheetHeader>
-          <SheetTitle>Add New Transaction</SheetTitle>
+          <SheetTitle>Add Transaction</SheetTitle>
           <SheetDescription>
-            Record a new income or expense transaction.
+            Recorded transactions will update your budget health in real-time.
           </SheetDescription>
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 mt-6 flex-1">
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description *</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Groceries, Salary" {...field} />
+                    <Input placeholder="Rent, Coffee, Freelance..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -170,9 +181,12 @@ addTransaction(newTransaction);
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount *</FormLabel>
+                    <FormLabel>Amount</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="0.00" {...field} />
+                      <div className="relative">
+                        <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                        <Input type="number" step="0.01" className="pl-7" placeholder="0.00" {...field} />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -183,11 +197,11 @@ addTransaction(newTransaction);
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a type" />
+                          <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -206,24 +220,24 @@ addTransaction(newTransaction);
               name="category_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category *</FormLabel>
+                  <FormLabel>Category</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {groupedCategories[transactionType].length > 0 ? (
-                        groupedCategories[transactionType].map((cat: any) => (
+                      {filteredCategories.length > 0 ? (
+                        filteredCategories.map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {cat.name}
+                            <span className="flex items-center gap-2">
+                               {cat.name}
+                            </span>
                           </SelectItem>
                         ))
                       ) : (
-                        <SelectItem value="-" disabled>
-                          No {transactionType} categories found
-                        </SelectItem>
+                        <p className="p-2 text-xs text-muted-foreground text-center">No categories found</p>
                       )}
                     </SelectContent>
                   </Select>
@@ -238,33 +252,21 @@ addTransaction(newTransaction);
                 name="date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Date *</FormLabel>
+                    <FormLabel>Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
+                            variant="outline"
+                            className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                           >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
+                            {field.value ? format(field.value, "MMM d, yyyy") : <span>Pick date</span>}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
+                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
@@ -276,11 +278,11 @@ addTransaction(newTransaction);
                 name="workspace"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Workspace *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Workspace</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a workspace" />
+                          <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -294,11 +296,14 @@ addTransaction(newTransaction);
               />
             </div>
 
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <div className="flex justify-end space-x-2 pt-6">
+              <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">Add Transaction</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Add Transaction
+              </Button>
             </div>
           </form>
         </Form>
