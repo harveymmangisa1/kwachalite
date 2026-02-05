@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { 
   Wallet, Trophy, Calendar, Zap, Target, ChevronRight,
   TrendingUp, TrendingDown, Sparkles, Activity,
-  ArrowUpRight, ArrowDownRight, Flame, PieChart
+    Flame, PieChart
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -146,8 +146,8 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
                             {/* Income Pill */}
                             <div className="flex items-center justify-between p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 hover:bg-emerald-50 transition-colors cursor-default">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-full shadow-sm">
-                                        <ArrowUpRight className="w-4 h-4 text-emerald-600" />
+                                        <div className="p-2 bg-white rounded-full shadow-sm">
+                                        <TrendingUp className="w-4 h-4 text-emerald-600" />
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-semibold text-emerald-700/70 uppercase">Income</span>
@@ -161,7 +161,7 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
                             <div className="flex items-center justify-between p-4 rounded-2xl bg-rose-50/50 border border-rose-100/50 hover:bg-rose-50 transition-colors cursor-default">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-white rounded-full shadow-sm">
-                                        <ArrowDownRight className="w-4 h-4 text-rose-600" />
+                                        <TrendingDown className="w-4 h-4 text-rose-600" />
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-semibold text-rose-700/70 uppercase">Expenses</span>

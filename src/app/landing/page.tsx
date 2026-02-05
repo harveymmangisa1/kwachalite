@@ -1,218 +1,274 @@
 'use client';
 
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Wallet, 
-  TrendingUp, 
-  BarChart3, 
-  PieChart, 
-  DollarSign, 
-  Target, 
-  Shield, 
-  Zap, 
-  Users, 
-  ArrowRight,
-  CheckCircle,
-  Star,
-  Activity,
-  Bell,
-  Smartphone
-} from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import Logo from '@/components/logo';
+import { ArrowRight, ShieldCheck, PieChart, Smartphone, Globe2, CheckCircle2, Menu } from 'lucide-react';
 
 export default function LandingPage() {
-  const [animateCards, setAnimateCards] = useState(false);
+  const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setAnimateCards(true), 300);
-    return () => clearTimeout(timer);
-  }, []);
+  const handleSignIn = () => router.push('/');
+  const handleOpenAccount = () => router.push('/signup');
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top Nav */}
-      <div className="border-b bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="container mx-auto px-6 h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Wallet className="w-4 h-4 text-primary-foreground" aria-hidden="true" />
+    <div className="min-h-screen bg-[#0A0A0B] text-white selection:bg-blue-500/30 font-sans tracking-tight overflow-x-hidden">
+      
+      {/* Ultra-Thin Global Header */}
+      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#0A0A0B]/80 backdrop-blur-xl">
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <a href="/landing" className="flex items-center gap-2.5">
+              <Logo size="sm" showText={true} />
+            </a>
+            {/* Desktop Nav */}
+            <div className="hidden md:flex items-center gap-6 text-sm font-medium text-white/60">
+              <a href="#simplicity" className="hover:text-white transition-colors">How it Works</a>
+              <a href="#peace-of-mind" className="hover:text-white transition-colors">Peace of Mind</a>
+              <a href="#safety" className="hover:text-white transition-colors">Safety</a>
             </div>
-            <span className="font-semibold text-foreground">KwachaLite</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link to="/">
-              <Button variant="ghost" className="h-9 text-sm px-3 sm:px-4">Sign in</Button>
-            </Link>
-            <Link to="/signup">
-              <Button className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 text-sm px-3 sm:px-4">Get started</Button>
-            </Link>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" className="hidden md:flex text-sm font-medium hover:bg-white/5 text-white/70" onClick={handleSignIn}>
+              Log In
+            </Button>
+            <Button className="bg-white text-black hover:bg-gray-200 rounded-full px-5 py-2 text-sm font-bold transition-all hover:scale-105" onClick={handleOpenAccount}>
+              Get Started
+            </Button>
+            {/* Mobile Menu Icon (Placeholder functionality) */}
+            <button className="md:hidden text-white/70" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                <Menu className="w-6 h-6" />
+            </button>
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(15,23,42,0.06),transparent_60%)]" />
-        <div className="relative z-10 container mx-auto px-6 py-20 container-narrow">
-          <div className="text-center space-y-12">
-            {/* Logo and Title */}
-            <div className="space-y-6">
-              <div className="relative inline-block">
-                <div className="relative w-24 h-24 bg-primary rounded-3xl flex items-center justify-center shadow-sm mx-auto ui-smooth hover:scale-[1.02]">
-                  <Wallet className="w-10 h-10 text-primary-foreground" />
-                </div>
+      <section className="relative pt-32 lg:pt-48 pb-20 overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+            
+            {/* Left Content */}
+            <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-300 text-xs font-bold uppercase tracking-widest mx-auto lg:mx-0">
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                No finance degree required
               </div>
               
-              <div className="space-y-4">
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground">
-                  <span>
-                    Welcome to
-                  </span>
-                  <br />
-                  <span className="text-blue-600">
-                    KwachaLite
-                  </span>
-                </h1>
-                <p className="text-xl sm:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                  Your journey to financial freedom starts here. Track, analyze, and optimize your finances with beautiful, intelligent insights.
-                </p>
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium leading-[0.95] tracking-tighter">
+                Money, made <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">human.</span>
+              </h1>
+              
+              <p className="text-lg md:text-xl text-white/60 max-w-lg mx-auto lg:mx-0 leading-relaxed font-light">
+                Stop stressing over spreadsheets and complex charts. We translate your finances into simple, actionable insights. 
+                <span className="text-white block mt-2 font-medium">Finally, banking that speaks your language.</span>
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-2">
+                <Button size="lg" className="w-full sm:w-auto h-14 px-8 bg-blue-600 hover:bg-blue-500 rounded-full text-base font-semibold group transition-all" onClick={handleOpenAccount}>
+                  Try It Free <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <div className="text-sm text-white/40 font-medium">
+                  Takes less than 3 minutes
+                </div>
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-sm sm:max-w-none mx-auto">
-              <Link to="/signup" className="w-full sm:w-auto">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-sm h-12 sm:h-11 ui-smooth hover:-translate-y-0.5 w-full">
-                  <span className="truncate">Get Started</span>
-                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                </Button>
-              </Link>
-              <Link to="/" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl border-2 h-12 sm:h-11 border-border hover:bg-muted ui-smooth w-full">
-                  Sign In
-                </Button>
-              </Link>
+            {/* Right Content - Visual Representation of "Simplicity" */}
+            <div className="w-full lg:w-1/2 relative flex justify-center lg:justify-end">
+              <div className="relative w-full max-w-md aspect-[4/5] rounded-[3rem] bg-gradient-to-b from-neutral-800 to-neutral-900 border border-white/10 p-2 shadow-2xl rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                {/* Phone Frame */}
+                <div className="w-full h-full bg-[#0A0A0B] rounded-[2.5rem] overflow-hidden relative border-[4px] border-neutral-800">
+                   {/* Dynamic Content Mockup */}
+                   <div className="p-8 flex flex-col h-full">
+                      {/* Top Bar */}
+                      <div className="flex justify-between items-center mb-8 opacity-50">
+                        <div className="w-8 h-8 rounded-full bg-white/20"></div>
+                        <div className="w-20 h-2 rounded-full bg-white/20"></div>
+                      </div>
+                      
+                      {/* Main Balance Card */}
+                      <div className="bg-gradient-to-br from-blue-600 to-violet-600 rounded-3xl p-6 mb-6 shadow-lg shadow-blue-900/20">
+                        <p className="text-blue-100 text-sm font-medium mb-1">Safe to spend</p>
+                        <h3 className="text-4xl font-bold text-white mb-4">$1,250.00</h3>
+                        <div className="flex gap-2">
+                           <div className="h-1 flex-1 bg-white/30 rounded-full"></div>
+                           <div className="h-1 w-1/3 bg-white/10 rounded-full"></div>
+                        </div>
+                      </div>
+
+                      {/* Simple List */}
+                      <div className="space-y-4">
+                        <p className="text-white/40 text-xs uppercase tracking-widest font-bold">Recent Activity</p>
+                        {[1, 2, 3].map((_, i) => (
+                          <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${i === 0 ? 'bg-orange-500/20 text-orange-400' : 'bg-green-500/20 text-green-400'}`}>
+                                {i === 0 ? '☕' : '🛒'}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-white/90">{i === 0 ? 'Coffee Shop' : 'Grocery Market'}</span>
+                                <span className="text-xs text-white/40">Today, 9:41 AM</span>
+                              </div>
+                            </div>
+                            <span className="text-sm font-medium text-white">-${(15 + i * 12)}.00</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* "We do the math" Badge */}
+                      <div className="mt-auto bg-neutral-800 rounded-2xl p-4 flex items-center gap-3 border border-white/5">
+                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs">✨</div>
+                        <p className="text-xs text-white/70 leading-tight">We organized your bills. <br/>You're good for the weekend.</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature Section: "Human Friendly" */}
+      <section id="simplicity" className="py-20 lg:py-32 bg-[#0A0A0B]">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Box 1: The Main Value Prop */}
+            <div className="lg:col-span-8 group relative overflow-hidden rounded-[2.5rem] bg-[#111113] border border-white/5 p-8 md:p-12 transition-all hover:border-blue-500/30">
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                <div className="flex-1 space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-4">
+                    <PieChart className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white">Know where your money goes.</h3>
+                  <p className="text-white/50 text-base md:text-lg leading-relaxed">
+                    We automatically categorize everything. No manual entry, no confusing spreadsheets. Just a clear picture of your life.
+                  </p>
+                  <div className="pt-4 flex flex-wrap gap-3">
+                     {['Groceries', 'Rent', 'Fun'].map(tag => (
+                       <span key={tag} className="px-3 py-1 rounded-full bg-white/5 text-xs font-medium text-white/70 border border-white/5">
+                         {tag}
+                       </span>
+                     ))}
+                  </div>
+                </div>
+                {/* Visual Abstraction of "Easy" */}
+                <div className="w-full md:w-1/3 aspect-square bg-gradient-to-tr from-neutral-800 to-neutral-900 rounded-full flex items-center justify-center relative p-6">
+                   <div className="absolute inset-4 border-8 border-blue-500/20 rounded-full border-t-blue-500"></div>
+                   <div className="text-center">
+                     <span className="block text-2xl font-bold text-white">Simple</span>
+                     <span className="text-xs text-white/40">breakdown</span>
+                   </div>
+                </div>
+              </div>
             </div>
 
-            
+            {/* Box 2: Security */}
+            <div className="lg:col-span-4 rounded-[2.5rem] bg-gradient-to-br from-blue-700 to-violet-800 p-8 md:p-12 flex flex-col justify-between text-white shadow-2xl shadow-blue-900/10">
+               <ShieldCheck className="w-10 h-10 text-white/80 mb-6" />
+               <div className="space-y-4">
+                 <h3 className="text-2xl md:text-3xl font-bold leading-tight">Your money is safe.</h3>
+                 <p className="text-white/80 leading-relaxed">We use the same security measures as the world's biggest banks. Your data is yours alone.</p>
+               </div>
+            </div>
+
+            {/* Box 3: Sync */}
+            <div className="lg:col-span-4 rounded-[2.5rem] bg-[#111113] border border-white/5 p-8 md:p-12">
+                <Smartphone className="w-8 h-8 text-violet-400 mb-6" />
+                <h4 className="text-xl font-bold mb-3">On every device</h4>
+                <p className="text-white/40 mb-6">Start on your phone, finish on your laptop. Your account stays in sync instantly.</p>
+                <div className="flex gap-2 opacity-30">
+                   <div className="w-8 h-12 border border-white rounded-md"></div>
+                   <div className="w-16 h-12 border border-white rounded-md"></div>
+                </div>
+            </div>
+
+            {/* Box 4: Global */}
+            <div className="lg:col-span-8 rounded-[2.5rem] bg-[#111113] border border-white/5 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+               <div className="flex-1">
+                 <div className="flex items-center gap-2 mb-4 text-emerald-400">
+                    <Globe2 className="w-5 h-5" />
+                    <span className="text-xs font-bold uppercase tracking-widest">Global Friendly</span>
+                 </div>
+                 <h4 className="text-2xl md:text-3xl font-bold mb-4">Travel without worry.</h4>
+                 <p className="text-white/50 text-lg">Use your card anywhere in the world with zero hidden fees. We handle the currency exchange automatically.</p>
+               </div>
+               <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3 px-5 py-3 bg-neutral-900 rounded-xl border border-white/5">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-xs">🇺🇸</div>
+                    <div>
+                      <div className="text-xs text-white/40">Paying in</div>
+                      <div className="text-sm font-bold">USD</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 px-5 py-3 bg-neutral-900 rounded-xl border border-white/5">
+                    <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-xs">🇿🇲</div>
+                    <div>
+                      <div className="text-xs text-white/40">Spending in</div>
+                      <div className="text-sm font-bold">Kwacha</div>
+                    </div>
+                  </div>
+               </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Features Section */}
-      <div className="py-20 bg-background">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Everything you need to manage your finances
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              KwachaLite provides all the tools you need to take control of your financial life with ease and intelligence.
-            </p>
-          </div>
-
-          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-1000 ${animateCards ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            {/* Smart Analytics */}
-            <Card className="p-6 border border-border shadow-sm">
-              <CardContent className="p-0 text-center space-y-4">
-                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto">
-                  <TrendingUp className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Smart Analytics</h3>
-                <p className="text-muted-foreground">
-                  Get intelligent insights into your spending patterns with beautiful charts and detailed analysis.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Goal Tracking */}
-            <Card className="p-6 border border-border shadow-sm">
-              <CardContent className="p-0 text-center space-y-4">
-                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto">
-                  <Target className="w-8 h-8 text-emerald-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Goal Tracking</h3>
-                <p className="text-muted-foreground">
-                  Set financial goals and track your progress with visual indicators and milestone celebrations.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Budget Management */}
-            <Card className="p-6 border border-border shadow-sm">
-              <CardContent className="p-0 text-center space-y-4">
-                <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto">
-                  <BarChart3 className="w-8 h-8 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Budget Management</h3>
-                <p className="text-muted-foreground">
-                  Create intelligent budgets and get alerts when you're approaching your spending limits.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Secure & Private */}
-            <Card className="p-6 border border-border shadow-sm">
-              <CardContent className="p-0 text-center space-y-4">
-                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto">
-                  <Shield className="w-8 h-8 text-emerald-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Secure & Private</h3>
-                <p className="text-muted-foreground">
-                  Your financial data is encrypted and protected with bank-level security protocols.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Quick Setup */}
-            <Card className="p-6 border border-border shadow-sm">
-              <CardContent className="p-0 text-center space-y-4">
-                <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto">
-                  <Zap className="w-8 h-8 text-amber-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Quick Setup</h3>
-                <p className="text-muted-foreground">
-                  Get started in just 2 minutes with our intuitive onboarding and setup process.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Community */}
-            <Card className="p-6 border border-border shadow-sm">
-              <CardContent className="p-0 text-center space-y-4">
-                <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto">
-                  <Users className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Trusted Community</h3>
-                <p className="text-muted-foreground">
-                  Join thousands of users who have transformed their financial lives with KwachaLite.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-
-      {/* Final CTA Section */}
-      <div className="py-20 bg-primary text-primary-foreground">
+      {/* Social Proof / Confidence Builder (Replaced Partners) */}
+      <section className="py-20 border-t border-white/5">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-4">Ready to transform your finances?</h2>
-          <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-            Take control of your financial future with KwachaLite's powerful tools and insights.
+            <h3 className="text-lg text-white/40 mb-8 font-medium">Join thousands of people mastering their money</h3>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-12 opacity-50">
+               {['Zero Hidden Fees', '24/7 Support', 'Instant Alerts'].map((item) => (
+                   <div key={item} className="flex items-center gap-2">
+                       <CheckCircle2 className="w-5 h-5 text-blue-500" />
+                       <span className="text-lg font-medium">{item}</span>
+                   </div>
+               ))}
+            </div>
+        </div>
+      </section>
+
+      {/* Simplified CTA */}
+      <section className="py-32 relative overflow-hidden">
+        {/* Glow Effect */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px]" />
+        
+        <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-6">
+            Financial freedom <br /> starts with a single tap.
+          </h2>
+          <p className="text-xl text-white/50 mb-10 font-light">
+            No paperwork. No waiting in lines. Just a better way to live.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/signup">
-              <Button size="lg" className="bg-background text-foreground hover:bg-muted px-8 py-4 text-lg font-semibold rounded-xl shadow-sm h-11">
-                Start Your Journey
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <p className="text-primary-foreground/60 text-sm">Free forever • No credit card required</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button size="lg" className="h-14 px-10 bg-white text-black hover:bg-gray-100 rounded-full text-base font-bold transition-transform hover:-translate-y-1" onClick={handleOpenAccount}>
+              Open Free Account
+            </Button>
+            <Button size="lg" variant="outline" className="h-14 px-10 rounded-full text-base font-bold border-white/10 hover:bg-white/5 hover:text-white" onClick={handleSignIn}>
+              Log In
+            </Button>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Minimal Footer */}
+      <footer className="border-t border-white/5 py-12 bg-[#050506]">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2 opacity-50">
+             <Logo size="sm" showText={false} />
+             <span className="text-sm font-medium tracking-wide">KwachaLite</span>
+          </div>
+          <p className="text-xs font-medium text-white/30 text-center md:text-right">
+            © {new Date().getFullYear()} KwachaLite. Built for everyone. <br className="md:hidden"/> Powered by Octet Systems.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
