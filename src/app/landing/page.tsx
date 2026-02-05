@@ -1,18 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/logo';
 // Swapped Map -> Activity for the 'Global' section to resolve the export error
-import { Menu, TrendingUp, Lock, Phone, Activity, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Menu, TrendingUp, Lock, Phone, MapPin, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export default function LandingPage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleSignIn = () => router.push('/');
-  const handleOpenAccount = () => router.push('/signup');
+  const handleSignIn = () => navigate('/');
+  const handleOpenAccount = () => navigate('/signup');
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white selection:bg-blue-500/30 font-sans tracking-tight overflow-x-hidden">
@@ -188,7 +188,7 @@ export default function LandingPage() {
                <div className="flex-1">
                  <div className="flex items-center gap-2 mb-4 text-emerald-400">
                     {/* Using Activity icon here */}
-                    <Activity className="w-5 h-5" />
+                    <MapPin className="w-5 h-5" />
                     <span className="text-xs font-bold uppercase tracking-widest">Global Friendly</span>
                  </div>
                  <h4 className="text-2xl md:text-3xl font-bold mb-4">Travel without worry.</h4>

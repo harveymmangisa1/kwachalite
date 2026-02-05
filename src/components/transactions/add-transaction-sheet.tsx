@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, PlusCircle, Loader2 } from 'lucide-react';
+import { CalendarIcon, PlusCircle, Loader2, AlertCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -42,6 +42,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useActiveWorkspace } from '@/hooks/use-active-workspace';
 import { AnalyticsService } from '@/lib/analytics';
 import { StreakService, ACTIVITY_TYPES } from '@/lib/streak-service';
+import { AddCategorySheet } from '@/components/budgets/add-category-sheet';
 import type { Transaction, Category } from '@/lib/types';
 
 // Moved outside to prevent re-initialization on every render
@@ -64,6 +65,7 @@ export function AddTransactionSheet() {
   
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCategorySheet, setShowCategorySheet] = useState(false);
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(formSchema),
@@ -81,6 +83,17 @@ export function AddTransactionSheet() {
   const filteredCategories = useMemo(() => {
     return categories.filter(cat => cat.type === transactionType);
   }, [categories, transactionType]);
+
+  // Show notification when opening transaction sheet if no categories exist for selected type
+  useEffect(() => {
+    if (open && filteredCategories.length === 0) {
+      toast({
+        title: 'No Categories Found',
+        description: `You don't have any ${transactionType} categories. Create categories first to organize your transactions.`,
+        variant: 'destructive',
+      });
+    }
+  }, [open, filteredCategories.length, transactionType, toast]);
 
   // Sync workspace if it changes in the background
   useEffect(() => {
@@ -144,6 +157,7 @@ export function AddTransactionSheet() {
   }
 
   return (
+    <>
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm" className="gap-1 shadow-sm">
@@ -237,11 +251,37 @@ export function AddTransactionSheet() {
                           </SelectItem>
                         ))
                       ) : (
-                        <p className="p-2 text-xs text-muted-foreground text-center">No categories found</p>
+                        <div className="p-3 text-center">
+                          <p className="text-xs text-muted-foreground mb-2">No categories found</p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowCategorySheet(true)}
+                            className="text-xs"
+                          >
+                            Create Category
+                          </Button>
+                        </div>
                       )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
+                  {filteredCategories.length === 0 && (
+                    <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-xs">
+                          <p className="font-medium text-amber-800">
+                            No {transactionType} categories
+                          </p>
+                          <p className="text-amber-600 mt-1">
+                            Create categories first to organize your {transactionType} transactions.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </FormItem>
               )}
             />
@@ -309,5 +349,12 @@ export function AddTransactionSheet() {
         </Form>
       </SheetContent>
     </Sheet>
+
+    {/* Category Creation Sheet */}
+    <AddCategorySheet 
+      open={showCategorySheet} 
+      onOpenChange={setShowCategorySheet} 
+    />
+    </>
   );
 }
