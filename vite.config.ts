@@ -8,6 +8,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'next/navigation': path.resolve(__dirname, './src/lib/next-navigation-shim.ts'),
+      'next/router': path.resolve(__dirname, './src/lib/next-navigation-shim.ts'),
     },
   },
   server: {
