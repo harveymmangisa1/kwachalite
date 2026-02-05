@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/logo';
-// Swapped Languages -> Map for maximum compatibility
-import { Menu, TrendingUp, Lock, Phone, Map, CheckCircle2, ChevronRight } from 'lucide-react';
+// Swapped Map -> Activity for the 'Global' section to resolve the export error
+import { Menu, TrendingUp, Lock, Phone, Activity, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -187,8 +187,8 @@ export default function LandingPage() {
             <div className="lg:col-span-8 rounded-[2.5rem] bg-[#111113] border border-white/5 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
                <div className="flex-1">
                  <div className="flex items-center gap-2 mb-4 text-emerald-400">
-                    {/* Using Map icon here */}
-                    <Map className="w-5 h-5" />
+                    {/* Using Activity icon here */}
+                    <Activity className="w-5 h-5" />
                     <span className="text-xs font-bold uppercase tracking-widest">Global Friendly</span>
                  </div>
                  <h4 className="text-2xl md:text-3xl font-bold mb-4">Travel without worry.</h4>
