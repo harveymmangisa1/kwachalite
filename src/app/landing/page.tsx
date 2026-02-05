@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/logo';
-import { ArrowRight, ShieldCheck, PieChart, Smartphone, Globe2, CheckCircle2, Menu } from 'lucide-react';
+// Swapped 'Shield' -> 'Lock' and 'Globe' -> 'Languages' to resolve import errors
+import { Menu, TrendingUp, Lock, Phone, Languages, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -38,12 +39,27 @@ export default function LandingPage() {
             <Button className="bg-white text-black hover:bg-gray-200 rounded-full px-5 py-2 text-sm font-bold transition-all hover:scale-105" onClick={handleOpenAccount}>
               Get Started
             </Button>
-            {/* Mobile Menu Icon (Placeholder functionality) */}
-            <button className="md:hidden text-white/70" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                <Menu className="w-6 h-6" />
+            {/* Mobile Menu Icon */}
+            <button 
+              className="md:hidden text-white/70 hover:text-white transition-colors" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <Menu className="w-6 h-6" />
             </button>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-white/5 bg-[#0A0A0B]/95 backdrop-blur-xl">
+            <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
+              <a href="#simplicity" className="text-sm font-medium text-white/60 hover:text-white transition-colors py-2">How it Works</a>
+              <a href="#peace-of-mind" className="text-sm font-medium text-white/60 hover:text-white transition-colors py-2">Peace of Mind</a>
+              <a href="#safety" className="text-sm font-medium text-white/60 hover:text-white transition-colors py-2">Safety</a>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -70,7 +86,7 @@ export default function LandingPage() {
               
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-2">
                 <Button size="lg" className="w-full sm:w-auto h-14 px-8 bg-blue-600 hover:bg-blue-500 rounded-full text-base font-semibold group transition-all" onClick={handleOpenAccount}>
-                  Try It Free <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  Try It Free <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <div className="text-sm text-white/40 font-medium">
                   Takes less than 3 minutes
@@ -104,18 +120,22 @@ export default function LandingPage() {
                       {/* Simple List */}
                       <div className="space-y-4">
                         <p className="text-white/40 text-xs uppercase tracking-widest font-bold">Recent Activity</p>
-                        {[1, 2, 3].map((_, i) => (
+                        {[
+                          { emoji: '☕', label: 'Coffee Shop', amount: 15 },
+                          { emoji: '🛒', label: 'Grocery Market', amount: 27 },
+                          { emoji: '🛒', label: 'Pharmacy', amount: 39 }
+                        ].map((item, i) => (
                           <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
                             <div className="flex items-center gap-3">
                               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${i === 0 ? 'bg-orange-500/20 text-orange-400' : 'bg-green-500/20 text-green-400'}`}>
-                                {i === 0 ? '☕' : '🛒'}
+                                {item.emoji}
                               </div>
                               <div className="flex flex-col">
-                                <span className="text-sm font-medium text-white/90">{i === 0 ? 'Coffee Shop' : 'Grocery Market'}</span>
+                                <span className="text-sm font-medium text-white/90">{item.label}</span>
                                 <span className="text-xs text-white/40">Today, 9:41 AM</span>
                               </div>
                             </div>
-                            <span className="text-sm font-medium text-white">-${(15 + i * 12)}.00</span>
+                            <span className="text-sm font-medium text-white">-${item.amount}.00</span>
                           </div>
                         ))}
                       </div>
@@ -123,7 +143,7 @@ export default function LandingPage() {
                       {/* "We do the math" Badge */}
                       <div className="mt-auto bg-neutral-800 rounded-2xl p-4 flex items-center gap-3 border border-white/5">
                         <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs">✨</div>
-                        <p className="text-xs text-white/70 leading-tight">We organized your bills. <br/>You're good for the weekend.</p>
+                        <p className="text-xs text-white/70 leading-tight">We organized your bills. <br/>You&apos;re good for the weekend.</p>
                       </div>
                    </div>
                 </div>
@@ -143,7 +163,7 @@ export default function LandingPage() {
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="flex-1 space-y-4">
                   <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-4">
-                    <PieChart className="w-6 h-6 text-blue-400" />
+                    <TrendingUp className="w-6 h-6 text-blue-400" />
                   </div>
                   <h3 className="text-2xl md:text-3xl font-bold text-white">Know where your money goes.</h3>
                   <p className="text-white/50 text-base md:text-lg leading-relaxed">
@@ -168,18 +188,18 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Box 2: Security */}
+            {/* Box 2: Security - UPDATED to Lock */}
             <div className="lg:col-span-4 rounded-[2.5rem] bg-gradient-to-br from-blue-700 to-violet-800 p-8 md:p-12 flex flex-col justify-between text-white shadow-2xl shadow-blue-900/10">
-               <ShieldCheck className="w-10 h-10 text-white/80 mb-6" />
+               <Lock className="w-10 h-10 text-white/80 mb-6" />
                <div className="space-y-4">
                  <h3 className="text-2xl md:text-3xl font-bold leading-tight">Your money is safe.</h3>
-                 <p className="text-white/80 leading-relaxed">We use the same security measures as the world's biggest banks. Your data is yours alone.</p>
+                 <p className="text-white/80 leading-relaxed">We use the same security measures as the world&apos;s biggest banks. Your data is yours alone.</p>
                </div>
             </div>
 
             {/* Box 3: Sync */}
             <div className="lg:col-span-4 rounded-[2.5rem] bg-[#111113] border border-white/5 p-8 md:p-12">
-                <Smartphone className="w-8 h-8 text-violet-400 mb-6" />
+                <Phone className="w-8 h-8 text-violet-400 mb-6" />
                 <h4 className="text-xl font-bold mb-3">On every device</h4>
                 <p className="text-white/40 mb-6">Start on your phone, finish on your laptop. Your account stays in sync instantly.</p>
                 <div className="flex gap-2 opacity-30">
@@ -188,11 +208,11 @@ export default function LandingPage() {
                 </div>
             </div>
 
-            {/* Box 4: Global */}
+            {/* Box 4: Global - UPDATED to Languages */}
             <div className="lg:col-span-8 rounded-[2.5rem] bg-[#111113] border border-white/5 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
                <div className="flex-1">
                  <div className="flex items-center gap-2 mb-4 text-emerald-400">
-                    <Globe2 className="w-5 h-5" />
+                    <Languages className="w-5 h-5" />
                     <span className="text-xs font-bold uppercase tracking-widest">Global Friendly</span>
                  </div>
                  <h4 className="text-2xl md:text-3xl font-bold mb-4">Travel without worry.</h4>
@@ -219,7 +239,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof / Confidence Builder (Replaced Partners) */}
+      {/* Social Proof / Confidence Builder */}
       <section className="py-20 border-t border-white/5">
         <div className="container mx-auto px-6 text-center">
             <h3 className="text-lg text-white/40 mb-8 font-medium">Join thousands of people mastering their money</h3>
