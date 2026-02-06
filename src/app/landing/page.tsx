@@ -11,7 +11,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleSignIn = () => navigate('/');
+  const handleSignIn = () => navigate('/login');
   const handleOpenAccount = () => navigate('/signup');
 
   return (
