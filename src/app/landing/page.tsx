@@ -4,12 +4,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/logo';
+import { DashboardPreview } from '@/components/landing/dashboard-preview';
+import { MobileDashboardPreview } from '@/components/landing/mobile-dashboard-preview';
+import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 // Swapped Map -> Activity for the 'Global' section to resolve the export error
 import { Menu, TrendingUp, Lock, Phone, MapPin, CheckCircle2, ChevronRight } from 'lucide-react';
 
-export default function LandingPage() {
+function LandingPageContent() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleSignIn = () => navigate('/login');
   const handleOpenAccount = () => navigate('/signup');
@@ -32,6 +36,17 @@ export default function LandingPage() {
           </div>
           
           <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <div className="hidden md:flex items-center gap-1 p-1 bg-white/10 rounded-full">
+              <button
+                onClick={() => toggleTheme()}
+                className="p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                title="Toggle theme"
+              >
+                {theme === 'light' ? '🌙' : '☀️'}
+              </button>
+            </div>
+            
             <Button variant="ghost" className="hidden md:flex text-sm font-medium hover:bg-white/5 text-white/70" onClick={handleSignIn}>
               Log In
             </Button>
@@ -84,49 +99,46 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right Content */}
+            {/* Right Content - Dashboard Previews */}
             <div className="w-full lg:w-1/2 relative flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-md aspect-[4/5] rounded-[3rem] bg-gradient-to-b from-neutral-800 to-neutral-900 border border-white/10 p-2 shadow-2xl rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
-                <div className="w-full h-full bg-[#0A0A0B] rounded-[2.5rem] overflow-hidden relative border-[4px] border-neutral-800">
-                   <div className="p-8 flex flex-col h-full">
-                      <div className="flex justify-between items-center mb-8 opacity-50">
-                        <div className="w-8 h-8 rounded-full bg-white/20"></div>
-                        <div className="w-20 h-2 rounded-full bg-white/20"></div>
+              <div className="w-full max-w-lg space-y-6">
+                {/* Desktop Preview */}
+                <div className="hidden lg:block">
+                  <div className="text-center mb-4">
+                    <p className="text-sm text-white/60 font-medium">Desktop Experience</p>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20 rounded-2xl blur-3xl"></div>
+                    <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-2 border border-white/20">
+                      <div className="aspect-[16/10] rounded-xl overflow-hidden">
+                        <DashboardPreview isDark={theme === 'dark'} />
                       </div>
-                      <div className="bg-gradient-to-br from-blue-600 to-violet-600 rounded-3xl p-6 mb-6 shadow-lg shadow-blue-900/20">
-                        <p className="text-blue-100 text-sm font-medium mb-1">Safe to spend</p>
-                        <h3 className="text-4xl font-bold text-white mb-4">$1,250.00</h3>
-                        <div className="flex gap-2">
-                           <div className="h-1 flex-1 bg-white/30 rounded-full"></div>
-                           <div className="h-1 w-1/3 bg-white/10 rounded-full"></div>
-                        </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Preview */}
+                <div>
+                  <div className="text-center mb-4">
+                    <p className="text-sm text-white/60 font-medium">Mobile Experience</p>
+                  </div>
+                  <div className="relative mx-auto" style={{ maxWidth: '320px' }}>
+                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-blue-500/20 rounded-2xl blur-3xl"></div>
+                    <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-2 border border-white/20">
+                      <div className="aspect-[9/19.5] rounded-xl overflow-hidden">
+                        <MobileDashboardPreview isDark={theme === 'dark'} />
                       </div>
-                      <div className="space-y-4">
-                        <p className="text-white/40 text-xs uppercase tracking-widest font-bold">Recent Activity</p>
-                        {[
-                          { emoji: '☕', label: 'Coffee Shop', amount: 15 },
-                          { emoji: '🛒', label: 'Grocery Market', amount: 27 },
-                          { emoji: '🛒', label: 'Pharmacy', amount: 39 }
-                        ].map((item, i) => (
-                          <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${i === 0 ? 'bg-orange-500/20 text-orange-400' : 'bg-green-500/20 text-green-400'}`}>
-                                {item.emoji}
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-sm font-medium text-white/90">{item.label}</span>
-                                <span className="text-xs text-white/40">Today, 9:41 AM</span>
-                              </div>
-                            </div>
-                            <span className="text-sm font-medium text-white">-${item.amount}.00</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-auto bg-neutral-800 rounded-2xl p-4 flex items-center gap-3 border border-white/5">
-                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs">✨</div>
-                        <p className="text-xs text-white/70 leading-tight">We organized your bills. <br/>You&apos;re good for the weekend.</p>
-                      </div>
-                   </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Feature Pills */}
+                <div className="flex flex-wrap justify-center gap-2 lg:hidden">
+                  {['Real-time Sync', 'Dark Mode', 'Mobile First'].map((feature) => (
+                    <span key={feature} className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium border border-white/20">
+                      {feature}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>

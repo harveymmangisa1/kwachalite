@@ -935,13 +935,13 @@ export class SupabaseSync {
 
     const budgets: BusinessBudget[] = (data || []).map((item: any) => ({
       id: item.id,
-      name: item.name,
+      name: item.name ?? item.category,
       category: item.category,
       budgetAmount: item.budget_amount,
       period: item.period,
       startDate: item.start_date,
       endDate: item.end_date,
-      currentSpent: item.current_spent,
+      currentSpent: item.current_spent ?? item.spent_amount ?? 0,
       workspace: 'business',
     }));
 
@@ -971,12 +971,12 @@ export class SupabaseSync {
       invoiceId: item.invoice_id,
       quoteId: item.quote_id,
       clientId: item.client_id,
-      date: item.date,
+      date: item.date ?? item.sale_date,
       amount: item.amount,
-      paymentMethod: item.payment_method,
+      paymentMethod: item.payment_method || 'other',
       referenceNumber: item.reference_number,
-      notes: item.notes,
-      status: item.status,
+      notes: item.notes ?? item.description,
+      status: item.status || 'confirmed',
     }));
     this.updateStoreData('salesReceipts', receipts);
   }
@@ -999,18 +999,18 @@ export class SupabaseSync {
     }
     const notes: DeliveryNote[] = (data || []).map((item: any) => ({
       id: item.id,
-      deliveryNoteNumber: item.delivery_note_number,
+      deliveryNoteNumber: item.delivery_note_number || item.delivery_number,
       invoiceId: item.invoice_id,
       quoteId: item.quote_id,
       clientId: item.client_id,
-      date: item.date,
+      date: item.date ?? item.delivery_date,
       deliveryDate: item.delivery_date,
-      deliveryAddress: item.delivery_address,
+      deliveryAddress: item.delivery_address || '',
       items: item.items,
-      deliveryMethod: item.delivery_method,
+      deliveryMethod: item.delivery_method || 'delivery',
       trackingNumber: item.tracking_number,
       notes: item.notes,
-      status: item.status,
+      status: item.status || 'delivered',
       receivedBy: item.received_by,
       receivedAt: item.received_at,
     }));
@@ -1035,14 +1035,14 @@ export class SupabaseSync {
     }
     const revenues: BusinessRevenue[] = (data || []).map((item: any) => ({
       id: item.id,
-      source: item.source,
+      source: item.source || 'direct',
       sourceId: item.source_id,
       clientId: item.client_id,
       amount: item.amount,
-      date: item.date,
+      date: item.date ?? item.revenue_date,
       description: item.description,
       category: item.category,
-      status: item.status,
+      status: item.status || 'received',
       paymentMethod: item.payment_method,
     }));
     this.updateStoreData('businessRevenues', revenues);
@@ -1068,12 +1068,12 @@ export class SupabaseSync {
       id: item.id,
       vendor: item.vendor,
       amount: item.amount,
-      date: item.date,
+      date: item.date ?? item.expense_date,
       description: item.description,
       category: item.category,
       receiptUrl: item.receipt_url,
-      taxDeductible: item.tax_deductible,
-      status: item.status,
+      taxDeductible: item.tax_deductible ?? false,
+      status: item.status || 'paid',
       paymentMethod: item.payment_method,
     }));
     this.updateStoreData('businessExpenses', expenses);
@@ -1084,7 +1084,7 @@ export class SupabaseSync {
     if (this.shouldSkipTable('savings_groups')) return;
     // This needs to fetch groups where the user is a member, not just the creator
     const { data, error } = await db
-      .rpc('get_user_savings_groups')
+      .rpc('get_user_savings_groups');
     if (error) {
       if (this.handleMissingTableError('savings_groups', error)) {
         return;
@@ -1093,31 +1093,8 @@ export class SupabaseSync {
       this.updateSyncState({ syncError: error.message });
       return;
     }
-    
-    // Get group IDs where user is a member
-    const memberGroupIds = memberGroups?.map((m: any) => m.group_id) || [];
-    
-    // Fetch those groups
-    let additionalGroups: any[] = [];
-    if (memberGroupIds.length > 0) {
-      const { data: additionalData, error: additionalError } = await db
-          .from('savings_groups')
-          .select('*')
-          .in('id', memberGroupIds);
-      if (additionalError) {
-        console.error('Error fetching member groups:', additionalError);
-      } else {
-        additionalGroups = additionalData || [];
-      }
-    }
-    
-    // Combine and deduplicate groups
-    const allGroups = [...(createdGroups || []), ...additionalGroups];
-    const uniqueGroups = allGroups.filter((group, index, self) => 
-      index === self.findIndex(g => g.id === group.id)
-    );
-    
-    const groups: SavingsGroup[] = uniqueGroups.map((item: any) => ({
+
+    const groups: SavingsGroup[] = (data || []).map((item: any) => ({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -1943,13 +1920,14 @@ export class SupabaseSync {
       } else {
         const syncData = {
           id: budget.id,
-          name: budget.name,
+          name: budget.name || null,
           category: budget.category,
           budget_amount: budget.budgetAmount,
           period: budget.period,
           start_date: budget.startDate,
           end_date: budget.endDate,
           current_spent: budget.currentSpent,
+          spent_amount: budget.currentSpent,
           workspace: budget.workspace,
           user_id: this.user.id,
         };
@@ -2004,11 +1982,16 @@ export class SupabaseSync {
           quote_id: receipt.quoteId || null,
           client_id: receipt.clientId,
           date: receipt.date,
+          sale_date: receipt.date,
           amount: receipt.amount,
           payment_method: receipt.paymentMethod,
           reference_number: receipt.referenceNumber || null,
           notes: receipt.notes || null,
           status: receipt.status,
+          description: receipt.notes || null,
+          category: null,
+          items: null,
+          workspace: 'business',
           user_id: this.user.id,
         };
 
@@ -2058,6 +2041,7 @@ export class SupabaseSync {
         const syncData = {
           id: deliveryNote.id,
           delivery_note_number: deliveryNote.deliveryNoteNumber,
+          delivery_number: deliveryNote.deliveryNoteNumber,
           invoice_id: deliveryNote.invoiceId || null,
           quote_id: deliveryNote.quoteId || null,
           client_id: deliveryNote.clientId,
@@ -2071,6 +2055,7 @@ export class SupabaseSync {
           status: deliveryNote.status,
           received_by: deliveryNote.receivedBy || null,
           received_at: deliveryNote.receivedAt || null,
+          workspace: 'business',
           user_id: this.user.id,
         };
 
@@ -2124,10 +2109,12 @@ export class SupabaseSync {
           client_id: revenue.clientId || null,
           amount: revenue.amount,
           date: revenue.date,
+          revenue_date: revenue.date,
           description: revenue.description,
           category: revenue.category,
           status: revenue.status,
           payment_method: revenue.paymentMethod || null,
+          workspace: 'business',
           user_id: this.user.id,
         };
 
@@ -2179,12 +2166,14 @@ export class SupabaseSync {
           vendor: expense.vendor || null,
           amount: expense.amount,
           date: expense.date,
+          expense_date: expense.date,
           description: expense.description,
           category: expense.category,
           receipt_url: expense.receiptUrl || null,
           tax_deductible: expense.taxDeductible,
           status: expense.status,
           payment_method: expense.paymentMethod || null,
+          workspace: 'business',
           user_id: this.user.id,
         };
 

@@ -326,7 +326,23 @@ CREATE TRIGGER update_sales_receipts_updated_at
 
 CREATE TRIGGER update_delivery_notes_updated_at 
     BEFORE UPDATE ON delivery_notes 
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();-- Row Level Security (RLS) Policies for Kwachalite
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+/* -------------------------------------------------------------------------- */
+/* Expand receipts/delivery notes to match app schema                          */
+/* -------------------------------------------------------------------------- */
+
+ALTER TABLE public.sales_receipts
+    ADD COLUMN IF NOT EXISTS sale_date DATE DEFAULT CURRENT_DATE,
+    ADD COLUMN IF NOT EXISTS description TEXT,
+    ADD COLUMN IF NOT EXISTS category TEXT,
+    ADD COLUMN IF NOT EXISTS items JSONB;
+
+ALTER TABLE public.delivery_notes
+    ADD COLUMN IF NOT EXISTS delivery_number TEXT,
+    ADD COLUMN IF NOT EXISTS order_reference TEXT;
+
+-- Row Level Security (RLS) Policies for Kwachalite
 -- Execute this SQL in your Supabase SQL Editor AFTER running the initial schema
 
 -- Enable RLS on all tables
@@ -873,6 +889,7 @@ UPDATE public.quotes SET quote_date = created_at::DATE WHERE quote_date IS NULL;
     name text NOT NULL,
     category text NOT NULL,
     budget_amount numeric NOT NULL,
+    spent_amount numeric NOT NULL DEFAULT 0,
     period text NOT NULL,
     start_date date NOT NULL,
     end_date date NOT NULL,
@@ -1945,6 +1962,27 @@ CREATE TABLE IF NOT EXISTS public.business_expenses (
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
+
+/* -------------------------------------------------------------------------- */
+/* Expand revenue/expense tables to match app schema                           */
+/* -------------------------------------------------------------------------- */
+
+ALTER TABLE public.business_revenues
+    ADD COLUMN IF NOT EXISTS source_id UUID,
+    ADD COLUMN IF NOT EXISTS client_id UUID REFERENCES public.clients(id) ON DELETE SET NULL,
+    ADD COLUMN IF NOT EXISTS date DATE DEFAULT CURRENT_DATE,
+    ADD COLUMN IF NOT EXISTS revenue_date DATE DEFAULT CURRENT_DATE,
+    ADD COLUMN IF NOT EXISTS status TEXT,
+    ADD COLUMN IF NOT EXISTS category TEXT,
+    ADD COLUMN IF NOT EXISTS description TEXT,
+    ADD COLUMN IF NOT EXISTS workspace TEXT DEFAULT 'business';
+
+ALTER TABLE public.business_expenses
+    ADD COLUMN IF NOT EXISTS date DATE DEFAULT CURRENT_DATE,
+    ADD COLUMN IF NOT EXISTS expense_date DATE DEFAULT CURRENT_DATE,
+    ADD COLUMN IF NOT EXISTS status TEXT,
+    ADD COLUMN IF NOT EXISTS payment_method TEXT,
+    ADD COLUMN IF NOT EXISTS workspace TEXT DEFAULT 'business';
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_business_revenues_user_date ON public.business_revenues(user_id, received_at DESC);
