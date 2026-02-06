@@ -53,10 +53,17 @@ export function BudgetAdjustModal({
   const { toast } = useToast();
   const [budget, setBudget] = useState<string>('');
   const [budgetFrequency, setBudgetFrequency] = useState<'weekly' | 'monthly'>('monthly');
-  
+
+  useEffect(() => {
+    if (category) {
+      setBudget(category.budget?.toString() || '');
+      setBudgetFrequency(category.budgetFrequency || 'monthly');
+    }
+  }, [category]);
+
   // Calculate spending data for the category within budget period
   if (!category) return null;
-  
+
   const now = new Date();
   const categoryTransactions = transactions.filter(t => {
     if (t.category !== category.name) return false;
@@ -101,13 +108,6 @@ export function BudgetAdjustModal({
     amount
   }));
 
-  useEffect(() => {
-    if (category) {
-      setBudget(category.budget?.toString() || '');
-      setBudgetFrequency(category.budgetFrequency || 'monthly');
-    }
-  }, [category]);
-
   const handleSave = () => {
     if (!category) return;
     
@@ -136,8 +136,6 @@ export function BudgetAdjustModal({
     
     onOpenChange(false);
   };
-
-  if (!category) return null;
 
   const budgetAmount = category.budget || 0;
   const remaining = budgetAmount - totalSpent;
