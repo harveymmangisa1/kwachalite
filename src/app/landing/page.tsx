@@ -69,6 +69,21 @@ function LandingPageContent() {
               <a href="#simplicity" className="text-sm font-medium text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition-colors py-2">How it Works</a>
               <a href="#peace-of-mind" className="text-sm font-medium text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition-colors py-2">Peace of Mind</a>
               <a href="#safety" className="text-sm font-medium text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition-colors py-2">Safety</a>
+              <div className="pt-2 flex flex-col gap-3">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-center text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 text-slate-700 dark:text-white/80"
+                  onClick={handleSignIn}
+                >
+                  Log In
+                </Button>
+                <Button
+                  className="w-full justify-center bg-black text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 rounded-full"
+                  onClick={handleOpenAccount}
+                >
+                  Get Started
+                </Button>
+              </div>
             </div>
           </div>
         )}
