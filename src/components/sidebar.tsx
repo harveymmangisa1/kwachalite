@@ -207,7 +207,7 @@ export function MobileNav() {
   return (
     <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
       <div className="bg-background/95 backdrop-blur-md border-t border-border/60 safe-area-bottom">
-        <nav className="flex items-center justify-around h-16 px-2">
+        <nav className="flex items-center justify-around h-[68px] px-2">
           {coreNavItems.map((item) => {
             const isActive = location.pathname === item.href || 
               (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
@@ -218,19 +218,19 @@ export function MobileNav() {
                 to={item.href}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                  "flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-lg transition-all duration-200",
+                  "flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-xl transition-all duration-200",
                   isActive 
                     ? "text-primary bg-primary/10" 
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/10"
                 )}
               >
                 <div className={cn(
-                  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200",
+                  "flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200",
                   isActive 
                     ? "bg-primary text-primary-foreground" 
                     : "text-muted-foreground"
                 )}>
-                  <item.icon className="w-4 h-4" strokeWidth={1.5} />
+                  <item.icon className="w-4.5 h-4.5" strokeWidth={1.5} />
                 </div>
                 <span className="text-[10px] font-medium mt-1">{item.label}</span>
               </Link>

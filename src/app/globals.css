@@ -122,6 +122,16 @@
   }
 }
 
+@layer utilities {
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 @keyframes float {
   0% {
     transform: translateY(0px);

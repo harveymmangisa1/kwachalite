@@ -24,7 +24,7 @@ export interface BusinessProfile {
 }
 
 // Timeout for database operations (10 seconds)
-const TIMEOUT_MS = 10000;
+const TIMEOUT_MS = 30000;
 
 // Create a promise that rejects after timeout
 function withTimeout<T>(promise: Promise<T> | any, ms: number): Promise<T> {
@@ -36,11 +36,48 @@ function withTimeout<T>(promise: Promise<T> | any, ms: number): Promise<T> {
   ]);
 }
 
+function loadProfileFromLocalStorage(userId: string): BusinessProfile | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const localStorageKey = `business_profile_${userId}`;
+    const savedProfile = localStorage.getItem(localStorageKey);
+    if (!savedProfile) return null;
+    return JSON.parse(savedProfile) as BusinessProfile;
+  } catch (error) {
+    console.warn('Failed to load business profile from localStorage:', error);
+    return null;
+  }
+}
+
+function getPendingSyncFlag(userId: string) {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem(`business_profile_pending_sync_${userId}`) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function setPendingSyncFlag(userId: string, value: boolean) {
+  if (typeof window === 'undefined') return;
+  try {
+    const key = `business_profile_pending_sync_${userId}`;
+    if (value) {
+      localStorage.setItem(key, '1');
+    } else {
+      localStorage.removeItem(key);
+    }
+  } catch (error) {
+    console.warn('Failed to update business profile pending sync flag:', error);
+  }
+}
+
 export function useBusinessProfile() {
   const { user, loading: authLoading } = useAuth();
   const [businessProfile, setBusinessProfile] = useState<BusinessProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingSync, setPendingSync] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const mounted = useRef(true);
 
@@ -67,6 +104,7 @@ export function useBusinessProfile() {
         setIsLoading(false);
         setBusinessProfile(null);
         setError(null);
+        setPendingSync(false);
       }
       return;
     }
@@ -89,25 +127,20 @@ export function useBusinessProfile() {
       console.log('Loading business profile for user:', user.id);
       
       // Try to load from Supabase first (primary source)
-      const localStorageKey = `business_profile_${user.id}`;
-      
       // Only load from localStorage if offline or for initial loading state
       const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
       
       if (isOffline) {
-        try {
-          const savedProfile = localStorage.getItem(localStorageKey);
-          if (savedProfile) {
-            const profileFromLocal = JSON.parse(savedProfile) as BusinessProfile;
-            console.log('Business profile loaded from localStorage (offline mode)');
-            if (mounted.current) {
-              setBusinessProfile(profileFromLocal);
-              setIsLoading(false);
-            }
-            return; // Don't try Supabase if offline
+        const profileFromLocal = loadProfileFromLocalStorage(user.id);
+        if (profileFromLocal) {
+          console.log('Business profile loaded from localStorage (offline mode)');
+          if (mounted.current) {
+            setBusinessProfile(profileFromLocal);
+            setIsLoading(false);
+            setError(null);
+            setPendingSync(getPendingSyncFlag(user.id));
           }
-        } catch (localError) {
-          console.warn('Failed to load from localStorage:', localError);
+          return; // Don't try Supabase if offline
         }
       }
       
@@ -115,11 +148,14 @@ export function useBusinessProfile() {
       try {
         console.log('Attempting to load from Supabase business_profiles table...');
         
-        const { data, error: queryError } = await supabase
-          .from('business_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid 406
+        const { data, error: queryError } = await withTimeout(
+          supabase
+            .from('business_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle(),
+          TIMEOUT_MS
+        );
         
         // Check if component is still mounted and request wasn't aborted
         if (!mounted.current || currentController.signal.aborted) {
@@ -136,6 +172,12 @@ export function useBusinessProfile() {
           } else {
             // Other error - log but don't fail
             console.warn(`Supabase error (using localStorage): ${queryError.message}`);
+          }
+          const profileFromLocal = loadProfileFromLocalStorage(user.id);
+          if (profileFromLocal && mounted.current) {
+            setBusinessProfile(profileFromLocal);
+            setError(null);
+            setPendingSync(getPendingSyncFlag(user.id));
           }
         } else if (data) {
           // Successfully loaded from Supabase
@@ -161,9 +203,13 @@ export function useBusinessProfile() {
           console.log('Business profile loaded successfully from Supabase');
           if (mounted.current) {
             setBusinessProfile(supabaseProfile);
+            setError(null);
+            setPendingSync(false);
+            setPendingSyncFlag(user.id, false);
             
             // Update localStorage with latest data
             try {
+              const localStorageKey = `business_profile_${user.id}`;
               localStorage.setItem(localStorageKey, JSON.stringify(supabaseProfile));
             } catch (e) {
               console.warn('Failed to update localStorage:', e);
@@ -172,7 +218,13 @@ export function useBusinessProfile() {
         }
       } catch (supabaseError) {
         console.warn('Supabase load failed, using localStorage fallback:', supabaseError);
-        // We already set profileFromLocal above, so no need to do anything else
+        const profileFromLocal = loadProfileFromLocalStorage(user.id);
+        if (profileFromLocal && mounted.current) {
+          setBusinessProfile(profileFromLocal);
+          setError(null);
+          setPendingSync(getPendingSyncFlag(user.id));
+          return;
+        }
       }
       
       // If we don't have any data from any source, set to null
@@ -190,8 +242,16 @@ export function useBusinessProfile() {
       console.error('Error loading business profile:', error);
       
       const errorMessage = error instanceof Error ? error.message : 'Failed to load business profile';
-      setError(errorMessage);
-      setBusinessProfile(null);
+      const profileFromLocal = user ? loadProfileFromLocalStorage(user.id) : null;
+      if (profileFromLocal && mounted.current) {
+        setBusinessProfile(profileFromLocal);
+        setError(null);
+        setPendingSync(getPendingSyncFlag(user.id));
+      } else if (mounted.current) {
+        setError(errorMessage);
+        setBusinessProfile(null);
+        setPendingSync(false);
+      }
     } finally {
       // Only update loading state if component is still mounted
       if (mounted.current && !currentController.signal.aborted) {
@@ -279,6 +339,10 @@ export function useBusinessProfile() {
         }
         
         console.log('Successfully saved business profile to Supabase (PRIMARY)');
+        setPendingSyncFlag(user.id, false);
+        if (mounted.current) {
+          setPendingSync(false);
+        }
         
         // Update localStorage cache from successful Supabase save
         try {
@@ -302,10 +366,12 @@ export function useBusinessProfile() {
           const localStorageKey = `business_profile_${user.id}`;
           localStorage.setItem(localStorageKey, JSON.stringify(updatedProfile));
           console.log('Successfully saved business profile to localStorage (fallback)');
+          setPendingSyncFlag(user.id, true);
           
           // Update local state immediately
           if (mounted.current) {
             setBusinessProfile(updatedProfile);
+            setPendingSync(true);
           }
           
           // Don't throw - we already saved to localStorage
@@ -366,6 +432,10 @@ export function useBusinessProfile() {
       } catch (supabaseError) {
         // Don't throw - we already saved to localStorage
         console.warn('Failed to save to Supabase (localStorage save successful):', supabaseError);
+        setPendingSyncFlag(user.id, true);
+        if (mounted.current) {
+          setPendingSync(true);
+        }
       }
       
       return updatedProfile;
@@ -410,6 +480,7 @@ export function useBusinessProfile() {
     businessProfile,
     isLoading,
     error,
+    pendingSync,
     updateBusinessProfile,
     getDisplayName,
     getBusinessInitials,

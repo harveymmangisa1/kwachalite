@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -20,6 +21,7 @@ import { useBusinessProfile, type BusinessProfile } from '@/hooks/use-business-p
 import { useToast } from '@/hooks/use-toast';
 import { SyncStatus } from '@/components/sync-status';
 import { supabase } from '@/lib/supabase';
+import { AlertCircle } from 'lucide-react';
 
 export function BusinessProfileSettings() {
   const { user } = useAuth();
@@ -28,6 +30,7 @@ export function BusinessProfileSettings() {
     businessProfile: hookProfile, 
     isLoading: isLoadingProfile, 
     error: profileError,
+    pendingSync,
     updateBusinessProfile: hookUpdateProfile,
     refreshProfile 
   } = useBusinessProfile();
@@ -204,6 +207,15 @@ export function BusinessProfileSettings() {
         </div>
       </CardHeader>
       <CardContent>
+        {pendingSync && (
+          <Alert className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Saved locally</AlertTitle>
+            <AlertDescription>
+              Your business profile is saved on this device and will sync to Supabase when the connection is stable.
+            </AlertDescription>
+          </Alert>
+        )}
         {saveError && (
           <div className="mb-4">
             <ErrorState error={saveError} />

@@ -14,10 +14,11 @@ import { cn } from '@/lib/utils';
 interface DashboardHeroProps {
     userName: string;
     userId: string;
+    avatarUrl?: string | null;
     transactions: Transaction[];
 }
 
-export function DashboardHero({ userName, userId, transactions }: DashboardHeroProps) {
+export function DashboardHero({ userName, userId, avatarUrl, transactions }: DashboardHeroProps) {
     const [streak, setStreak] = useState<UserStreak | null>(null);
     const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -66,12 +67,32 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
     const formatCurrency = (amount: number) => 
         new Intl.NumberFormat('en-MW', { style: 'currency', currency: 'MWK', minimumFractionDigits: 0 }).format(amount).replace('MWK', 'K');
 
+    const initials = userName
+        .split(' ')
+        .map((part) => part[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase();
+
     return (
-        <div className="space-y-8 font-sans text-slate-900 animate-in fade-in duration-500">
+        <div className="space-y-6 sm:space-y-8 font-sans text-slate-900 animate-in fade-in duration-500">
             
             {/* --- Header Section --- */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-1">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="h-11 w-11 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center border border-slate-200">
+                            {avatarUrl ? (
+                                <img src={avatarUrl} alt={userName} className="h-full w-full object-cover" />
+                            ) : (
+                                <span className="text-sm font-semibold text-slate-600">{initials}</span>
+                            )}
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs text-slate-500">Welcome back</span>
+                            <span className="text-sm font-semibold text-slate-800">{userName}</span>
+                        </div>
+                    </div>
                     <div className="flex items-center gap-2 text-slate-500 text-sm font-medium mb-1">
                         <Calendar className="w-4 h-4 text-indigo-500" />
                         <span>
@@ -80,19 +101,19 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
                             })}
                         </span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
                         {getGreeting()}, <span className="text-indigo-600">{userName}</span>
                     </h1>
-                    <p className="text-slate-500 max-w-md">
+                    <p className="text-slate-500 max-w-md text-sm sm:text-base">
                         Here's your financial breakdown for this month. You have <span className="font-semibold text-slate-700">{monthlyTransactions.length} pending insights</span>.
                     </p>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                    <Button variant="outline" className="rounded-full border-slate-200 hover:bg-slate-50 text-slate-600">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <Button variant="outline" className="rounded-full border-slate-200 hover:bg-slate-50 text-slate-600 h-10">
                         View Reports
                     </Button>
-                    <Button className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200">
+                    <Button className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 h-10">
                         <Zap className="w-4 h-4 mr-2" />
                         Quick Action
                     </Button>
@@ -100,10 +121,10 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
             </div>
 
             {/* --- Bento Grid Layout --- */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
                 
                 {/* 1. Main Financial Card (8 Cols) */}
-                <Card className="lg:col-span-8 relative overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-8 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-300 group">
+                <Card className="lg:col-span-8 relative overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-5 sm:p-8 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-300 group">
                     {/* Subtle Background Gradient */}
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
 
@@ -136,15 +157,15 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
 
                         {/* Large Balance Display */}
                         <div>
-                            <span className="text-5xl md:text-7xl font-bold tracking-tighter text-slate-900">
+                            <span className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter text-slate-900">
                                 {formatCurrency(Math.abs(netBalance))}
                             </span>
                         </div>
 
                         {/* Income / Expense Split Pills */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             {/* Income Pill */}
-                            <div className="flex items-center justify-between p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 hover:bg-emerald-50 transition-colors cursor-default">
+                            <div className="flex items-center justify-between p-3 sm:p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 hover:bg-emerald-50 transition-colors cursor-default">
                                 <div className="flex items-center gap-3">
                                         <div className="p-2 bg-white rounded-full shadow-sm">
                                         <TrendingUp className="w-4 h-4 text-emerald-600" />
@@ -158,7 +179,7 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
                             </div>
 
                             {/* Expense Pill */}
-                            <div className="flex items-center justify-between p-4 rounded-2xl bg-rose-50/50 border border-rose-100/50 hover:bg-rose-50 transition-colors cursor-default">
+                            <div className="flex items-center justify-between p-3 sm:p-4 rounded-2xl bg-rose-50/50 border border-rose-100/50 hover:bg-rose-50 transition-colors cursor-default">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-white rounded-full shadow-sm">
                                         <TrendingDown className="w-4 h-4 text-rose-600" />
@@ -173,7 +194,7 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
                         </div>
 
                         {/* Savings Rate Progress */}
-                        <div className="space-y-3 pt-2">
+                        <div className="space-y-3 pt-1 sm:pt-2">
                             <div className="flex justify-between items-end">
                                 <div className="flex items-center gap-2">
                                     <Target className="w-4 h-4 text-slate-400" />
@@ -181,7 +202,7 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
                                 </div>
                                 <span className="text-sm font-bold text-slate-900">{savingsRate}% <span className="text-slate-400 font-normal">/ 20%</span></span>
                             </div>
-                            <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-2.5 sm:h-3 w-full bg-slate-100 rounded-full overflow-hidden">
                                 <div 
                                     className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-1000 ease-out relative"
                                     style={{ width: `${Math.min(savingsRate, 100)}%` }}
@@ -194,10 +215,10 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
                 </Card>
 
                 {/* Right Column Stats (4 Cols) */}
-                <div className="lg:col-span-4 flex flex-col gap-6">
+                <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
                     
                     {/* 2. Gamified Streak Card (Dark Theme) */}
-                    <Card className="flex-1 p-6 rounded-[2rem] border-0 bg-[#0F172A] text-white shadow-xl relative overflow-hidden group">
+                    <Card className="flex-1 p-5 sm:p-6 rounded-[2rem] border-0 bg-[#0F172A] text-white shadow-xl relative overflow-hidden group">
                         {/* Mesh Gradients */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl" />
                         <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl" />
@@ -214,7 +235,7 @@ export function DashboardHero({ userName, userId, transactions }: DashboardHeroP
 
                             <div className="mb-8">
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-5xl font-bold tracking-tight text-white">{currentStreak}</span>
+                                    <span className="text-4xl sm:text-5xl font-bold tracking-tight text-white">{currentStreak}</span>
                                     <span className="text-lg text-slate-400 font-medium">days</span>
                                 </div>
                                 <p className="text-sm text-slate-400 mt-2 leading-relaxed">

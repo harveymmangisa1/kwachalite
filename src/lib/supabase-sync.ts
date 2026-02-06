@@ -577,8 +577,14 @@ export class SupabaseSync {
         () => db.removeChannel(taskNotesSubscription),
       ];
 
-      // Initial data fetch
-      this.performInitialDataFetch();
+      // Initial data fetch (defer slightly to avoid startup contention)
+      if (typeof window !== 'undefined') {
+        window.setTimeout(() => {
+          void this.performInitialDataFetch();
+        }, 1000);
+      } else {
+        this.performInitialDataFetch();
+      }
 
       this.updateSyncState({
         lastSyncTime: new Date(),
@@ -594,37 +600,46 @@ export class SupabaseSync {
 
   private async performInitialDataFetch() {
     try {
-      await Promise.all([
-        this.fetchAndUpdateTransactions(),
-        this.fetchAndUpdateBills(),
-        this.fetchAndUpdateSavingsGoals(),
-        this.fetchAndUpdateCategories(),
-        this.fetchAndUpdateClients(),
-        this.fetchAndUpdateProducts(),
-        this.fetchAndUpdateQuotes(),
-        this.fetchAndUpdateLoans(),
-        this.fetchAndUpdateBusinessBudgets(),
-        this.fetchAndUpdateSalesReceipts(),
-        this.fetchAndUpdateDeliveryNotes(),
-        this.fetchAndUpdateBusinessRevenues(),
-        this.fetchAndUpdateBusinessExpenses(),
-        this.fetchAndUpdateSavingsGroups(),
-        this.fetchAndUpdateGroupMembers(),
-        this.fetchAndUpdateGroupInvitations(),
-        this.fetchAndUpdateGroupContributions(),
-        this.fetchAndUpdateGroupActivities(),
-        this.fetchAndUpdateProjects(),
-        this.fetchAndUpdateInvoices(),
-        this.fetchAndUpdateClientPayments(),
-        this.fetchAndUpdateClientExpenses(),
-        this.fetchAndUpdateCommunicationLogs(),
-        this.fetchAndUpdateTaskNotes(),
-      ]);
+      const tasks = [
+        () => this.fetchAndUpdateTransactions(),
+        () => this.fetchAndUpdateBills(),
+        () => this.fetchAndUpdateSavingsGoals(),
+        () => this.fetchAndUpdateCategories(),
+        () => this.fetchAndUpdateClients(),
+        () => this.fetchAndUpdateProducts(),
+        () => this.fetchAndUpdateQuotes(),
+        () => this.fetchAndUpdateLoans(),
+        () => this.fetchAndUpdateBusinessBudgets(),
+        () => this.fetchAndUpdateSalesReceipts(),
+        () => this.fetchAndUpdateDeliveryNotes(),
+        () => this.fetchAndUpdateBusinessRevenues(),
+        () => this.fetchAndUpdateBusinessExpenses(),
+        () => this.fetchAndUpdateSavingsGroups(),
+        () => this.fetchAndUpdateGroupMembers(),
+        () => this.fetchAndUpdateGroupInvitations(),
+        () => this.fetchAndUpdateGroupContributions(),
+        () => this.fetchAndUpdateGroupActivities(),
+        () => this.fetchAndUpdateProjects(),
+        () => this.fetchAndUpdateInvoices(),
+        () => this.fetchAndUpdateClientPayments(),
+        () => this.fetchAndUpdateClientExpenses(),
+        () => this.fetchAndUpdateCommunicationLogs(),
+        () => this.fetchAndUpdateTaskNotes(),
+      ];
+
+      await this.runTasksInBatches(tasks, 2);
     } catch (error) {
       console.error('Error in initial data fetch:', error);
       this.updateSyncState({
         syncError: error instanceof Error ? error.message : 'Failed to fetch initial data',
       });
+    }
+  }
+
+  private async runTasksInBatches(tasks: Array<() => Promise<void>>, batchSize: number) {
+    for (let i = 0; i < tasks.length; i += batchSize) {
+      const batch = tasks.slice(i, i + batchSize);
+      await Promise.all(batch.map(task => task()));
     }
   }
 

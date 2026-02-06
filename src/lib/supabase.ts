@@ -8,6 +8,24 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+const fetchConcurrency = 2;
+let activeFetches = 0;
+const fetchWaiters: Array<() => void> = [];
+
+const limitedFetch: typeof fetch = async (...args) => {
+  if (activeFetches >= fetchConcurrency) {
+    await new Promise<void>(resolve => fetchWaiters.push(resolve));
+  }
+  activeFetches += 1;
+  try {
+    return await fetch(...args);
+  } finally {
+    activeFetches -= 1;
+    const next = fetchWaiters.shift();
+    if (next) next();
+  }
+};
+
 // Global singleton to prevent multiple instances
 declare global {
   interface Window {
@@ -43,6 +61,7 @@ export const supabase = (() => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      fetch: limitedFetch,
     },
   });
   

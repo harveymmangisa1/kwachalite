@@ -132,10 +132,10 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
   return (
     <div className="relative -mx-4 md:mx-0">
       {/* Horizontal scroll container for mobile */}
-      <div className="overflow-x-auto md:overflow-visible scrollbar-hide px-4 md:px-0">
-        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 min-w-max md:min-w-0">
+      <div className="overflow-x-auto md:overflow-visible scrollbar-hide -mx-4 md:mx-0 px-4 md:px-0 pb-2">
+        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 min-w-max md:min-w-0 snap-x snap-mandatory">
           {/* Income Card */}
-          <Card className="group relative flex-shrink-0 w-[280px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-6">
+          <Card className="group relative flex-shrink-0 w-[260px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-5 sm:p-6 snap-start">
             {/* Animated gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50/30 to-transparent opacity-60" />
             <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl -translate-y-20 translate-x-20 group-hover:scale-150 transition-transform duration-700" />
@@ -158,7 +158,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Income</h3>
                   <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
                 </div>
-                <p className="text-4xl font-black text-slate-900 tracking-tight">
+                <p className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                   {formatCurrency(totalIncome)}
                 </p>
                 <div className="flex items-center gap-1.5 text-sm text-slate-600">
@@ -168,7 +168,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
               </div>
               
               {/* Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-sm font-semibold text-slate-700">
@@ -181,7 +181,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
           </Card>
 
           {/* Expenses Card */}
-          <Card className="group relative flex-shrink-0 w-[280px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-6">
+          <Card className="group relative flex-shrink-0 w-[260px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-5 sm:p-6 snap-start">
             <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-pink-50/30 to-transparent opacity-60" />
             <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-rose-400/20 to-pink-400/20 rounded-full blur-3xl -translate-y-20 translate-x-20 group-hover:scale-150 transition-transform duration-700" />
             
@@ -201,7 +201,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Expenses</h3>
                   <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
                 </div>
-                <p className="text-4xl font-black text-slate-900 tracking-tight">
+                <p className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                   {formatCurrency(totalExpenses)}
                 </p>
                 <div className="flex items-center gap-1.5 text-sm text-slate-600">
@@ -210,7 +210,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                   <span className="text-sm font-semibold text-slate-700">
@@ -223,7 +223,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
           </Card>
 
           {/* Balance Card */}
-          <Card className="group relative flex-shrink-0 w-[280px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-6">
+          <Card className="group relative flex-shrink-0 w-[260px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-5 sm:p-6 snap-start">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50/30 to-transparent opacity-60" />
             <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 rounded-full blur-3xl -translate-y-20 translate-x-20 group-hover:scale-150 transition-transform duration-700" />
             
@@ -244,7 +244,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
                   <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent" />
                 </div>
                 <p className={cn(
-                  "text-4xl font-black tracking-tight",
+                  "text-3xl sm:text-4xl font-black tracking-tight",
                   balance >= 0 ? "text-slate-900" : "text-rose-600"
                 )}>
                   {formatCurrency(balance)}
@@ -263,7 +263,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
                   <div className={cn(
                     "w-2 h-2 rounded-full animate-pulse",
@@ -278,7 +278,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
           </Card>
 
           {/* Budget Status Card */}
-          <Card className="group relative flex-shrink-0 w-[280px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-6">
+          <Card className="group relative flex-shrink-0 w-[260px] md:w-auto overflow-hidden border-0 bg-white shadow-lg hover:shadow-2xl transition-all duration-500 rounded-3xl p-5 sm:p-6 snap-start">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-orange-50/30 to-transparent opacity-60" />
             <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-400/20 to-orange-400/20 rounded-full blur-3xl -translate-y-20 translate-x-20 group-hover:scale-150 transition-transform duration-700" />
             
@@ -359,7 +359,7 @@ export function OverviewCards({ transactions }: OverviewCardsProps) {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
                   {budgetStatus.percentage <= 60 && (
                     <Sparkles className="w-4 h-4 text-emerald-500" />

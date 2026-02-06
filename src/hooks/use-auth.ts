@@ -77,7 +77,7 @@ export const useAuth = () => {
             try {
               await Promise.race([
                 ensureUserProfile(session.user),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Profile creation timeout')), 5000))
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Profile creation timeout')), 20000))
               ]);
             } catch (profileError) {
               console.error('Profile creation failed or timed out:', profileError);
@@ -179,7 +179,7 @@ export const useAuth = () => {
         try {
           await Promise.race([
             ensureUserProfile(session.user),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Profile creation timeout')), 5000))
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Profile creation timeout')), 20000))
           ]);
         } catch (profileError) {
           console.error('Profile creation on sign-in failed:', profileError);

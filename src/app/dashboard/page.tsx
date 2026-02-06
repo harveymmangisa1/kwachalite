@@ -46,27 +46,30 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="container-padding py-4 sm:py-8 space-y-6 sm:space-y-8">
+    <div className="container-padding py-4 sm:py-8 space-y-5 sm:space-y-8">
       {/* Single unified hero card */}
       <DashboardHero 
         userName={user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
         userId={user.id}
+        avatarUrl={user.user_metadata?.avatar_url || null}
         transactions={personalTransactions}
       />
       
       {shouldShowDashboard ? (
         <>
-          <OverviewCards transactions={personalTransactions} />
+          <section className="space-y-3">
+            <OverviewCards transactions={personalTransactions} />
+          </section>
           
-          {/* Other dashboard content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <RecentTransactions transactions={personalTransactions} />
             <CategoryPieChart transactions={personalTransactions} />
-          </div>
+          </section>
           
-          <IncomeExpenseChart transactions={personalTransactions} />
+          <section>
+            <IncomeExpenseChart transactions={personalTransactions} />
+          </section>
           
-          {/* Optional: Detailed streak view in a collapsible section */}
           <details className="group">
             <summary className="cursor-pointer text-sm font-medium text-neutral-700 hover:text-neutral-900 p-3 bg-gray-50 rounded-lg">
               View detailed streak statistics

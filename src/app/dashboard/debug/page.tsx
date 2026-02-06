@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useAppStore } from '@/lib/data';
 import { supabaseSync } from '@/lib/supabase-sync';
 import { supabase } from '@/lib/supabase';
+import { SupabaseDiagnostic } from '@/components/debug/supabase-diagnostic';
 
 export default function DebugPage() {
   const { user, loading, session } = useAuth();
@@ -56,27 +57,35 @@ export default function DebugPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold mb-4">Debug Page</h1>
       
-      <div className="space-y-4">
+      {/* Supabase Diagnostic Tool */}
+      <SupabaseDiagnostic />
+      
+      {/* Original Debug Info */}
+      <div className="bg-white p-6 rounded-lg shadow space-y-4">
+        <h2 className="text-lg font-semibold">System Status</h2>
+        
         <div>
-          <h2 className="text-lg font-semibold">Auth Status</h2>
+          <h3 className="font-semibold">Auth Status</h3>
           <p>Loading: {loading ? 'Yes' : 'No'}</p>
           <p>User: {user ? user.email : 'Not logged in'}</p>
           <p>Session: {session ? 'Active' : 'None'}</p>
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold">Data Counts</h2>
+          <h3 className="font-semibold">Data Counts</h3>
           <p>Clients: {clients.length}</p>
           <p>Products: {products.length}</p>
           <p>Quotes: {quotes.length}</p>
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold">Sync State</h2>
-          <pre>{JSON.stringify(supabaseSync.getSyncState(), null, 2)}</pre>
+          <h3 className="font-semibold">Sync State</h3>
+          <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto">
+            {JSON.stringify(supabaseSync.getSyncState(), null, 2)}
+          </pre>
         </div>
 
         <button
